@@ -12,12 +12,12 @@ public class Main extends JFrame {
         init();
     }
 
-    private void init(){
-        setTitle("Zombies Doomday");
-        setSize(1920, 1080); //kích thước window
+    private void init() {
+        setTitle("Zombies Doomsday");
+        setSize(1920, 1080);
         setLocationRelativeTo(null);
-        setResizable(false); //không cho resize kích thước window
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //khi thoát game thì dừng chương trình
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         PanelGame panelGame = new PanelGame();
         add(panelGame);
@@ -30,7 +30,7 @@ public class Main extends JFrame {
     }
 
     public static void main(String[] args) {
-        Main main = new Main() ;
+        Main main = new Main();
         main.setVisible(true);
     }
 }
