@@ -2,6 +2,7 @@ package game.obj;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.Image;
 import javax.swing.ImageIcon;
 
 public class Player {
@@ -11,10 +12,15 @@ public class Player {
     }
 
     public static final double PLAYER_SIZE = 84;
-    private double x; //vị trí x nhân vật
-    private double y; // vị trí y nhân vật
+    private double x, y; //vị trí x, y nhân vật
+
+    // NHÂN VẬT
+    private float speed = 0f;
+    private final float MAX_SPEED = 1f;
+
     private float angle = 0f;
     private final Image image; //ảnh nhân vật
+    private boolean speedUp;
 
     //thay đổi vị trí
     public void changeLocation(double x, double y){
@@ -22,6 +28,10 @@ public class Player {
         this.y = y;
     }
 
+    public void update(){
+        x += Math.cos(Math.toRadians(angle)) * speed;
+        y += Math.sin(Math.toRadians(angle)) * speed;
+    }
 
     //thay đổi hướng xoay
     public void changeAngle(float angle){
@@ -35,11 +45,12 @@ public class Player {
 
     public void draw(Graphics2D g2){
         AffineTransform oldTransform = g2.getTransform();
-        g2.translate(x, y);
+        g2.translate(x, y); //di chuyển vị trí
         AffineTransform tran = g2.getTransform();
+        tran.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2); //xoay nhân vật
+        g2.drawImage(image, tran,null);
 
-        g2.drawImage(image, 0, 0, null);
-        g2.setTransform(oldTransform);
+        g2.setTransform(oldTransform); //lưu trữ thay đổi
     }
 
     public double getX() {
@@ -54,4 +65,21 @@ public class Player {
         return angle;
     }
 
+    public void speedUp(){
+        speedUp = true;
+        if(speed > MAX_SPEED){
+            speed = MAX_SPEED;
+        } else{
+            speed += 0.01f;
+        }
+    }
+
+    public void speedDown(){
+        speedUp = false;
+        if(speed <= 0){
+            speed = 0f;
+        }else{
+            speed -= 0.01f;
+        }
+    }
 }

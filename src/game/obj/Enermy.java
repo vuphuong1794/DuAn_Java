@@ -11,8 +11,7 @@ public class Enermy {
     }
 
     public static final double ENERMY_SIZE = 84;
-    private double x;
-    private double y;
+    private double x, y;
     private final float speed = 0.3f;
     private float angle = 0;
     private final Image image;
@@ -34,14 +33,20 @@ public class Enermy {
         this.angle = angle;
     }
 
+    public void update(){
+        x += Math.cos(Math.toRadians(angle)) * speed;
+        y += Math.sin(Math.toRadians(angle)) * speed;
+    }
+
     public void draw(Graphics2D g2){
         AffineTransform oldTransform = g2.getTransform();
         g2.translate(x, y);
         AffineTransform tran = new AffineTransform();
-
-        g2.drawImage(image, 0, 0, null);
+        tran.rotate(Math.toRadians(angle), ENERMY_SIZE / 2, ENERMY_SIZE / 2);
+        g2.drawImage(image, tran, null);
         g2.setTransform(oldTransform);
     }
+
     public double getX() {
         return x;
     }
