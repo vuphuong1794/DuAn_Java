@@ -2,57 +2,90 @@ package game.obj;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.Image;
 import javax.swing.ImageIcon;
 
 public class Player {
 
-    public Player(){
-        this.image = new ImageIcon(getClass().getResource("/game/image/Player.png")).getImage();
-    }
-
+    // Kích thước của nhân vật
     public static final double PLAYER_SIZE = 84;
-    private double x, y; //vị trí x, y nhân vật
 
-    // NHÂN VẬT
+    // Vị trí x, y của nhân vật trên màn hình
+    private double x, y;
+
+    // Tốc độ của nhân vật
     private float speed = 0f;
-    private final float MAX_SPEED = 1f;
+    private static final float MAX_SPEED = 1f;
 
+    // Góc xoay của nhân vật (tính bằng độ)
     private float angle = 0f;
-    private final Image image; //ảnh nhân vật
+
+    // Hình ảnh của nhân vật
+    private final Image image;
+
+    // Biến kiểm tra xem nhân vật có đang tăng tốc không
     private boolean speedUp;
 
-    //thay đổi vị trí
-    public void changeLocation(double x, double y){
+    // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
+    public Player() {
+        this.image = loadImage("/game/image/CharacterPlayer.png");
+    }
+
+    // Phương thức tải hình ảnh và xử lý lỗi nếu có
+    private Image loadImage(String path) {
+        try {
+            return new ImageIcon(getClass().getResource(path)).getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    // Phương thức thay đổi vị trí của nhân vật
+    public void changeLocation(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public void update(){
+    // Phương thức cập nhật vị trí của nhân vật dựa trên góc và tốc độ
+    public void update() {
         x += Math.cos(Math.toRadians(angle)) * speed;
         y += Math.sin(Math.toRadians(angle)) * speed;
     }
 
-    //thay đổi hướng xoay
-    public void changeAngle(float angle){
-        if(angle < 0){
+    // Phương thức thay đổi góc xoay của nhân vật
+    public void changeAngle(float angle) {
+        if (angle < 0) {
             angle = 359;
-        } else if(angle > 359){
+        } else if (angle > 359) {
             angle = 0;
         }
         this.angle = angle;
     }
 
-    public void draw(Graphics2D g2){
+    // Phương thức vẽ nhân vật lên màn hình
+    public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
-        g2.translate(x, y); //di chuyển vị trí
+        g2.translate(x, y);
         AffineTransform tran = g2.getTransform();
-        tran.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2); //xoay nhân vật
-        g2.drawImage(image, tran,null);
-
-        g2.setTransform(oldTransform); //lưu trữ thay đổi
+        tran.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2);
+        g2.drawImage(image, tran, null);
+        g2.setTransform(oldTransform);
     }
 
+    // Phương thức tăng tốc nhân vật
+    public void speedUp() {
+        speedUp = true;
+        speed = Math.min(speed + 0.02f, MAX_SPEED);
+    }
+
+    // Phương thức giảm tốc nhân vật
+    public void speedDown() {
+        speedUp = false;
+        speed = Math.max(speed - 0.01f, 0f);
+    }
+
+    // Getters cho vị trí x, y và góc xoay
     public double getX() {
         return x;
     }
@@ -65,21 +98,5 @@ public class Player {
         return angle;
     }
 
-    public void speedUp(){
-        speedUp = true;
-        if(speed > MAX_SPEED){
-            speed = MAX_SPEED;
-        } else{
-            speed += 0.01f;
-        }
-    }
 
-    public void speedDown(){
-        speedUp = false;
-        if(speed <= 0){
-            speed = 0f;
-        }else{
-            speed -= 0.01f;
-        }
-    }
 }
