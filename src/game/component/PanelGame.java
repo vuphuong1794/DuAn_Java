@@ -1,6 +1,7 @@
 package game.component;
 
 import game.obj.Bullet;
+import game.obj.Effect;
 import game.obj.Player;
 import game.obj.Enemy;
 
@@ -33,6 +34,7 @@ public class PanelGame extends JComponent {
     private Player player;
     private List<Enemy> enemies;
     private List<Bullet> bullets;
+    private List<Effect> boomEffects;
 
     // Mouse position
     private Point mousePosition;
@@ -142,7 +144,7 @@ public class PanelGame extends JComponent {
         player = new Player();
         player.changeLocation(150, 150);
         enemies = new ArrayList<>();
-
+        boomEffects = new ArrayList<>();
         // Tạo luồng riêng để sinh kẻ thù định kỳ
         new Thread(() -> {
             while (start) {
@@ -242,7 +244,20 @@ public class PanelGame extends JComponent {
                 Area area = new Area(bullet.getShape());
                 area.intersect(enemy.getShape());
                 if(!area.isEmpty()){
-                    enemies.remove(enemy);
+
+                    boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
+                     if(true){
+                        enemies.remove(enemy);
+                        double x=enemy.getX()+Enemy.ENEMY_SIZE/2;
+                        double y=enemy.getY()+Enemy.ENEMY_SIZE/2;
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                        boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                        boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+
+                    }
+
                     bullets.remove(bullet);
                 }
             }
@@ -301,6 +316,17 @@ public class PanelGame extends JComponent {
                         }
                     }
                 }
+                for(int i = 0; i<boomEffects.size(); i++){
+                    Effect boomEffect = boomEffects.get(i);
+                    if (boomEffect != null) {
+                        boomEffect.update();
+                        if(!boomEffect.check()){
+                            boomEffects.remove(boomEffect);
+                        }
+                    }else{
+                        boomEffects.remove(boomEffect);
+                    }
+                }
                 sleep(1); // Ngủ 1ms để giảm tải cho CPU
             }
         }).start(); // Bắt đầu luồng xử lý đạn
@@ -321,6 +347,12 @@ public class PanelGame extends JComponent {
             Bullet bullet = bullets.get(i);
             if (bullet != null) {
                 bullet.draw(g2);
+            }
+        }
+        for(int i=0; i<boomEffects.size(); i++){
+            Effect boomEffect = boomEffects.get(i);
+            if (boomEffect != null) {
+                boomEffect.draw(g2);
             }
         }
     }

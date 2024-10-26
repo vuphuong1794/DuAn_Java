@@ -68,12 +68,11 @@ public class Enemy {
         Shape shap = getShape();
         g2.setTransform(oldTransform);
 
-        /*
         //test
         g2.setColor(Color.red);
         g2.draw(shap.getBounds2D());
-       
-         */
+
+
     }
 
     public double getX() {
