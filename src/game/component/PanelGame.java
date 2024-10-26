@@ -1,13 +1,15 @@
 package game.component;
 
-import game.obj.Enermy;
+import game.obj.Bullet;
 import game.obj.Player;
+import game.obj.Enemy;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import javax.swing.JComponent;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,185 +22,323 @@ public class PanelGame extends JComponent {
     private Thread thread;
     private boolean start = true;
     private Key key;
+    private Image imagemap;
+    private float shotTime;
 
-    //Game FPS
+    // Game FPS
     private final int FPS = 60;
     private final int TARGET_TIME = 1000000000 / FPS;
 
-    //Game Object
+    // Game Object
     private Player player;
-    private List<Enermy> enermies;
+    private List<Enemy> enemies;
+    private List<Bullet> bullets;
 
-    public void start(){
-        width = getWidth();
-        height = getHeight();
+    // Mouse position
+    private Point mousePosition;
+
+    public PanelGame() {
+        // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                mousePosition = e.getPoint();
+            }
+        });
+    }
+
+    // Khởi động game
+    public void start() {
+        width = getWidth(); // Lấy chiều rộng của panel
+        height = getHeight(); // Lấy chiều cao của panel
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         g2 = image.createGraphics();
+
+        // Cấu hình render cho đồ họa mượt mà hơn
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(start){
-                    long startTime = System.nanoTime();
-                    drawBackground();
-                    drawGame();
-                    render();
-                    long time = System.nanoTime() - startTime;
-                    if(time < TARGET_TIME){
-                        long sleep = (TARGET_TIME - time) / 1000000;
-                        sleep(sleep);
-                    }
 
+        // Khởi động luồng chính của game
+        thread = new Thread(() -> {
+            while (start) {
+                long startTime = System.nanoTime();
+                drawBackground();
+
+                // Tính góc quay Player - chuột
+                if (mousePosition != null) {
+                    double dx = mousePosition.x - player.getX();
+                    double dy = mousePosition.y - player.getY();
+
+                    // Tính toán góc của Player và chuột
+                    double angleToMouse = Math.toDegrees(Math.atan2(dy, dx));
+
+                    // Góc quay được 360 độ
+                    if (angleToMouse < 0) {
+                        angleToMouse += 360;
+                    }
+                    // Tăng độ nhạy của chuột
+                    float sensitiveAngle = (float)(angleToMouse * 1.5);
+
+                    // Cập nhật góc xoay của Player
+                    player.changeAngle((float) angleToMouse);
+                }
+
+
+                drawGame();
+                render();
+                long time = System.nanoTime() - startTime;
+
+                // Điều chỉnh tốc độ game để duy trì FPS ổn định
+                if (time < TARGET_TIME) {
+                    long sleep = (TARGET_TIME - time) / 1000000;
+                    sleep(sleep);
                 }
             }
         });
+
         initObjectGame();
         initKeyboard();
+        initBullets();
         thread.start();
     }
 
-    private void addEnermy(){
+    // Thêm kẻ thù vào game
+    private void addEnemy() {
         Random ran = new Random();
         int margin = 50; // Khoảng cách từ mép màn hình
-        int enemySize = 300; // Giả sử kích thước của kẻ thù là 50x50 pixels
+        int enemySize = 300; // Giả sử kích thước của kẻ thù
 
         // Tạo kẻ thù bên trái màn hình
-        int locationY1 = ran.nextInt(height - enemySize - 2*margin) + margin;
-        Enermy enemyLeft = new Enermy();
-        enemyLeft.changeLocation(-enemySize, locationY1); // Bắt đầu từ ngoài màn hình bên trái
+        int locationY1 = ran.nextInt(height - enemySize - 2 * margin) + margin;
+        Enemy enemyLeft = new Enemy();
+        enemyLeft.changeLocation(-enemySize, locationY1);
         enemyLeft.changeAngle(0); // Di chuyển sang phải
-        enermies.add(enemyLeft);
+        enemies.add(enemyLeft);
 
         // Tạo kẻ thù bên phải màn hình
-        int locationY2 = ran.nextInt(height - enemySize - 2*margin) + margin;
-        Enermy enemyRight = new Enermy();
-        enemyRight.changeLocation(width + enemySize, locationY2); // Bắt đầu từ ngoài màn hình bên phải
+        int locationY2 = ran.nextInt(height - enemySize - 2 * margin) + margin;
+        Enemy enemyRight = new Enemy();
+        enemyRight.changeLocation(width + enemySize, locationY2);
         enemyRight.changeAngle(180); // Di chuyển sang trái
-        enermies.add(enemyRight);
+        enemies.add(enemyRight);
 
-        // Tạo kẻ thù ở trên màn hình (tùy chọn)
-        int locationX3 = ran.nextInt(width - enemySize - 2*margin) + margin;
-        Enermy enemyTop = new Enermy();
-        enemyTop.changeLocation(locationX3, -enemySize); // Bắt đầu từ trên màn hình
+        // Tạo kẻ thù ở trên màn hình
+        int locationX3 = ran.nextInt(width - enemySize - 2 * margin) + margin;
+        Enemy enemyTop = new Enemy();
+        enemyTop.changeLocation(locationX3, -enemySize);
         enemyTop.changeAngle(90); // Di chuyển xuống
-        enermies.add(enemyTop);
+        enemies.add(enemyTop);
 
-        // Tạo kẻ thù ở dưới màn hình (tùy chọn)
-        int locationX4 = ran.nextInt(width - enemySize - 2*margin) + margin;
-        Enermy enemyBottom = new Enermy();
-        enemyBottom.changeLocation(locationX4, height + enemySize); // Bắt đầu từ dưới màn hình
+        // Tạo kẻ thù ở dưới màn hình
+        int locationX4 = ran.nextInt(width - enemySize - 2 * margin) + margin;
+        Enemy enemyBottom = new Enemy();
+        enemyBottom.changeLocation(locationX4, height + enemySize);
         enemyBottom.changeAngle(270); // Di chuyển lên
-        enermies.add(enemyBottom);
+        enemies.add(enemyBottom);
     }
 
-    //khởi tạo đối tượng
-    private void initObjectGame(){
+    // Khởi tạo các đối tượng trong game
+    private void initObjectGame() {
         player = new Player();
         player.changeLocation(150, 150);
-        enermies = new ArrayList<>();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(start){
-                    addEnermy();
-                    sleep(3000);
-                }
+        enemies = new ArrayList<>();
+
+        // Tạo luồng riêng để sinh kẻ thù định kỳ
+        new Thread(() -> {
+            while (start) {
+                addEnemy();
+                sleep(3000); // Mỗi 3 giây thêm kẻ thù mới
             }
         }).start();
     }
 
-    private void initKeyboard(){
+    // Khởi tạo xử lý bàn phím
+    private void initKeyboard() {
         key = new Key();
-        requestFocus();
-        addKeyListener(new KeyAdapter(){
+        requestFocus(); // Đảm bảo JComponent có focus để nhận sự kiện bàn phím
+        addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_A){
-                    key.setKey_left(true);
-                } else if(e.getKeyCode() == KeyEvent.VK_D){
-                    key.setKey_right(true);
-                } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    key.setKey_space(true);
-                } else if(e.getKeyCode() == KeyEvent.VK_J){
-                    key.setKey_j(true);
-                } else if(e.getKeyCode() == KeyEvent.VK_K){
-                    key.setKey_k(true);
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_A -> key.setKey_left(true);
+                    case KeyEvent.VK_D -> key.setKey_right(true);
+                    case KeyEvent.VK_SPACE -> key.setKey_space(true);
+                    case KeyEvent.VK_J -> key.setKey_j(true);
+                    case KeyEvent.VK_K -> key.setKey_k(true);
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_A){
-                    key.setKey_left(false);
-                } else if(e.getKeyCode() == KeyEvent.VK_D){
-                    key.setKey_right(false);
-                } else if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    key.setKey_space(false);
-                } else if(e.getKeyCode() == KeyEvent.VK_J){
-                    key.setKey_j(false);
-                } else if(e.getKeyCode() == KeyEvent.VK_K){
-                    key.setKey_k(false);
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_A -> key.setKey_left(false);
+                    case KeyEvent.VK_D -> key.setKey_right(false);
+                    case KeyEvent.VK_SPACE -> key.setKey_space(false);
+                    case KeyEvent.VK_J -> key.setKey_j(false);
+                    case KeyEvent.VK_K -> key.setKey_k(false);
                 }
             }
         });
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                float s = 0.5f; //tăng góc độ khi người dùng ấn nút di chuyển
-                while(start){
-                    float angle = player.getAngle();
-                    if(key.isKey_left()){
-                        angle -= s;
-                    }
-                    if(key.isKey_right()){
-                        angle += s;
-                    }
-                    if(key.isKey_space()){
-                        player.speedUp();
-                    }
-                    else{
-                        player.speedDown();
-                    }
-                    player.update();
-                    player.changeAngle(angle);
-                    for(int i = 0; i < enermies.size(); i++){
-                        Enermy enermy = enermies.get(i);
-                        if(enermy != null){
-                            enermy.update();
+
+        // Khởi động luồng xử lý di chuyển của player và enemies
+        new Thread(() -> {
+            float rotationSpeed = 0.5f; // Tốc độ thay đổi góc của Player
+            while (start) {
+                float angle = player.getAngle();
+                if (key.isKey_left()) {
+                    angle -= rotationSpeed; // Xoay trái
+                }
+                if (key.isKey_right()) {
+                    angle += rotationSpeed; // Xoay phải
+                }
+                if (key.isKey_space()) {
+                    player.speedUp(); // Tăng tốc
+                }
+                if (key.isKey_j()|| key.isKey_k()){
+                    if (shotTime==0){
+                        if (key.isKey_j()) {
+                            bullets.add(0,new Bullet(player.getX(), player.getY(), player.getAngle(), 5,3f));
+                        }
+                        else{
+                            bullets.add(0,new Bullet(player.getX(), player.getY(), player.getAngle(), 20,3f));
                         }
                     }
-                    sleep(5);
+                    shotTime++;
+                    if (shotTime==15){
+                        shotTime=0;
+                    }
                 }
+
+                else {
+                    player.speedDown(); // Giảm tốc
+                }
+                player.update();
+                player.changeAngle(angle);
+
+                // Cập nhật vị trí của tất cả các kẻ thù
+                List<Enemy> currentEnemies;
+                synchronized (enemies) {
+                    currentEnemies = new ArrayList<>(enemies); // Tạo một bản sao an toàn
+                }
+
+                for (Enemy enemy : currentEnemies) {
+                    if (enemy != null) {
+                        enemy.update();
+                        if(!enemy.check(width, height)){
+                            enemies.remove(enemy);
+                            System.out.println("removed");
+                        }
+                    }
+                }
+                sleep(5); // Ngủ 5ms để giảm tải cho CPU
             }
         }).start();
     }
 
-    private void drawBackground(){
-        g2.setColor(new Color(30, 30, 30));
-        g2.fillRect(0, 0, width, height);
+    private void checkBullets(Bullet bullet){
+        for(int i=0; i<enemies.size(); i++){
+            Enemy enemy = enemies.get(i);
+            if(enemy!=null){
+                Area area = new Area(bullet.getShape());
+                area.intersect(enemy.getShape());
+                if(!area.isEmpty()){
+                    enemies.remove(enemy);
+                    bullets.remove(bullet);
+                }
+            }
+        }
+
     }
 
-    private void drawGame(){
-        player.draw(g2);
-        for(int i = 0; i < enermies.size(); i++){
-            Enermy enermy = enermies.get(i);
-            if(enermy != null){
-                enermy.draw(g2);
+    // Vẽ nền game
+    private void drawBackground() {
+        // Tải hình ảnh bản đồ nếu chưa được tải
+        if (imagemap == null) {
+            imagemap = loadImage("/game/image/map.png");
+        }
+
+        // Vẽ hình ảnh bản đồ lên nền
+        if (imagemap != null) {
+            g2.drawImage(imagemap, 0, 0, width, height, null); // Vẽ hình ảnh với kích thước của panel
+        } else {
+            g2.setColor(new Color(30, 30, 30)); // Màu nền xám đậm nếu không tải được hình ảnh
+            g2.fillRect(0, 0, width, height); // Vẽ hình chữ nhật với kích thước của panel
+        }
+    }
+
+    // Phương thức tải hình ảnh và xử lý lỗi nếu có
+    private Image loadImage(String path) {
+        try {
+            return new ImageIcon(getClass().getResource(path)).getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Không tải được map");
+            return null; // Trả về null nếu xảy ra lỗi khi tải hình ảnh
+        }
+    }
+
+    private void initBullets() {
+        bullets = new ArrayList<>();
+        new Thread(() -> {
+            while (start) {
+                // Tạo một bản sao của danh sách đạn để duyệt qua
+                List<Bullet> bulletsCopy;
+                synchronized (bullets) {
+                    bulletsCopy = new ArrayList<>(bullets);
+                }
+
+                for (int i = 0; i < bulletsCopy.size(); i++) {
+                    Bullet bullet = bulletsCopy.get(i);
+                    if (bullet != null) {
+                        bullet.update(); // Cập nhật vị trí của viên đạn
+                        checkBullets(bullet); //kiểm tra nếu viên đạn bắn trúng zombie
+                        // Kiểm tra nếu viên đạn còn trong khung hình
+                        if (!bullet.check(width, height)) {
+                            // Nếu viên đạn ra ngoài khung hình, thêm vào danh sách xóa
+                            synchronized (bullets) {
+                                bullets.remove(bullet); // Xóa viên đạn khỏi danh sách gốc
+                            }
+                        }
+                    }
+                }
+                sleep(1); // Ngủ 1ms để giảm tải cho CPU
+            }
+        }).start(); // Bắt đầu luồng xử lý đạn
+    }
+
+
+
+    // Vẽ các đối tượng trong game
+    private void drawGame() {
+        player.draw(g2); // Vẽ player
+        for (int i = 0; i < enemies.size(); i++) {
+            Enemy enemy = enemies.get(i);
+            if (enemy != null) {
+                enemy.draw(g2); // Vẽ từng kẻ thù
+            }
+        }
+        for (int i = 0; i < bullets.size(); i++) {
+            Bullet bullet = bullets.get(i);
+            if (bullet != null) {
+                bullet.draw(g2);
             }
         }
     }
 
-    private void render(){
+    // Render hình ảnh đã vẽ lên màn hình
+    private void render() {
         Graphics g = getGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
+        if (g != null) {
+            g.drawImage(image, 0, 0, null); // Vẽ hình ảnh từ bộ nhớ đệm lên màn hình
+            g.dispose();
+        }
     }
 
-    private void sleep(long speed){
-        try{
-            Thread.sleep(speed);
-        } catch(InterruptedException ex){
+    // Dừng lại một khoảng thời gian (ms)
+    private void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
             System.err.println(ex);
         }
     }

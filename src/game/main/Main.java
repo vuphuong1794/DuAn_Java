@@ -2,12 +2,12 @@ package game.main;
 
 import game.component.PanelGame;
 import javax.swing.JFrame;
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Main extends JFrame {
-
+    // Hàm main
     public Main() {
         init();
     }
@@ -33,4 +33,6 @@ public class Main extends JFrame {
         Main main = new Main();
         main.setVisible(true);
     }
+
+
 }
