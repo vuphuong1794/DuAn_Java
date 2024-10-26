@@ -72,7 +72,6 @@ public class Enemy {
         g2.setColor(Color.red);
         g2.draw(shap.getBounds2D());
 
-
     }
 
     public double getX() {
@@ -88,10 +87,20 @@ public class Enemy {
     }
 
     public Area getShape() {
+        // Get the width and height of the image
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+
+        // Tạo ra hình chữ nhật với toạ độ x, y và chiều dài chiều rộng cho trước
+        Rectangle rectangle = new Rectangle(0, 0, 50, 50);
+
+        // Apply transformations: translation and rotation
         AffineTransform afx = new AffineTransform();
-        afx.translate(x, y);
-        afx.rotate(Math.toRadians(angle), ENEMY_SIZE/2, ENEMY_SIZE/2);
-        return new Area(afx.createTransformedShape(enemyShap));
+        afx.translate(x, y); // dịch chuyển zombie theo toạ độ x,y
+        afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
+
+        // Create an Area from the transformed rectangle
+        return new Area(afx.createTransformedShape(rectangle));
     }
 
     public boolean check(int width, int height) {

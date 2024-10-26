@@ -2,6 +2,7 @@ package game.obj;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import javax.swing.ImageIcon;
 
 public class Player {
@@ -70,7 +71,28 @@ public class Player {
         AffineTransform tran = g2.getTransform();
         tran.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2);
         g2.drawImage(image, tran, null);
+        Shape shap = getShape();
         g2.setTransform(oldTransform);
+
+        //test
+        g2.setColor(Color.red);
+        g2.draw(shap.getBounds2D());
+    }
+    public Area getShape() {
+        // Get the width and height of the image
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+
+        // Tạo ra hình chữ nhật với toạ độ x, y và chiều dài chiều rộng cho trước
+        Rectangle rectangle = new Rectangle(0, 0, 50, 50);
+
+        // Apply transformations: translation and rotation
+        AffineTransform afx = new AffineTransform();
+        afx.translate(x, y); // dịch chuyển zombie theo toạ độ x,y
+        afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
+
+        // Create an Area from the transformed rectangle
+        return new Area(afx.createTransformedShape(rectangle));
     }
 
     // Phương thức tăng tốc nhân vật
