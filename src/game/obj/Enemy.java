@@ -14,8 +14,9 @@ public class Enemy {
     private float angle = 0;
     private static final int NUM_IMAGES = 7;
     private final Image image;
-    private final Area enemyShap;
-    private boolean hasEnteredScreen = false; // Thêm biến để theo dõi trạng thái
+    private final Area enemyShape;
+    private boolean hasEnteredScreen = false;
+    private boolean isActive = true;  // Thêm biến để kiểm soát trạng thái hoạt động
 
     public Enemy() {
         Random random = new Random();
@@ -29,7 +30,7 @@ public class Enemy {
         p.lineTo(ENEMY_SIZE+10, ENEMY_SIZE/2);
         p.lineTo(ENEMY_SIZE-5, ENEMY_SIZE-13);
         p.lineTo(15, ENEMY_SIZE-10);
-        enemyShap = new Area(p);
+        enemyShape = new Area(p);
     }
 
     public void changeLocation(double x, double y) {
@@ -60,18 +61,19 @@ public class Enemy {
     }
 
     public void draw(Graphics2D g2) {
+        if (!isActive) return;  // Không vẽ nếu zombie không còn hoạt động
+
         AffineTransform oldTransform = g2.getTransform();
         g2.translate(x, y);
         AffineTransform tran = new AffineTransform();
         tran.rotate(Math.toRadians(angle), ENEMY_SIZE / 2, ENEMY_SIZE / 2);
         g2.drawImage(image, tran, null);
-        Shape shap = getShape();
+        Shape shape = getShape();
         g2.setTransform(oldTransform);
 
         //test
         g2.setColor(Color.red);
-        g2.draw(shap.getBounds2D());
-
+        g2.draw(shape.getBounds2D());
     }
 
     public double getX() {
@@ -87,36 +89,28 @@ public class Enemy {
     }
 
     public Area getShape() {
-        // Get the width and height of the image
-        int width = image.getWidth(null);
-        int height = image.getHeight(null);
-
-        // Tạo ra hình chữ nhật với toạ độ x, y và chiều dài chiều rộng cho trước
         Rectangle rectangle = new Rectangle(0, 0, 50, 50);
-
-        // Apply transformations: translation and rotation
         AffineTransform afx = new AffineTransform();
-        afx.translate(x, y); // dịch chuyển zombie theo toạ độ x,y
-        afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
-
-        // Create an Area from the transformed rectangle
+        afx.translate(x, y);
+        afx.rotate(Math.toRadians(angle), 0, 0);
         return new Area(afx.createTransformedShape(rectangle));
     }
 
     public boolean check(int width, int height) {
-        // Nếu enemy chưa từng vào màn hình, luôn trả về true
-        if (!hasEnteredScreen) {
-            return true;
-        }
+        // Define a buffer to allow enemies to stay in the game if they are close to the edges
+        int buffer = 50; // Increase this buffer if needed for testing
 
-        // Chỉ kiểm tra biên khi enemy đã từng vào màn hình
+        // Get enemy bounds
         Rectangle size = getShape().getBounds();
-        boolean isOutOfBounds = x <= -size.getWidth() ||
-                y <= -size.getHeight() ||
-                x >= width + size.getWidth() ||
-                y >= height + size.getHeight();
 
-        // Trả về false nếu enemy đã ra khỏi màn hình sau khi đã vào
+        // Check if the enemy is beyond the screen bounds plus the buffer
+        boolean isOutOfBounds = x <= -size.getWidth() - buffer ||
+                y < -size.getHeight() - buffer ||
+                x > width + buffer ||
+                y > height + buffer;
+
+        // If out of bounds, return false to mark for removal
         return !isOutOfBounds;
     }
+
 }
