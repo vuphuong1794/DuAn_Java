@@ -35,6 +35,8 @@ public class PanelGame extends JComponent {
     private List<Enemy> enemies;
     private List<Bullet> bullets;
     private List<Effect> boomEffects;
+// Lưu thời gian tạo hiệu ứng nổ
+    private long lastExplosionTime = 0;
 
     // Mouse position
     private Point mousePosition;
@@ -167,7 +169,10 @@ public class PanelGame extends JComponent {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> key.setKey_left(true);
                     case KeyEvent.VK_D -> key.setKey_right(true);
-                    case KeyEvent.VK_SPACE -> key.setKey_space(true);
+                    // case KeyEvent.VK_SPACE -> key.setKey_space(true);
+                    case KeyEvent.VK_S -> key.setKey_down(true);
+                    case KeyEvent.VK_W -> key.setKey_up(true);
+
                     case KeyEvent.VK_J -> key.setKey_j(true);
                     case KeyEvent.VK_K -> key.setKey_k(true);
                 }
@@ -178,7 +183,9 @@ public class PanelGame extends JComponent {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> key.setKey_left(false);
                     case KeyEvent.VK_D -> key.setKey_right(false);
-                    case KeyEvent.VK_SPACE -> key.setKey_space(false);
+                    // case KeyEvent.VK_SPACE -> key.setKey_space(false);
+                    case KeyEvent.VK_S -> key.setKey_down(false);
+                    case KeyEvent.VK_W -> key.setKey_up(false);
                     case KeyEvent.VK_J -> key.setKey_j(false);
                     case KeyEvent.VK_K -> key.setKey_k(false);
                 }
@@ -191,14 +198,20 @@ public class PanelGame extends JComponent {
             while (start) {
                 float angle = player.getAngle();
                 if (key.isKey_left()) {
-                    angle -= rotationSpeed; // Xoay trái
+                    player.changeLocation(player.getX() - rotationSpeed, player.getY()); // Di chuyển sang trái
                 }
                 if (key.isKey_right()) {
-                    angle += rotationSpeed; // Xoay phải
+                    player.changeLocation(player.getX() + rotationSpeed, player.getY()); // Di chuyển sang phải
                 }
-                if (key.isKey_space()) {
-                    player.speedUp(); // Tăng tốc
+                if (key.isKey_up()) {
+                    player.changeLocation(player.getX(), player.getY() - rotationSpeed); // Di chuyển lên
                 }
+                if (key.isKey_down()) {
+                    player.changeLocation(player.getX(), player.getY() + rotationSpeed); // Di chuyển xuống
+                }
+                // if (key.isKey_space()) {
+                //     player.speedUp(); // Tăng tốc
+                // }
                 if (key.isKey_j()|| key.isKey_k()){
                     if (shotTime==0){
                         if (key.isKey_j()) {
@@ -279,36 +292,45 @@ public class PanelGame extends JComponent {
             area.intersect(enemy.getShape());
             if (!area.isEmpty()) {
                 double enemyHp = enemy.getHP();
-
-
-                //==============================================CODE DANH CHO ZOMBIE NO====================
-                // if (!enemy.updateHP(player.getHP())) {
-                //     enemies.remove(enemy);
-                //     double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
-                //     double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
     
-                //     boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
-                //     boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
-                //     boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
-                //     boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
-                //     boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
-                // }
-
-                if (!player.updateHP(enemyHp)) {
-                    player.setAlive(false);
-                    double x = player.getX() + Player.PLAYER_SIZE / 2;
-                    double y = player.getY() + Player.PLAYER_SIZE / 2;
+                // Lấy thời gian hiện tại
+                long currentTime = System.currentTimeMillis();
     
-                    boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
-                    boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
-                    boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
-                    boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
-                    boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                // Kiểm tra nếu đã qua 3 giây kể từ lần nổ trước
+                if (currentTime - lastExplosionTime >= 3000) {
+                    if (!enemy.updateHP(player.getHP())) {
+                        enemies.remove(enemy);
+                        double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
+                        double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
+    
+                        // Thêm hiệu ứng nổ vào danh sách hiệu ứng
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                        boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                        boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+    
+                        // Cập nhật lại thời gian của lần nổ cuối
+                        lastExplosionTime = currentTime;
+                    }
+                    
+                    if (!player.updateHP(enemyHp)) {
+                        player.setAlive(false);
+                        double x = player.getX() + Player.PLAYER_SIZE / 2;
+                        double y = player.getY() + Player.PLAYER_SIZE / 2;
+    
+                        // Thêm hiệu ứng nổ cho người chơi
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                        boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                        boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                    }
                 }
-                
             }
         }
     }
+    
     
 
     // Vẽ nền game
