@@ -112,19 +112,20 @@ public class Enemy extends HpRender  {
         if (!isActive) return;  // Không vẽ nếu zombie không còn hoạt động
 
         AffineTransform oldTransform = g2.getTransform();
-        g2.translate(x, y);
-        AffineTransform tran = new AffineTransform();
-        tran.rotate(Math.toRadians(angle), ENEMY_SIZE / 2, ENEMY_SIZE / 2);
-        g2.drawImage(image, tran, null);
+        // Dịch chuyển đến vị trí trung tâm của Enemy và xoay quanh tâm
+        g2.translate(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
+        g2.rotate(Math.toRadians(angle));
+
+        // Vẽ hình ảnh Enemy tại (-width / 2, -height / 2) để căn giữa
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+        g2.drawImage(image, -width / 2, -height / 2, null);
         Shape shape = getShape();
 
         // Gan gia tri hp cho Hprender
         hpRender(g2, shape, y);
         g2.setTransform(oldTransform);
 
-        //test
-        g2.setColor(Color.red);
-        g2.draw(shape.getBounds2D());
     }
 
     public double getX() {
@@ -140,13 +141,20 @@ public class Enemy extends HpRender  {
     }
 
 
-    //===================================GETSHAPE CAN DUOC SUA LAI+++++++++++++++++++++++++++++++++++++++++++++
     public Area getShape() {
-        Rectangle rectangle = new Rectangle(0, 0, 50, 50);
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+
+        // Define the bounding area of the image centered at (0,0)
+        Rectangle imageRect = new Rectangle(-width / 2, -height / 2, width, height);
+
+        // Create a transformation for the enemy's position and angle
         AffineTransform afx = new AffineTransform();
-        afx.translate(x, y);
-        afx.rotate(Math.toRadians(angle), 0, 0);
-        return new Area(afx.createTransformedShape(rectangle));
+        afx.translate(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2); // Move to enemy's center
+        afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around center
+
+        // Return the transformed shape of the image area
+        return new Area(afx.createTransformedShape(imageRect));
     }
 
     public boolean check(int width, int height) {
