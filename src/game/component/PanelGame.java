@@ -158,26 +158,30 @@ public class PanelGame extends JComponent {
         requestFocus(); // Đảm bảo JComponent có focus để nhận sự kiện bàn phím
         addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A -> key.setKey_left(true);
-                    case KeyEvent.VK_D -> key.setKey_right(true);
-                    case KeyEvent.VK_SPACE -> key.setKey_space(true);
-                    case KeyEvent.VK_J -> key.setKey_j(true);
-                    case KeyEvent.VK_K -> key.setKey_k(true);
-                }
-            }
+public void keyPressed(KeyEvent e) {
+    if(e.getKeyCode() == KeyEvent.VK_A){
+        key.setKey_left(true);
+    } else if(e.getKeyCode() == KeyEvent.VK_D){
+        key.setKey_right(true);
+    } else if(e.getKeyCode() == KeyEvent.VK_W){
+        key.setKey_up(true);
+    } else if(e.getKeyCode() == KeyEvent.VK_S){
+        key.setKey_down(true);
+    }
+}
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A -> key.setKey_left(false);
-                    case KeyEvent.VK_D -> key.setKey_right(false);
-                    case KeyEvent.VK_SPACE -> key.setKey_space(false);
-                    case KeyEvent.VK_J -> key.setKey_j(false);
-                    case KeyEvent.VK_K -> key.setKey_k(false);
-                }
-            }
+@Override
+public void keyReleased(KeyEvent e) {
+    if(e.getKeyCode() == KeyEvent.VK_A){
+        key.setKey_left(false);
+    } else if(e.getKeyCode() == KeyEvent.VK_D){
+        key.setKey_right(false);
+    } else if(e.getKeyCode() == KeyEvent.VK_W){
+        key.setKey_up(false);
+    } else if(e.getKeyCode() == KeyEvent.VK_S){
+        key.setKey_down(false);
+    }
+}
         });
 
         // Khởi động luồng xử lý di chuyển của player và enemies
@@ -185,14 +189,17 @@ public class PanelGame extends JComponent {
             float rotationSpeed = 0.5f; // Tốc độ thay đổi góc của Player
             while (start) {
                 float angle = player.getAngle();
-                if (key.isKey_left()) {
-                    angle -= rotationSpeed; // Xoay trái
+                if(key.isKey_left()){
+                    player.changeLocation(player.getX() - rotationSpeed, player.getY());
                 }
-                if (key.isKey_right()) {
-                    angle += rotationSpeed; // Xoay phải
+                if(key.isKey_right()){
+                    player.changeLocation(player.getX() + rotationSpeed, player.getY());
                 }
-                if (key.isKey_space()) {
-                    player.speedUp(); // Tăng tốc
+                if(key.isKey_up()){
+                    player.changeLocation(player.getX(), player.getY() - rotationSpeed);
+                }
+                if(key.isKey_down()){
+                    player.changeLocation(player.getX(), player.getY() + rotationSpeed);
                 }
                 if (key.isKey_j()|| key.isKey_k()){
                     if (shotTime==0){
