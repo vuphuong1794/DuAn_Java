@@ -1,36 +1,88 @@
-Game 2D top down tiêu diệt zombie sử dụng java Swing, Graphics2D
+<h1 align= "center"> 🧟 ZOMBIE DOOMDAYS: NGÀY TẬN THẾ ZOMBIE 🧟 </h1>
 
--- Git Command --
+[![Version](https://img.shields.io/badge/version-0.1-blue.svg)](https://github.com/yourusername/zombie-survival)
+[![Status](https://img.shields.io/badge/status-in%20development-green.svg)](https://github.com/yourusername/zombie-survival)
 
-(reset)
-- git reset --soft id (quay về trạng thái staged changes của commit trước đó và có thể sửa về thêm file mà ko bị mất commit trước đó, [phù hợp để thêm file thiếu])
-- git reset --mixed id (những staged changes được thêm sau commit id sẽ quay về trạng thái changes và có thể tiếp tục sửa và thêm file, [phù hợp để sửa file])
-- git rest --hard id (quay về commit id và những commit và code của commit được thêm sau commit id sẽ bị xoá)
+<div align="center">
+<img src="https://static1.thegamerimages.com/wordpress/wp-content/uploads/2024/02/the-walking-dead-season-2-sarah-clementine.jpg"/>
+</div>
 
-git log --oneline (xem lịch sử commit)
-git merge --abort (hủy bỏ quá trình hợp nhất)
+---
 
-Lưu ý conflict message:
-- current changes (thay đổi hiện tại)
-- incoming changes ( những thay đổi mới)
+## 📝 Mô tả
 
-(hợp nhất)
-- git merge branchName (hợp nhất code với nhánh khác theo thứ tự, cái nào commit trước sẽ được xếp trước)
-+ xử lý conflict nếu có:
-  + sau khi fix conflict:
-    + git add . hoặc fileName
-    + git commit -m "text"
-    + git push origin branchName
+**Zombie Doomdays** là một tựa game sinh tồn zombie đầy kịch tính, nơi bạn phải chiến đấu để tồn tại trong thế giới hậu tận thế. Với cơ chế bắn súng và yếu tố sinh tồn căng thẳng, game mang đến trải nghiệm đầy thử thách.
 
-+ git push 
+### 🎮 Tính năng hiện có
 
-- git rebase branchName (hợp nhất code với nhánh khác không theo thứ tự, những commit của nhánh kia sẽ được ưu tiên lên trước rồi mới tới commit của mình)
-+ xử lý conflict nếu có:
-  + sau khi fix conflict:
-    + git add . hoặc fileName
-    + git rebase --continue
-    + git push --force
+- **Hệ thống vũ khí đơn giản**
+  - Súng thường với đạn thường
+  - Súng phóng lựu với đạn nổ
+
+- **Zombie AI cơ bản**
+  - Zombie tự động đuổi theo người chơi
+  - Gây sát thương khi chạm vào người chơi
+
+- **Hệ thống máu**
+  - Người chơi có thanh máu
+  - Mất máu khi bị zombie tấn công
+
+## 🎮 Cách chơi
+
+```plaintext
+W,A,S,D - Di chuyển
+J - Bắn đạn thường
+K - Bắn đạn phóng lựu
+```
+
+## 📥 Cài đặt
+
+1. Tải game từ [trang chủ](https://github.com/vuphuong1794/Zombie_DoomDays)
+2. Tải Folder hoặc dùng Git Clone
+3. Mở IDE
+4. Chạy file Main
+5. Tận hưởng game!
+
+## 🗺️ Lộ trình phát triển
+
+- [x] v0.1 - Alpha test
+  - [x] Hệ thống bắn súng đơn giản
+  - [x] AI zombie đơn giản
+  - [ ] Hệ thống nhặt đạn, vật phẩm
+
+- [ ] v0.2 - Beta
+  - [ ] Hệ thống bắn súng nâng cao
+  - [ ] Zombie có tính năng riêng biệt
+  - [ ] Chế độ Multiplayer
+
+- [ ] v1.0 - Phiên bản chính thức
+  - [ ] Hệ thống bắn súng nâng cao
+  - [ ] Hệ thống nhặt đạn, vật phẩm
+  - [ ] Zombie có tính năng riêng biệt
+  - [ ] Multiplayer
 
 
+## 🤝 Đóng góp
 
+Chúng tôi luôn chào đón sự đóng góp từ cộng đồng! Hãy làm theo các bước sau:
 
+1. Fork project
+2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
+3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
+4. Push lên branch (`git push origin feature/AmazingFeature`)
+5. Tạo Pull Request
+
+## 👥 Team phát triển
+
+- 🤺 **Player Developer**: [Ngô Xuân Diệu](https://github.com/Yuno04)
+- 🧟 **Zombie Developer**: [Vũ Nguyễn Phương](https://github.com/vuphuong1794)
+- 🎨,🎮 **Leader, Art and Game Director**: [Mai Nguyễn Đăng Khoa](https://github.com/MaiKhoa0101)
+- 🖥️ **Game Features**: [Nguyễn Hồng Tồn](https://github.com/PolyEtilen1909)
+
+---
+
+<div align="center">
+
+*Made by Nhóm 2❤️*
+
+</div>
