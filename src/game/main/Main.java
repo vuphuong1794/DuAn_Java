@@ -10,7 +10,7 @@ public class Main extends JFrame {
     // Hàm main
     public Main() {
         init();
-    }        
+    }
 
     private void init() {
         setTitle("Zombies Doomsday");

@@ -1,11 +1,11 @@
 package game.obj;
-
+import java.awt.geom.Path2D;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import javax.swing.ImageIcon;
 
-public class Player {
+public class Player extends HpRender {
 
     // Kích thước của nhân vật
     public static final double PLAYER_SIZE = 100;
@@ -20,15 +20,28 @@ public class Player {
     // Góc xoay của nhân vật (tính bằng độ)
     private float angle = 0f;
 
+    private final Area playerShap;
+
     // Hình ảnh của nhân vật
     private final Image image;
 
     // Biến kiểm tra xem nhân vật có đang tăng tốc không
     private boolean speedUp;
 
+    private boolean alive=true;
+
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
+        super(new HP(50,30));
         this.image = loadImage("/game/image/CharacterPlayer.png");
+        Path2D p = new Path2D.Double();
+    p.moveTo(0, 15);
+    p.lineTo(20, 5);
+    p.lineTo(PLAYER_SIZE + 15, PLAYER_SIZE / 2);
+    p.lineTo(20, PLAYER_SIZE - 5);
+    p.lineTo(0, PLAYER_SIZE - 15);
+
+    playerShap = new Area(p);
     }
 
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
@@ -74,10 +87,15 @@ public class Player {
         Shape shap = getShape();
         g2.setTransform(oldTransform);
 
+        //Hien thi thanh mau nhan vat
+        hpRender(g2, getShape(), PLAYER_SIZE);
         //test
         g2.setColor(Color.red);
         g2.draw(shap.getBounds2D());
     }
+
+
+    //==============================================GETSHAPE CAN DUOC SUA LAI
     public Area getShape() {
         // Get the width and height of the image
         int width = image.getWidth(null);
@@ -123,5 +141,20 @@ public class Player {
     public float getSpeed() {
         return speed;
     }
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public void reset() {
+        alive = true;
+        resetHP();
+        angle = 0;
+        speed = 0;
+    }
+
 
 }
