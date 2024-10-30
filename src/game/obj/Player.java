@@ -120,5 +120,8 @@ public class Player {
         return angle;
     }
 
+    public float getSpeed() {
+        return speed;
+    }
 
 }
