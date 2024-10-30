@@ -7,7 +7,9 @@ import java.awt.geom.Area;
 import java.util.Random;
 import java.awt.geom.Path2D;
 
-public class Enemy {
+
+
+public class Enemy extends HpRender  {
     public static final double ENEMY_SIZE = 84;
     private double x, y;
     private final float speed = 0.3f;
@@ -18,7 +20,9 @@ public class Enemy {
     private boolean hasEnteredScreen = false;
     private boolean isActive = true;  // Thêm biến để kiểm soát trạng thái hoạt động
 
-    public Enemy() {
+    public Enemy()  {
+        // Them HP cho Enemy
+        super( new HP(20,20));
         Random random = new Random();
         int imageNumber = random.nextInt(NUM_IMAGES) + 1;
         String imagePath = "/game/image/Z" + imageNumber + ".png";
@@ -69,6 +73,9 @@ public class Enemy {
         tran.rotate(Math.toRadians(angle), ENEMY_SIZE / 2, ENEMY_SIZE / 2);
         g2.drawImage(image, tran, null);
         Shape shape = getShape();
+
+        // Gan gia tri hp cho Hprender
+        hpRender(g2, shape, y);
         g2.setTransform(oldTransform);
 
         //test
@@ -88,6 +95,8 @@ public class Enemy {
         return angle;
     }
 
+
+    //===================================GETSHAPE CAN DUOC SUA LAI+++++++++++++++++++++++++++++++++++++++++++++
     public Area getShape() {
         Rectangle rectangle = new Rectangle(0, 0, 50, 50);
         AffineTransform afx = new AffineTransform();

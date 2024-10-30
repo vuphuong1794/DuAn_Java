@@ -222,6 +222,11 @@ public class PanelGame extends JComponent {
                         if(!enemy.check(width, height)){
                             enemies.remove(i);
                             System.out.println("removed");
+                        }else{
+                            //cham vao thi zombie se ....
+                            if(player.isAlive()) {
+                                checkPlayer(enemy);
+                            }
                         }
                     }
                 }
@@ -239,7 +244,7 @@ public class PanelGame extends JComponent {
                 if(!area.isEmpty()){
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
-                    if(true){
+                    if(!enemy.updateHP(bullet.getSize())){
                         enemies.remove(enemy);
                         double x=enemy.getX()+Enemy.ENEMY_SIZE/2;
                         double y=enemy.getY()+Enemy.ENEMY_SIZE/2;
@@ -257,6 +262,44 @@ public class PanelGame extends JComponent {
         }
 
     }
+
+    private void checkPlayer(Enemy enemy) {
+        if (enemy != null) {
+            Area area = new Area(player.getShape());
+            area.intersect(enemy.getShape());
+            if (!area.isEmpty()) {
+                double enemyHp = enemy.getHP();
+
+
+                //==============================================CODE DANH CHO ZOMBIE NO====================
+                // if (!enemy.updateHP(player.getHP())) {
+                //     enemies.remove(enemy);
+                //     double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
+                //     double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
+    
+                //     boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                //     boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                //     boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                //     boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                //     boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                // }
+
+                if (!player.updateHP(enemyHp)) {
+                    player.setAlive(false);
+                    double x = player.getX() + Player.PLAYER_SIZE / 2;
+                    double y = player.getY() + Player.PLAYER_SIZE / 2;
+    
+                    boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                    boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                    boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                    boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                    boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                }
+                
+            }
+        }
+    }
+    
 
     // Vẽ nền game
     private void drawBackground() {
@@ -329,7 +372,10 @@ public class PanelGame extends JComponent {
 
     // Vẽ các đối tượng trong game
     private void drawGame() {
-        player.draw(g2); // Vẽ player
+        if (player.isAlive()) {
+            player.draw(g2); // Vẽ player 
+        }
+        
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
