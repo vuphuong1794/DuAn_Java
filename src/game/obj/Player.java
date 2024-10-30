@@ -39,7 +39,6 @@ public class Player {
             e.printStackTrace();
             return null;
         }
-
     }
 
     // Phương thức thay đổi vị trí của nhân vật
@@ -63,35 +62,35 @@ public class Player {
         }
         this.angle = angle;
     }
-
-    // Phương thức vẽ nhân vật lên màn hình
     public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
-        g2.translate(x, y);
-        AffineTransform tran = g2.getTransform();
-        tran.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2);
-        g2.drawImage(image, tran, null);
-        Shape shap = getShape();
-        g2.setTransform(oldTransform);
 
-        //test
-        g2.setColor(Color.red);
-        g2.draw(shap.getBounds2D());
+        // Move to the player's center and rotate around it
+        g2.translate(x + PLAYER_SIZE / 2, y + PLAYER_SIZE / 2);
+        g2.rotate(Math.toRadians(angle));
+
+        // Draw the player image centered at (-width / 2, -height / 2)
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+        g2.drawImage(image, -width / 2, -height / 2, null);
+
+        // Restore the original transformation
+        g2.setTransform(oldTransform);
     }
+
+    // Method to create the player's original shape without scaling on rotation
     public Area getShape() {
-        // Get the width and height of the image
         int width = image.getWidth(null);
         int height = image.getHeight(null);
 
-        // Tạo ra hình chữ nhật với toạ độ x, y và chiều dài chiều rộng cho trước
-        Rectangle rectangle = new Rectangle(0, 0, 50, 50);
+        // Create a centered rectangle for the image bounds
+        Rectangle rectangle = new Rectangle(-width / 2, -height / 2, width, height);
 
-        // Apply transformations: translation and rotation
+        // Apply rotation without changing position
         AffineTransform afx = new AffineTransform();
-        afx.translate(x, y); // dịch chuyển zombie theo toạ độ x,y
-        afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
+        afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around the center
 
-        // Create an Area from the transformed rectangle
+        // Return the rotated shape area
         return new Area(afx.createTransformedShape(rectangle));
     }
 
@@ -119,6 +118,4 @@ public class Player {
     public float getAngle() {
         return angle;
     }
-
-
 }

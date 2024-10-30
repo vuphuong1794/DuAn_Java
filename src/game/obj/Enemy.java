@@ -61,46 +61,35 @@ public class Enemy {
 
     public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
-        g2.translate(x, y);
-        AffineTransform tran = new AffineTransform();
-        tran.rotate(Math.toRadians(angle), ENEMY_SIZE / 2, ENEMY_SIZE / 2);
-        g2.drawImage(image, tran, null);
-        Shape shap = getShape();
+
+        // Dịch chuyển đến vị trí trung tâm của Enemy và xoay quanh tâm
+        g2.translate(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
+        g2.rotate(Math.toRadians(angle));
+
+        // Vẽ hình ảnh Enemy tại (-width / 2, -height / 2) để căn giữa
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+        g2.drawImage(image, -width / 2, -height / 2, null);
+
+
+        // Khôi phục lại transform ban đầu
         g2.setTransform(oldTransform);
-
-        //test
-        g2.setColor(Color.red);
-        g2.draw(shap.getBounds2D());
-
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public float getAngle() {
-        return angle;
     }
 
     public Area getShape() {
-        // Get the width and height of the image
         int width = image.getWidth(null);
         int height = image.getHeight(null);
 
-        // Tạo ra hình chữ nhật với toạ độ x, y và chiều dài chiều rộng cho trước
-        Rectangle rectangle = new Rectangle(0, 0, 50, 50);
+        // Define the bounding area of the image centered at (0,0)
+        Rectangle imageRect = new Rectangle(-width / 2, -height / 2, width, height);
 
-        // Apply transformations: translation and rotation
+        // Create a transformation for the enemy's position and angle
         AffineTransform afx = new AffineTransform();
-        afx.translate(x, y); // dịch chuyển zombie theo toạ độ x,y
-        afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
+        afx.translate(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2); // Move to enemy's center
+        afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around center
 
-        // Create an Area from the transformed rectangle
-        return new Area(afx.createTransformedShape(rectangle));
+        // Return the transformed shape of the image area
+        return new Area(afx.createTransformedShape(imageRect));
     }
 
     public boolean check(int width, int height) {
@@ -118,5 +107,16 @@ public class Enemy {
 
         // Trả về false nếu enemy đã ra khỏi màn hình sau khi đã vào
         return !isOutOfBounds;
+    }
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public float getAngle() {
+        return angle;
     }
 }
