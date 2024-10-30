@@ -106,6 +106,11 @@ public class PanelGame extends JComponent {
 
     // Thêm kẻ thù vào game
     private void addEnemy() {
+        // Check if the number of enemies is less than 20
+        if (enemies.size() >= 30) {
+            return; // If there are already 20 enemies, do not add more
+        }
+
         Random ran = new Random();
         int margin = 50;
         int enemySize = 100;
@@ -115,7 +120,6 @@ public class PanelGame extends JComponent {
         enemyLeft.changeLocation(-enemySize + 5, locationY1); // đứng gần cạnh viền
         enemyLeft.changeAngle(0);
         enemies.add(enemyLeft);
-
 
         int locationY2 = ran.nextInt(height - enemySize - 2 * margin) + margin;
         Enemy enemyRight = new Enemy();
@@ -135,6 +139,7 @@ public class PanelGame extends JComponent {
         enemyBottom.changeAngle(270); // Moving up
         enemies.add(enemyBottom);
     }
+
 
 
     // Khởi tạo các đối tượng trong game
@@ -259,7 +264,6 @@ public class PanelGame extends JComponent {
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
-
                     }
 
                     bullets.remove(bullet);
