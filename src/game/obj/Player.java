@@ -32,9 +32,10 @@ public class Player extends HpRender {
 
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
-        super(new HP(50,30));
+        super(new HP(50,50));
         this.image = loadImage("/game/image/CharacterPlayer.png");
-        Path2D p = new Path2D.Double();
+        
+    Path2D p = new Path2D.Double();
     p.moveTo(0, 15);
     p.lineTo(20, 5);
     p.lineTo(PLAYER_SIZE + 15, PLAYER_SIZE / 2);

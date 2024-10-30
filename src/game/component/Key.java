@@ -59,6 +59,9 @@ public class Key {
         this.key_k = key_k;
     }
 
+
+    
+
     private boolean key_right;
     private boolean key_left;
     private boolean key_up;
