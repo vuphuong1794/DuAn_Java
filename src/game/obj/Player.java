@@ -98,6 +98,7 @@ public class Player extends HpRender {
 
     // Method to create the player's original shape without scaling on rotation
     public Area getShape() {
+        // Get the width and height of the image
         int width = image.getWidth(null);
         int height = image.getHeight(null);
 
