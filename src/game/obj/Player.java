@@ -1,11 +1,11 @@
 package game.obj;
-
+import java.awt.geom.Path2D;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import javax.swing.ImageIcon;
 
-public class Player {
+public class Player extends HpRender {
 
     // Kích thước của nhân vật
     public static final double PLAYER_SIZE = 100;
@@ -20,15 +20,28 @@ public class Player {
     // Góc xoay của nhân vật (tính bằng độ)
     private float angle = 0f;
 
+    private final Area playerShap;
+
     // Hình ảnh của nhân vật
     private final Image image;
 
     // Biến kiểm tra xem nhân vật có đang tăng tốc không
     private boolean speedUp;
 
+    private boolean alive=true;
+
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
+        super(new HP(50,50));
         this.image = loadImage("/game/image/CharacterPlayer.png");
+        Path2D p = new Path2D.Double();
+    p.moveTo(0, 15);
+    p.lineTo(20, 5);
+    p.lineTo(PLAYER_SIZE + 15, PLAYER_SIZE / 2);
+    p.lineTo(20, PLAYER_SIZE - 5);
+    p.lineTo(0, PLAYER_SIZE - 15);
+
+    playerShap = new Area(p);
     }
 
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
@@ -39,6 +52,7 @@ public class Player {
             e.printStackTrace();
             return null;
         }
+
     }
 
     // Phương thức thay đổi vị trí của nhân vật
@@ -62,6 +76,8 @@ public class Player {
         }
         this.angle = angle;
     }
+
+    // Phương thức vẽ nhân vật lên màn hình
     public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
 
@@ -74,12 +90,15 @@ public class Player {
         int height = image.getHeight(null);
         g2.drawImage(image, -width / 2, -height / 2, null);
 
+        hpRender(g2, getShape(), PLAYER_SIZE);
+
         // Restore the original transformation
         g2.setTransform(oldTransform);
     }
 
     // Method to create the player's original shape without scaling on rotation
     public Area getShape() {
+        // Get the width and height of the image
         int width = image.getWidth(null);
         int height = image.getHeight(null);
 
@@ -118,4 +137,24 @@ public class Player {
     public float getAngle() {
         return angle;
     }
+
+    public float getSpeed() {
+        return speed;
+    }
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public void reset() {
+        alive = true;
+        resetHP();
+        angle = 0;
+        speed = 0;
+    }
+
+
 }

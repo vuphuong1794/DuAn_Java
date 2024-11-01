@@ -9,7 +9,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 
 public class Main extends JFrame {
-    // Hàm main
     public Main() {
         init();
     }

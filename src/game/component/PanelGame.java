@@ -106,38 +106,41 @@ public class PanelGame extends JComponent {
 
     // Thêm kẻ thù vào game
     private void addEnemy() {
-        Random ran = new Random();
-        int margin = 50; // Khoảng cách từ mép màn hình
-        int enemySize = 300; // Giả sử kích thước của kẻ thù
+        // Check if the number of enemies is less than 20
+        if (enemies.size() >= 30) {
+            return; // If there are already 20 enemies, do not add more
+        }
 
-        // Tạo kẻ thù bên trái màn hình
+        Random ran = new Random();
+        int margin = 50;
+        int enemySize = 100;
+
         int locationY1 = ran.nextInt(height - enemySize - 2 * margin) + margin;
         Enemy enemyLeft = new Enemy();
-        enemyLeft.changeLocation(-enemySize, locationY1);
-        enemyLeft.changeAngle(0); // Di chuyển sang phải
+        enemyLeft.changeLocation(-enemySize + 5, locationY1); // đứng gần cạnh viền
+        enemyLeft.changeAngle(0);
         enemies.add(enemyLeft);
 
-        // Tạo kẻ thù bên phải màn hình
         int locationY2 = ran.nextInt(height - enemySize - 2 * margin) + margin;
         Enemy enemyRight = new Enemy();
-        enemyRight.changeLocation(width + enemySize, locationY2);
-        enemyRight.changeAngle(180); // Di chuyển sang trái
+        enemyRight.changeLocation(width - 10, locationY2);
+        enemyRight.changeAngle(180); // Moving left
         enemies.add(enemyRight);
 
-        // Tạo kẻ thù ở trên màn hình
         int locationX3 = ran.nextInt(width - enemySize - 2 * margin) + margin;
         Enemy enemyTop = new Enemy();
-        enemyTop.changeLocation(locationX3, -enemySize);
-        enemyTop.changeAngle(90); // Di chuyển xuống
+        enemyTop.changeLocation(locationX3, -enemySize + 10);
+        enemyTop.changeAngle(90); // Moving down
         enemies.add(enemyTop);
 
-        // Tạo kẻ thù ở dưới màn hình
         int locationX4 = ran.nextInt(width - enemySize - 2 * margin) + margin;
         Enemy enemyBottom = new Enemy();
-        enemyBottom.changeLocation(locationX4, height + enemySize);
-        enemyBottom.changeAngle(270); // Di chuyển lên
+        enemyBottom.changeLocation(locationX4, height - 10);
+        enemyBottom.changeAngle(270); // Moving up
         enemies.add(enemyBottom);
     }
+
+
 
     // Khởi tạo các đối tượng trong game
     private void initObjectGame() {
@@ -217,18 +220,24 @@ public class PanelGame extends JComponent {
                 player.update();
                 player.changeAngle(angle);
 
-                // Cập nhật vị trí của tất cả các kẻ thù
-                List<Enemy> currentEnemies;
-                synchronized (enemies) {
-                    currentEnemies = new ArrayList<>(enemies); // Tạo một bản sao an toàn
-                }
+                for(int i=0; i<enemies.size(); i++){
+                    Enemy enemy = enemies.get(i);
+                    if(enemy != null){
+                        enemy.updateMovement(
+                                player.getX(),
+                                player.getY(),
+                                player.getAngle(),
+                                player.getSpeed()  // Giả sử bạn có getter cho speed của player
+                        );
 
-                for (Enemy enemy : currentEnemies) {
-                    if (enemy != null) {
-                        enemy.update();
                         if(!enemy.check(width, height)){
-                            enemies.remove(enemy);
+                            enemies.remove(i);
                             System.out.println("removed");
+                        }else{
+                            //cham vao thi zombie se ....
+                            if(player.isAlive()) {
+                                checkPlayer(enemy);
+                            }
                         }
                     }
                 }
@@ -246,7 +255,7 @@ public class PanelGame extends JComponent {
                 if(!area.isEmpty()){
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
-                     if(true){
+                    if(!enemy.updateHP(bullet.getSize())){
                         enemies.remove(enemy);
                         double x=enemy.getX()+Enemy.ENEMY_SIZE/2;
                         double y=enemy.getY()+Enemy.ENEMY_SIZE/2;
@@ -255,7 +264,6 @@ public class PanelGame extends JComponent {
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
-
                     }
 
                     bullets.remove(bullet);
@@ -264,6 +272,44 @@ public class PanelGame extends JComponent {
         }
 
     }
+
+    private void checkPlayer(Enemy enemy) {
+        if (enemy != null) {
+            Area area = new Area(player.getShape());
+            area.intersect(enemy.getShape());
+            if (!area.isEmpty()) {
+                double enemyHp = enemy.getHP();
+
+
+                //==============================================CODE DANH CHO ZOMBIE NO====================
+                // if (!enemy.updateHP(player.getHP())) {
+                //     enemies.remove(enemy);
+                //     double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
+                //     double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
+    
+                //     boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                //     boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                //     boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                //     boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                //     boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                // }
+
+                if (!player.updateHP(enemyHp)) {
+                    player.setAlive(false);
+                    double x = player.getX() + Player.PLAYER_SIZE / 2;
+                    double y = player.getY() + Player.PLAYER_SIZE / 2;
+    
+                    boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                    boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                    boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                    boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                    boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                }
+                
+            }
+        }
+    }
+    
 
     // Vẽ nền game
     private void drawBackground() {
@@ -336,7 +382,10 @@ public class PanelGame extends JComponent {
 
     // Vẽ các đối tượng trong game
     private void drawGame() {
-        player.draw(g2); // Vẽ player
+        if (player.isAlive()) {
+            player.draw(g2); // Vẽ player 
+        }
+        
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
