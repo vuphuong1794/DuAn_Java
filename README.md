@@ -45,10 +45,11 @@ K - Bắn đạn phóng lựu
 
 ## 🗺️ Lộ trình phát triển
 
-- [x] v0.1 - Alpha test
+- [x] v0.1 - Test
   - [x] Hệ thống bắn súng đơn giản
   - [x] AI zombie đơn giản
   - [ ] Hệ thống nhặt đạn, vật phẩm
+  - [ ] Lưu điểm mà người chơi đạt được trong CSDL
 
 - [ ] v0.2 - Beta
   - [ ] Hệ thống bắn súng nâng cao
