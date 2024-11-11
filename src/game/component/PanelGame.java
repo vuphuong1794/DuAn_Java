@@ -108,6 +108,9 @@ public class PanelGame extends JComponent {
 
     // Thêm kẻ thù vào game
     private void addEnemy() {
+        if (enemies.size() >= 30) {
+            return; // If there are already 20 enemies, do not add more
+        }
         Random ran = new Random();
         int margin = 50;
         int enemySize = 100;
@@ -231,7 +234,12 @@ public class PanelGame extends JComponent {
                 for(int i=0; i<enemies.size(); i++){
                     Enemy enemy = enemies.get(i);
                     if(enemy != null){
-                        enemy.update();
+                        enemy.updateMovement(
+                            player.getX(),
+                            player.getY(),
+                            player.getAngle(),
+                            player.getSpeed()  // Giả sử bạn có getter cho speed của player
+                    );
                         if(!enemy.check(width, height)){
                             enemies.remove(i);
                             System.out.println("removed");

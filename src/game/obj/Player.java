@@ -81,18 +81,21 @@ public class Player extends HpRender {
     // Phương thức vẽ nhân vật lên màn hình
     public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
-        g2.translate(x, y);
-        AffineTransform tran = g2.getTransform();
-        tran.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2);
-        g2.drawImage(image, tran, null);
-        Shape shap = getShape();
+
+        // Move to the player's center and rotate around it
+        g2.translate(x + PLAYER_SIZE / 2, y + PLAYER_SIZE / 2);
+        g2.rotate(Math.toRadians(angle));
+
+        // Draw the player image centered at (-width / 2, -height / 2)
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+        g2.drawImage(image, -width / 2, -height / 2, null);
+
+        hpRender(g2, getShape(), PLAYER_SIZE);
+
+        // Restore the original transformation
         g2.setTransform(oldTransform);
         
-        //Hien thi thanh mau nhan vat
-        hpRender(g2, getShape(), PLAYER_SIZE);
-        //test
-        g2.setColor(Color.red);
-        g2.draw(shap.getBounds2D());
     }
 
 
@@ -142,6 +145,10 @@ public class Player extends HpRender {
     }
     public boolean isAlive() {
         return alive;
+    }
+
+    public float getSpeed() {
+        return speed;
     }
     
     public void setAlive(boolean alive) {

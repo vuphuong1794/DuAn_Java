@@ -6,7 +6,7 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
 public class HpRender {
-    private final HP hp;
+    protected final HP hp;
 
     public HpRender(HP hp) {
         this.hp = hp;
@@ -35,5 +35,10 @@ public class HpRender {
 
     public void resetHP() {
         hp.setCurrentHp(hp.getMAX_HP());
+    }
+
+    public void draw(Graphics2D g2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'draw'");
     }
 }
