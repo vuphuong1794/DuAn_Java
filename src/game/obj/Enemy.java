@@ -7,8 +7,6 @@ import java.awt.geom.Area;
 import java.util.Random;
 import java.awt.geom.Path2D;
 
-
-
 public class Enemy extends HpRender  {
     public static final double ENEMY_SIZE = 84;
     private double x, y;
@@ -108,6 +106,19 @@ public class Enemy extends HpRender  {
         this.angle = angle;
     }
 
+//    public void update() {
+//        x += Math.cos(Math.toRadians(angle)) * speed;
+//        y += Math.sin(Math.toRadians(angle)) * speed;
+//
+//        // Kiểm tra xem enemy đã vào trong màn hình chưa
+//        Rectangle bounds = getShape().getBounds();
+//        if (!hasEnteredScreen &&
+//                x + bounds.width > 0 && x < bounds.width + ENEMY_SIZE &&
+//                y + bounds.height > 0 && y < bounds.height + ENEMY_SIZE) {
+//            hasEnteredScreen = true;
+//        }
+//    }
+
     public void draw(Graphics2D g2) {
         if (!isActive) return;  // Không vẽ nếu zombie không còn hoạt động
 
@@ -140,8 +151,8 @@ public class Enemy extends HpRender  {
         return angle;
     }
 
-
     public Area getShape() {
+        // Get the width and height of the image
         int width = image.getWidth(null);
         int height = image.getHeight(null);
 
@@ -161,7 +172,12 @@ public class Enemy extends HpRender  {
         // Define a buffer to allow enemies to stay in the game if they are close to the edges
         int buffer = 50; // Increase this buffer if needed for testing
 
-        // Get enemy bounds
+        // Nếu enemy chưa từng vào màn hình, luôn trả về true
+        if (!hasEnteredScreen) {
+            return true;
+        }
+
+        // Chỉ kiểm tra biên khi enemy đã từng vào màn hình
         Rectangle size = getShape().getBounds();
 
         // Check if the enemy is beyond the screen bounds plus the buffer

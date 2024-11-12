@@ -5,6 +5,8 @@ import javax.swing.JFrame;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 
 public class Main extends JFrame {
     public Main() {
