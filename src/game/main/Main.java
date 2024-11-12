@@ -15,7 +15,7 @@ public class Main extends JFrame {
 
     private void init() {
         setTitle("Zombies Doomsday");
-        setSize(1920, 1080);
+        setSize(1920, 940);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -9,7 +9,7 @@ public class Player extends HpRender {
 
     // Thêm các hằng số để định nghĩa kích thước màn hình game
     private static final int GAME_WIDTH = 1920;  // Điều chỉnh theo kích thước thực tế của game
-    private static final int GAME_HEIGHT = 1080;  // Điều chỉnh theo kích thước thực tế của game
+    private static final int GAME_HEIGHT = 740;  // Điều chỉnh theo kích thước thực tế của game
     // Kích thước của nhân vật
     public static final double PLAYER_SIZE = 100;
 
