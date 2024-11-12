@@ -32,7 +32,7 @@ public class Player extends HpRender {
 
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
-        super(new HP(50,50));
+        super(new HP(50,40));
         this.image = loadImage("/game/image/CharacterPlayer.png");
         
         Path2D p = new Path2D.Double();
@@ -101,11 +101,9 @@ public class Player extends HpRender {
     public void draw(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();  // Save the current transform
 
-        // Move to the player's center and rotate around it
         g2.translate(x, y);
-        g2.rotate(Math.toRadians(angle));
+        g2.rotate(Math.toRadians(angle), PLAYER_SIZE / 2, PLAYER_SIZE / 2);
 
-        // Draw the player image centered at (-width / 2, -height / 2)
         int width = image.getWidth(null);
         int height = image.getHeight(null);
         g2.drawImage(image, -width / 2, -height / 2, null);
@@ -118,9 +116,10 @@ public class Player extends HpRender {
         g2.draw(getShape());
         g2.draw(getShape().getBounds());
 
-        hpRender(g2, getShape(), y);  // Pass the offset value to the hpRender method
+        hpRender(g2, getShape(), PLAYER_SIZE );
+
         // Reset transformations after drawing to avoid distorting other elements
-        g2.setTransform(oldTransform);
+        //g2.setTransform(oldTransform);
     }
 
 

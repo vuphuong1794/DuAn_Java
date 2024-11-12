@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import java.util.ArrayList;
@@ -302,6 +303,18 @@ public class PanelGame extends JComponent {
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
                     }
+                    if (!player.updateHP(enemyHp)) {
+                        player.setAlive(false);
+                        double x = player.getX();
+                        double y = player.getY();
+
+                        // Thêm hiệu ứng nổ cho người chơi
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                        boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                        boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                }
             }
         }
     }
@@ -400,6 +413,28 @@ public class PanelGame extends JComponent {
             if (boomEffect != null) {
                 boomEffect.draw(g2);
             }
+        }
+
+        g2.setColor(Color.WHITE);
+
+        if(!player.isAlive()){
+            String text = "GAME OVER";
+            String textKey = "Press any key to continue";
+            g2.setFont(getFont().deriveFont(Font.BOLD, 50f));
+            FontMetrics fm = g2.getFontMetrics();
+            Rectangle2D r2 = fm.getStringBounds(text, g2);
+            double textWidth = r2.getWidth();
+            double textHeight = r2.getHeight();
+            double x = (width - textWidth) / 2;
+            double y = (height - textHeight) / 2;
+            g2.drawString(text, (int)x, (int)y + fm.getAscent());
+            g2.setFont(getFont().deriveFont(Font.BOLD, 15f));
+            fm = g2.getFontMetrics();
+            r2 = fm.getStringBounds(textKey, g2);
+            textWidth = r2.getWidth();
+            x = (width - textWidth) / 2;
+            y = (height - textHeight) / 2;
+            g2.drawString(textKey, (int)x, (int)y + fm.getAscent() + 50);
         }
     }
 
