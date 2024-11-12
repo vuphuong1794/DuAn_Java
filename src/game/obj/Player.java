@@ -11,7 +11,7 @@ public class Player extends HpRender {
     private static final int GAME_WIDTH = 1920;  // Điều chỉnh theo kích thước thực tế của game
     private static final int GAME_HEIGHT = 740;  // Điều chỉnh theo kích thước thực tế của game
     // Kích thước của nhân vật
-    public static final double PLAYER_SIZE = 100;
+    public static final double PLAYER_SIZE = 64;
 
     // Vị trí x, y của nhân vật trên màn hình
     private double x, y;
@@ -28,9 +28,6 @@ public class Player extends HpRender {
     // Hình ảnh của nhân vật
     private final Image image;
 
-    // Biến kiểm tra xem nhân vật có đang tăng tốc không
-    private boolean speedUp;
-
     private boolean alive=true;
 
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
@@ -38,14 +35,14 @@ public class Player extends HpRender {
         super(new HP(50,50));
         this.image = loadImage("/game/image/CharacterPlayer.png");
         
-    Path2D p = new Path2D.Double();
-    p.moveTo(0, 15);
-    p.lineTo(20, 5);
-    p.lineTo(PLAYER_SIZE + 15, PLAYER_SIZE / 2);
-    p.lineTo(20, PLAYER_SIZE - 5);
-    p.lineTo(0, PLAYER_SIZE - 15);
+        Path2D p = new Path2D.Double();
+        p.moveTo(0, 15);
+        p.lineTo(20, 5);
+        p.lineTo(PLAYER_SIZE + 15, PLAYER_SIZE / 2);
+        p.lineTo(20, PLAYER_SIZE - 5);
+        p.lineTo(0, PLAYER_SIZE - 15);
 
-    playerShap = new Area(p);
+        playerShap = new Area(p);
     }
 
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
@@ -102,10 +99,10 @@ public class Player extends HpRender {
 
     // Phương thức vẽ nhân vật lên màn hình
     public void draw(Graphics2D g2) {
-        AffineTransform oldTransform = g2.getTransform();
+        AffineTransform oldTransform = g2.getTransform();  // Save the current transform
 
         // Move to the player's center and rotate around it
-        g2.translate(x + PLAYER_SIZE / 2, y + PLAYER_SIZE / 2);
+        g2.translate(x, y);
         g2.rotate(Math.toRadians(angle));
 
         // Draw the player image centered at (-width / 2, -height / 2)
@@ -113,39 +110,36 @@ public class Player extends HpRender {
         int height = image.getHeight(null);
         g2.drawImage(image, -width / 2, -height / 2, null);
 
-        hpRender(g2, getShape(), PLAYER_SIZE);
+        // Restore the original transformation for HUD or other static elements
+        g2.setTransform(oldTransform);
 
-        // Restore the original transformation
+        // Draw the square at the player's position
+        g2.setColor(new Color(12, 173, 84));
+        g2.draw(getShape());
+        g2.draw(getShape().getBounds());
+
+        hpRender(g2, getShape(), y);  // Pass the offset value to the hpRender method
+        // Reset transformations after drawing to avoid distorting other elements
         g2.setTransform(oldTransform);
     }
+
+
 
     // Method to create the player's original shape without scaling on rotation
     public Area getShape() {
         // Get the width and height of the image
-        int width = image.getWidth(null);
-        int height = image.getHeight(null);
+        //int width = image.getWidth(null);
+        //int height = image.getHeight(null);
 
         // Create a centered rectangle for the image bounds
-        Rectangle rectangle = new Rectangle(-width / 2, -height / 2, width, height);
+        //Rectangle rectangle = new Rectangle(-width / 2, -height / 2, width, height);
 
         // Apply rotation without changing position
         AffineTransform afx = new AffineTransform();
+        afx.translate(x, y);
         afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around the center
 
-        // Return the rotated shape area
-        return new Area(afx.createTransformedShape(rectangle));
-    }
-
-    // Phương thức tăng tốc nhân vật
-    public void speedUp() {
-        speedUp = true;
-        speed = Math.min(speed + 0.05f, MAX_SPEED);
-    }
-
-    // Phương thức giảm tốc nhân vật
-    public void speedDown() {
-        speedUp = false;
-        speed = Math.max(speed - 0.01f, 0f);
+        return new Area(afx.createTransformedShape(playerShap));
     }
 
     // Getters cho vị trí x, y và góc xoay
@@ -164,6 +158,7 @@ public class Player extends HpRender {
     public float getSpeed() {
         return speed;
     }
+
     public boolean isAlive() {
         return alive;
     }

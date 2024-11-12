@@ -287,12 +287,9 @@ public class PanelGame extends JComponent {
             area.intersect(enemy.getShape());
             if (!area.isEmpty()) {
                 double enemyHp = enemy.getHP();
-    
-                // Lấy thời gian hiện tại
-                long currentTime = System.currentTimeMillis();
-    
-                // Kiểm tra nếu đã qua 3 giây kể từ lần nổ trước
-                if (currentTime - lastExplosionTime >= 3000) {
+                System.out.println("Collision detected at Player: (" + player.getX() + ", " + player.getY() +
+                        ") Enemy: (" + enemy.getX() + ", " + enemy.getY() + ")");
+
                     if (!enemy.updateHP(player.getHP())) {
                         enemies.remove(enemy);
                         double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
@@ -304,24 +301,7 @@ public class PanelGame extends JComponent {
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
-    
-                        // Cập nhật lại thời gian của lần nổ cuối
-                        lastExplosionTime = currentTime;
                     }
-                    
-                    if (!player.updateHP(enemyHp)) {
-                        player.setAlive(false);
-                        double x = player.getX() + Player.PLAYER_SIZE / 2;
-                        double y = player.getY() + Player.PLAYER_SIZE / 2;
-    
-                        // Thêm hiệu ứng nổ cho người chơi
-                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
-                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
-                        boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
-                        boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
-                        boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
-                    }
-                }
             }
         }
     }
