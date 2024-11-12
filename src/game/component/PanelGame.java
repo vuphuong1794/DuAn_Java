@@ -42,7 +42,7 @@ public class PanelGame extends JComponent {
     private Point mousePosition;
 
     public PanelGame() {
-        // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
+        // Tạo trình để lắng nghe chuyển động, theo dõi vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
@@ -196,22 +196,20 @@ public class PanelGame extends JComponent {
         new Thread(() -> {
             float rotationSpeed = 0.5f; // Tốc độ thay đổi góc của Player
             while (start) {
-                float angle = player.getAngle();
+                float speed = 1f; // Tốc độ di chuyển của Player
+
                 if (key.isKey_left()) {
-                    player.changeLocation(player.getX() - rotationSpeed, player.getY()); // Di chuyển sang trái
+                    player.changeLocation(player.getX() - speed, player.getY()); // Di chuyển sang trái
                 }
                 if (key.isKey_right()) {
-                    player.changeLocation(player.getX() + rotationSpeed, player.getY()); // Di chuyển sang phải
+                    player.changeLocation(player.getX() + speed, player.getY()); // Di chuyển sang phải
                 }
                 if (key.isKey_up()) {
-                    player.changeLocation(player.getX(), player.getY() - rotationSpeed); // Di chuyển lên
+                    player.changeLocation(player.getX(), player.getY() - speed); // Di chuyển lên
                 }
                 if (key.isKey_down()) {
-                    player.changeLocation(player.getX(), player.getY() + rotationSpeed); // Di chuyển xuống
+                    player.changeLocation(player.getX(), player.getY() + speed); // Di chuyển xuống
                 }
-                // if (key.isKey_space()) {
-                //     player.speedUp(); // Tăng tốc
-                // }
                 if (key.isKey_j()|| key.isKey_k()){
                     if (shotTime==0){
                         if (key.isKey_j()) {
@@ -227,11 +225,8 @@ public class PanelGame extends JComponent {
                     }
                 }
 
-                else {
-                    player.speedDown(); // Giảm tốc
-                }
                 player.update();
-                player.changeAngle(angle);
+                //player.changeAngle(angle);
 
                 for(int i=0; i<enemies.size(); i++){
                     Enemy enemy = enemies.get(i);

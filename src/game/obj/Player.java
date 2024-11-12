@@ -7,6 +7,9 @@ import javax.swing.ImageIcon;
 
 public class Player extends HpRender {
 
+    // Thêm các hằng số để định nghĩa kích thước màn hình game
+    private static final int GAME_WIDTH = 1920;  // Điều chỉnh theo kích thước thực tế của game
+    private static final int GAME_HEIGHT = 1080;  // Điều chỉnh theo kích thước thực tế của game
     // Kích thước của nhân vật
     public static final double PLAYER_SIZE = 100;
 
@@ -57,15 +60,34 @@ public class Player extends HpRender {
     }
 
     // Phương thức thay đổi vị trí của nhân vật
-    public void changeLocation(double x, double y) {
-        this.x = x;
-        this.y = y;
+    public void changeLocation(double newX, double newY) {
+        // Giới hạn vị trí X trong phạm vi màn hình
+        if (newX < 0) {
+            this.x = 0;
+        } else if (newX > GAME_WIDTH - PLAYER_SIZE) {
+            this.x = GAME_WIDTH - PLAYER_SIZE;
+        } else {
+            this.x = newX;
+        }
+
+        // Giới hạn vị trí Y trong phạm vi màn hình
+        if (newY < 0) {
+            this.y = 0;
+        } else if (newY > GAME_HEIGHT - PLAYER_SIZE) {
+            this.y = GAME_HEIGHT - PLAYER_SIZE;
+        } else {
+            this.y = newY;
+        }
     }
 
     // Phương thức cập nhật vị trí của nhân vật dựa trên góc và tốc độ
     public void update() {
-        x += Math.cos(Math.toRadians(angle)) * speed;
-        y += Math.sin(Math.toRadians(angle)) * speed;
+        // Tính toán vị trí mới
+        double newX = x + Math.cos(Math.toRadians(angle)) * speed;
+        double newY = y + Math.sin(Math.toRadians(angle)) * speed;
+
+        // Sử dụng changeLocation để đảm bảo vị trí mới nằm trong màn hình
+        changeLocation(newX, newY);
     }
 
     // Phương thức thay đổi góc xoay của nhân vật
@@ -116,7 +138,7 @@ public class Player extends HpRender {
     // Phương thức tăng tốc nhân vật
     public void speedUp() {
         speedUp = true;
-        speed = Math.min(speed + 0.02f, MAX_SPEED);
+        speed = Math.min(speed + 0.05f, MAX_SPEED);
     }
 
     // Phương thức giảm tốc nhân vật
