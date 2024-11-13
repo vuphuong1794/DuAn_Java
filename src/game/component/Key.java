@@ -33,15 +33,6 @@ public class Key {
     public void setKey_down(boolean key_down) {
         this.key_down = key_down;
     }
-    
-
-    // public boolean isKey_space(){
-    //     return key_space;
-    // }
-
-    // public void setKey_space(boolean key_space){
-    //     this.key_space = key_space;
-    // }
 
     public boolean isKey_j(){
         return key_j;
@@ -59,14 +50,12 @@ public class Key {
         this.key_k = key_k;
     }
 
-
-    
-
     private boolean key_right;
     private boolean key_left;
     private boolean key_up;
     private boolean key_down;
-    // private boolean key_space;
     private boolean key_j;
     private boolean key_k;
+    private boolean key_enter;
+
 }

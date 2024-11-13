@@ -170,10 +170,8 @@ public class PanelGame extends JComponent {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> key.setKey_left(true);
                     case KeyEvent.VK_D -> key.setKey_right(true);
-                    // case KeyEvent.VK_SPACE -> key.setKey_space(true);
                     case KeyEvent.VK_S -> key.setKey_down(true);
                     case KeyEvent.VK_W -> key.setKey_up(true);
-
                     case KeyEvent.VK_J -> key.setKey_j(true);
                     case KeyEvent.VK_K -> key.setKey_k(true);
                 }
@@ -184,7 +182,6 @@ public class PanelGame extends JComponent {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> key.setKey_left(false);
                     case KeyEvent.VK_D -> key.setKey_right(false);
-                    // case KeyEvent.VK_SPACE -> key.setKey_space(false);
                     case KeyEvent.VK_S -> key.setKey_down(false);
                     case KeyEvent.VK_W -> key.setKey_up(false);
                     case KeyEvent.VK_J -> key.setKey_j(false);
@@ -195,7 +192,6 @@ public class PanelGame extends JComponent {
 
         // Khởi động luồng xử lý di chuyển của player và enemies
         new Thread(() -> {
-            float rotationSpeed = 0.5f; // Tốc độ thay đổi góc của Player
             while (start) {
                 float speed = 1f; // Tốc độ di chuyển của Player
 
