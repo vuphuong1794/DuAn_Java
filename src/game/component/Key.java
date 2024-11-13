@@ -50,6 +50,10 @@ public class Key {
         this.key_k = key_k;
     }
 
+    public boolean isKey_enter(){ return key_enter;}
+
+    public void setKey_enter(boolean key_enter){this.key_enter = key_enter;}
+
     private boolean key_right;
     private boolean key_left;
     private boolean key_up;

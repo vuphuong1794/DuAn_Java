@@ -160,6 +160,13 @@ public class PanelGame extends JComponent {
         }).start();
     }
 
+    private void resetGame(){
+        enemies.clear();
+        bullets.clear();
+        player.changeLocation(150, 150);
+        player.reset();
+    }
+
     // Khởi tạo xử lý bàn phím
     private void initKeyboard() {
         key = new Key();
@@ -174,6 +181,7 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_W -> key.setKey_up(true);
                     case KeyEvent.VK_J -> key.setKey_j(true);
                     case KeyEvent.VK_K -> key.setKey_k(true);
+                    case KeyEvent.VK_ENTER -> key.setKey_enter(true);
                 }
             }
 
@@ -186,6 +194,7 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_W -> key.setKey_up(false);
                     case KeyEvent.VK_J -> key.setKey_j(false);
                     case KeyEvent.VK_K -> key.setKey_k(false);
+                    case KeyEvent.VK_ENTER -> key.setKey_enter(false);
                 }
             }
         });
@@ -193,37 +202,40 @@ public class PanelGame extends JComponent {
         // Khởi động luồng xử lý di chuyển của player và enemies
         new Thread(() -> {
             while (start) {
-                float speed = 1f; // Tốc độ di chuyển của Player
-
-                if (key.isKey_left()) {
-                    player.changeLocation(player.getX() - speed, player.getY()); // Di chuyển sang trái
-                }
-                if (key.isKey_right()) {
-                    player.changeLocation(player.getX() + speed, player.getY()); // Di chuyển sang phải
-                }
-                if (key.isKey_up()) {
-                    player.changeLocation(player.getX(), player.getY() - speed); // Di chuyển lên
-                }
-                if (key.isKey_down()) {
-                    player.changeLocation(player.getX(), player.getY() + speed); // Di chuyển xuống
-                }
-                if (key.isKey_j()|| key.isKey_k()){
-                    if (shotTime==0){
-                        if (key.isKey_j()) {
-                            bullets.add(0,new Bullet(player.getX(), player.getY(), player.getAngle(), 5,3f));
+                if(player.isAlive()) {
+                    float speed = 1f; // Tốc độ di chuyển của Player
+                    if (key.isKey_left()) {
+                        player.changeLocation(player.getX() - speed, player.getY()); // Di chuyển sang trái
+                    }
+                    if (key.isKey_right()) {
+                        player.changeLocation(player.getX() + speed, player.getY()); // Di chuyển sang phải
+                    }
+                    if (key.isKey_up()) {
+                        player.changeLocation(player.getX(), player.getY() - speed); // Di chuyển lên
+                    }
+                    if (key.isKey_down()) {
+                        player.changeLocation(player.getX(), player.getY() + speed); // Di chuyển xuống
+                    }
+                    if (key.isKey_j() || key.isKey_k()) {
+                        if (shotTime == 0) {
+                            if (key.isKey_j()) {
+                                bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                            } else {
+                                bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 20, 3f));
+                            }
                         }
-                        else{
-                            bullets.add(0,new Bullet(player.getX(), player.getY(), player.getAngle(), 20,3f));
+                        shotTime++;
+                        if (shotTime == 15) {
+                            shotTime = 0;
                         }
                     }
-                    shotTime++;
-                    if (shotTime==15){
-                        shotTime=0;
+                    player.update();
+                }
+                else{
+                    if(key.isKey_enter()){
+                        resetGame();
                     }
                 }
-
-                player.update();
-                //player.changeAngle(angle);
 
                 for(int i=0; i<enemies.size(); i++){
                     Enemy enemy = enemies.get(i);
@@ -301,8 +313,8 @@ public class PanelGame extends JComponent {
                     }
                     if (!player.updateHP(enemyHp)) {
                         player.setAlive(false);
-                        double x = player.getX();
-                        double y = player.getY();
+                        double x = player.getX() + Player.PLAYER_SIZE / 2;
+                        double y = player.getY() + Player.PLAYER_SIZE / 2;
 
                         // Thêm hiệu ứng nổ cho người chơi
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
@@ -415,7 +427,7 @@ public class PanelGame extends JComponent {
 
         if(!player.isAlive()){
             String text = "GAME OVER";
-            String textKey = "Press any key to continue";
+            String textKey = "Press enter to continue";
             g2.setFont(getFont().deriveFont(Font.BOLD, 50f));
             FontMetrics fm = g2.getFontMetrics();
             Rectangle2D r2 = fm.getStringBounds(text, g2);

@@ -19,7 +19,7 @@ public class Player extends HpRender {
     private boolean alive = true;
 
     public Player() {
-        super(new HP(50, 40));
+        super(new HP(50, 50));
         this.image = loadImage("/game/image/CharacterPlayer.png");
 
         Path2D p = new Path2D.Double();
