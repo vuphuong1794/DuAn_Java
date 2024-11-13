@@ -36,14 +36,14 @@ public class PanelGame extends JComponent {
     private List<Enemy> enemies;
     private List<Bullet> bullets;
     private List<Effect> boomEffects;
-// Lưu thời gian tạo hiệu ứng nổ
+    // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
 
     // Mouse position
     private Point mousePosition;
 
     public PanelGame() {
-        // Tạo trình để lắng nghe chuyển động, theo dõi vị trí chuột
+        // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(java.awt.event.MouseEvent e) {
@@ -88,7 +88,6 @@ public class PanelGame extends JComponent {
                     player.changeAngle((float) angleToMouse);
                 }
 
-
                 drawGame();
                 render();
                 long time = System.nanoTime() - startTime;
@@ -109,11 +108,9 @@ public class PanelGame extends JComponent {
 
     // Thêm kẻ thù vào game
     private void addEnemy() {
-        // Check if the number of enemies is less than 20
         if (enemies.size() >= 30) {
             return; // If there are already 20 enemies, do not add more
         }
-
         Random ran = new Random();
         int margin = 50;
         int enemySize = 100;
@@ -142,8 +139,6 @@ public class PanelGame extends JComponent {
         enemyBottom.changeAngle(270); // Moving up
         enemies.add(enemyBottom);
     }
-
-
 
     // Khởi tạo các đối tượng trong game
     private void initObjectGame() {
@@ -195,12 +190,14 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_J -> key.setKey_j(false);
                     case KeyEvent.VK_K -> key.setKey_k(false);
                     case KeyEvent.VK_ENTER -> key.setKey_enter(false);
+
                 }
             }
         });
 
         // Khởi động luồng xử lý di chuyển của player và enemies
         new Thread(() -> {
+            float rotationSpeed = 0.5f; // Tốc độ thay đổi góc của Player
             while (start) {
                 if(player.isAlive()) {
                     float speed = 1f; // Tốc độ di chuyển của Player
@@ -232,7 +229,7 @@ public class PanelGame extends JComponent {
                     player.update();
                 }
                 else{
-                    if(key.isKey_enter()){
+                    if(key.isKey_enter()) {
                         resetGame();
                     }
                 }
@@ -246,7 +243,6 @@ public class PanelGame extends JComponent {
                                 player.getAngle(),
                                 player.getSpeed()  // Giả sử bạn có getter cho speed của player
                         );
-
                         if(!enemy.check(width, height)){
                             enemies.remove(i);
                             System.out.println("removed");
@@ -281,13 +277,13 @@ public class PanelGame extends JComponent {
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+
                     }
 
                     bullets.remove(bullet);
                 }
             }
         }
-
     }
 
     private void checkPlayer(Enemy enemy) {
@@ -296,21 +292,28 @@ public class PanelGame extends JComponent {
             area.intersect(enemy.getShape());
             if (!area.isEmpty()) {
                 double enemyHp = enemy.getHP();
-                System.out.println("Collision detected at Player: (" + player.getX() + ", " + player.getY() +
-                        ") Enemy: (" + enemy.getX() + ", " + enemy.getY() + ")");
 
+                // Lấy thời gian hiện tại
+                long currentTime = System.currentTimeMillis();
+
+                // Kiểm tra nếu đã qua 3 giây kể từ lần nổ trước
+                if (currentTime - lastExplosionTime >= 3000) {
                     if (!enemy.updateHP(player.getHP())) {
                         enemies.remove(enemy);
                         double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
                         double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
-    
+
                         // Thêm hiệu ứng nổ vào danh sách hiệu ứng
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+
+                        // Cập nhật lại thời gian của lần nổ cuối
+                        lastExplosionTime = currentTime;
                     }
+
                     if (!player.updateHP(enemyHp)) {
                         player.setAlive(false);
                         double x = player.getX() + Player.PLAYER_SIZE / 2;
@@ -322,12 +325,11 @@ public class PanelGame extends JComponent {
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                    }
                 }
             }
         }
     }
-    
-    
 
     // Vẽ nền game
     private void drawBackground() {
@@ -401,9 +403,9 @@ public class PanelGame extends JComponent {
     // Vẽ các đối tượng trong game
     private void drawGame() {
         if (player.isAlive()) {
-            player.draw(g2); // Vẽ player 
+            player.draw(g2); // Vẽ player
         }
-        
+
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
