@@ -21,7 +21,6 @@ public class Enemy extends HpRender  {
     private static final float ROTATION_SPEED = 2.0f; // Tốc độ xoay của enemy
     private static final int MIN_DISTANCE = 150; // Khoảng cách tối thiểu với player
 
-
     public Enemy()  {
         // Them HP cho Enemy
         super( new HP(20,20));
@@ -137,6 +136,9 @@ public class Enemy extends HpRender  {
         hpRender(g2, shape, y);
         g2.setTransform(oldTransform);
 
+        //test
+        //g2.setColor(Color.red);
+        //g2.draw(shape.getBounds2D());
     }
 
     public double getX() {
@@ -151,6 +153,8 @@ public class Enemy extends HpRender  {
         return angle;
     }
 
+
+    //===================================GETSHAPE CAN DUOC SUA LAI+++++++++++++++++++++++++++++++++++++++++++++
     public Area getShape() {
         // Get the width and height of the image
         int width = image.getWidth(null);

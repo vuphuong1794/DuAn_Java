@@ -13,7 +13,7 @@ public class Bullet {
     private double size;
     private float speed=1f;
     public Bullet(double x, double y, float angle, double size, float speed) {
-        x+=30;
+        x+=50;
         y+=50;
         this.x=x;
         this.y=y;

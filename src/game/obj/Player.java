@@ -1,4 +1,3 @@
-
 package game.obj;
 import java.awt.geom.Path2D;
 import java.awt.*;
