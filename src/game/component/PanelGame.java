@@ -36,6 +36,8 @@ public class PanelGame extends JComponent {
     private List<Enemy> enemies;
     private List<Bullet> bullets;
     private List<Effect> boomEffects;
+    private int score = 0;
+
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
 
@@ -156,6 +158,7 @@ public class PanelGame extends JComponent {
     }
 
     private void resetGame(){
+        score=0;
         enemies.clear();
         bullets.clear();
         player.changeLocation(150, 150);
@@ -269,6 +272,7 @@ public class PanelGame extends JComponent {
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
                     if(!enemy.updateHP(bullet.getSize())){
+                        score++;
                         enemies.remove(enemy);
                         double x=enemy.getX()+Enemy.ENEMY_SIZE/2;
                         double y=enemy.getY()+Enemy.ENEMY_SIZE/2;
@@ -426,6 +430,7 @@ public class PanelGame extends JComponent {
         }
 
         g2.setColor(Color.WHITE);
+        g2.drawString("Score: "+score, 30, 40);
 
         if(!player.isAlive()){
             String text = "GAME OVER";
