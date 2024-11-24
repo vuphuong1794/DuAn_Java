@@ -10,10 +10,13 @@ import game.obj.sound.sound;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -197,6 +200,23 @@ public class PanelGame extends JComponent {
     private void initKeyboard() {
         key = new Key();
         requestFocus(); // Đảm bảo JComponent có focus để nhận sự kiện bàn phím
+        
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) { // Chuột trái
+                    key.setMouseLeftClick(true);
+                }
+            }
+    
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) { // Chuột trái
+                    key.setMouseLeftClick(false);
+                }
+            }
+        });
+
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -205,12 +225,10 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_D -> key.setKey_right(true);
                     case KeyEvent.VK_S -> key.setKey_down(true);
                     case KeyEvent.VK_W -> key.setKey_up(true);
-                    case KeyEvent.VK_J -> key.setKey_j(true);
-                    case KeyEvent.VK_K -> key.setKey_k(true);
                     case KeyEvent.VK_ENTER -> key.setKey_enter(true);
                 }
             }
-
+        
             @Override
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
@@ -218,8 +236,6 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_D -> key.setKey_right(false);
                     case KeyEvent.VK_S -> key.setKey_down(false);
                     case KeyEvent.VK_W -> key.setKey_up(false);
-                    case KeyEvent.VK_J -> key.setKey_j(false);
-                    case KeyEvent.VK_K -> key.setKey_k(false);
                     case KeyEvent.VK_ENTER -> key.setKey_enter(false);
 
                 }
@@ -243,25 +259,27 @@ public class PanelGame extends JComponent {
                     if (key.isKey_down()) {
                         player.changeLocation(player.getX(), player.getY() + speed); // Di chuyển xuống
                     }
-                    if (key.isKey_j() || key.isKey_k()) {
+                    if (key.isMouseLeftClick()) {
                         long currentTime = System.currentTimeMillis();
                         if (shotTime == 0) {
-                            if (key.isKey_j()) {
-                                bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
-                                Sound.soundShoot();
-                            }
-                            if (key.isKey_k()) {
-                                if (ammoCount > 0) { // Chỉ bắn được khi có đạn
-                                    // Kiểm tra đã qua 1 giây kể từ lần bắn trước
-                                    if (currentTime - lastShotTime >= 1000) { // 1000ms = 1 giây
-                                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 20, 3f));
-                                        Sound.soundShotgun();
-                                        ammoCount--; // Giảm số đạn sau khi bắn
-                                        hasAmmo = ammoCount > 0; // Cập nhật trạng thái đạn
-                                        lastShotTime = currentTime; // Cập nhật thời điểm bắn mới nhất
-                                    }
-                                }
-                            }
+                            bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                            Sound.soundShoot();
+                            // if (key.isKey_j()) {
+                            //     bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                            //     Sound.soundShoot();
+                            // }
+                            // if (key.isKey_k()) {
+                            //     if (ammoCount > 0) { // Chỉ bắn được khi có đạn
+                            //         // Kiểm tra đã qua 1 giây kể từ lần bắn trước
+                            //         if (currentTime - lastShotTime >= 1000) { // 1000ms = 1 giây
+                            //             bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 20, 3f));
+                            //             Sound.soundShotgun();
+                            //             ammoCount--; // Giảm số đạn sau khi bắn
+                            //             hasAmmo = ammoCount > 0; // Cập nhật trạng thái đạn
+                            //             lastShotTime = currentTime; // Cập nhật thời điểm bắn mới nhất
+                            //         }
+                            //     }
+                            // }
 
                         }
                         shotTime++;
