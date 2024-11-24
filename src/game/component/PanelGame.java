@@ -6,6 +6,7 @@ import game.obj.Player;
 import game.obj.Enemy;
 import game.obj.item.Item;
 import game.obj.sound.sound;
+import javax.sound.sampled.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -43,6 +44,11 @@ public class PanelGame extends JComponent {
     private sound Sound;
     private Point mousePosition; // Mouse position
 
+    //minimap
+    private static final int MINIMAP_SIZE = 100;  // Size of the minimap
+    private static final int MINIMAP_MARGIN = 10;  // Margin from the edges
+    private BufferedImage minimapBuffer;  // Buffer for the minimap
+
     private int score = 0;
     private int ammoCount = 0; // Số lượng đạn hiện có
     private long lastShotTime = 0; // Thời điểm bắn viên đạn cuối cùng
@@ -60,13 +66,16 @@ public class PanelGame extends JComponent {
             }
         });
     }
-
+    
     // Khởi động game
     public void start() {
         width = getWidth(); // Lấy chiều rộng của panel
         height = getHeight(); // Lấy chiều cao của panel
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         g2 = image.createGraphics();
+
+        //minimap_display
+        minimapBuffer = new BufferedImage(MINIMAP_SIZE, MINIMAP_SIZE, BufferedImage.TYPE_INT_ARGB);
 
         // Cấu hình render cho đồ họa mượt mà hơn
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -98,6 +107,82 @@ public class PanelGame extends JComponent {
         thread.start();
     }
 
+    //Minimap
+    private void drawMinimap() {
+        Graphics2D mg = minimapBuffer.createGraphics();
+        
+        // Clear minimap background
+        mg.setColor(new Color(0, 0, 0, 180));
+        mg.fillRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
+        
+        // Draw border
+        mg.setColor(Color.WHITE);
+        mg.drawRect(0, 0, MINIMAP_SIZE - 1, MINIMAP_SIZE - 1);
+        
+        // Calculate scale factors
+        float scaleX = (float) MINIMAP_SIZE / width;
+        float scaleY = (float) MINIMAP_SIZE / height;
+        
+        // Draw player (as a white dot)
+        int playerMinimapX = (int) (player.getX() * scaleX);
+        int playerMinimapY = (int) (player.getY() * scaleY);
+        mg.setColor(Color.WHITE);
+        mg.fillOval(playerMinimapX - 2, playerMinimapY - 2, 4, 4);
+        
+        // Draw enemies (as red dots)
+        mg.setColor(Color.RED);
+        for (Enemy enemy : enemies) {
+            int enemyMinimapX = (int) (enemy.getX() * scaleX);
+            int enemyMinimapY = (int) (enemy.getY() * scaleY);
+            mg.fillOval(enemyMinimapX - 2, enemyMinimapY - 2, 4, 4);
+        }
+        
+        // Draw items (as yellow dots)
+        mg.setColor(Color.YELLOW);
+        for (Item item : items) {
+            int itemMinimapX = (int) (item.getX() * scaleX);
+            int itemMinimapY = (int) (item.getY() * scaleY);
+            mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
+        }
+        
+        mg.dispose();
+        
+        // Draw the minimap on the main graphics context
+        // Position it below score and ammo
+        int minimapX = 1410;
+        int minimapY = 10; // Adjust this value based on where your score/ammo text ends
+        g2.drawImage(minimapBuffer, minimapX, minimapY, null);
+    }
+
+    private void drawVolumeControl() {
+        // Vẽ nhãn âm lượng
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.PLAIN, 14));
+        g2.drawString("Âm lượng:", 30, 80);
+    
+        // Vẽ thanh trượt tùy chỉnh
+        int sliderX = 100;
+        int sliderY = 65;
+        int sliderWidth = 150;
+        int sliderHeight = 20;
+    
+        // Vẽ đường nền của thanh trượt
+        g2.setColor(Color.GRAY);
+        g2.fillRect(sliderX, sliderY, sliderWidth, sliderHeight);
+    
+        // Tính toán vị trí của nút trượt dựa trên âm lượng hiện tại
+        int knobWidth = 10;
+        int knobX = sliderX + (int)(Sound.getVolume() * (sliderWidth - knobWidth));
+    
+        // Vẽ nút trượt
+        g2.setColor(Color.WHITE);
+        g2.fillRect(knobX, sliderY, knobWidth, sliderHeight);
+    
+        // Vẽ viền cho thanh trượt
+        g2.setColor(Color.BLACK);
+        g2.drawRect(sliderX, sliderY, sliderWidth, sliderHeight);
+    }
+    
     // Thêm kẻ thù vào game
     private void addEnemy() {
         Sound.soundZombie();
@@ -132,7 +217,7 @@ public class PanelGame extends JComponent {
         enemyBottom.changeAngle(270); // Moving up
         enemies.add(enemyBottom);
     }
-
+    
     // Khởi tạo các đối tượng trong game
     private void initObjectGame() {
         Sound = new sound();
@@ -523,8 +608,12 @@ public class PanelGame extends JComponent {
 
         //hiển thị trạng thái
         g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
         g2.drawString("Score: "+score, 30, 40);
         g2.drawString("Ammo: " + ammoCount, 30, 60);
+
+        drawVolumeControl();
+        drawMinimap();
 
         if(!player.isAlive()){
             String text = "GAME OVER";
@@ -536,6 +625,7 @@ public class PanelGame extends JComponent {
             double textHeight = r2.getHeight();
             double x = (width - textWidth) / 2;
             double y = (height - textHeight) / 2;
+            g2.setColor(Color.WHITE);
             g2.drawString(text, (int)x, (int)y + fm.getAscent());
             g2.setFont(getFont().deriveFont(Font.BOLD, 15f));
             fm = g2.getFontMetrics();
