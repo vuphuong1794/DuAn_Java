@@ -4,6 +4,8 @@ import game.obj.Bullet;
 import game.obj.Effect;
 import game.obj.Player;
 import game.obj.Enemy;
+import game.obj.item.Item;
+import game.obj.sound.sound;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -13,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -36,13 +39,17 @@ public class PanelGame extends JComponent {
     private List<Enemy> enemies;
     private List<Bullet> bullets;
     private List<Effect> boomEffects;
-    private int score = 0;
+    private List<Item> items;
+    private sound Sound;
+    private Point mousePosition; // Mouse position
 
+    private int score = 0;
+    private int ammoCount = 0; // Số lượng đạn hiện có
+    private long lastShotTime = 0; // Thời điểm bắn viên đạn cuối cùng
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
-
-    // Mouse position
-    private Point mousePosition;
+    private boolean hasAmmo = false; // Kiểm tra có đạn hay không
+    private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
     public PanelGame() {
         // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
@@ -83,8 +90,6 @@ public class PanelGame extends JComponent {
                     if (angleToMouse < 0) {
                         angleToMouse += 360;
                     }
-                    // Tăng độ nhạy của chuột
-                    float sensitiveAngle = (float)(angleToMouse * 1.5);
 
                     // Cập nhật góc xoay của Player
                     player.changeAngle((float) angleToMouse);
@@ -110,6 +115,7 @@ public class PanelGame extends JComponent {
 
     // Thêm kẻ thù vào game
     private void addEnemy() {
+        Sound.soundZombie();
         if (enemies.size() >= 30) {
             return; // If there are already 20 enemies, do not add more
         }
@@ -144,7 +150,9 @@ public class PanelGame extends JComponent {
 
     // Khởi tạo các đối tượng trong game
     private void initObjectGame() {
+        Sound = new sound();
         player = new Player();
+        items = new ArrayList<>();
         player.changeLocation(150, 150);
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
@@ -153,17 +161,37 @@ public class PanelGame extends JComponent {
             while (start) {
                 addEnemy();
                 sleep(3000); // Mỗi 3 giây thêm kẻ thù mới
+
+                if (items.size() < MAX_ITEMS) {
+                    addRandomItem();
+                }
+                sleep(5000); // 5 giây tạo 1 item mới nếu chưa đạt max
             }
         }).start();
     }
 
+    // Phương thức tạo item ngẫu nhiên
+    private void addRandomItem() {
+        Random rand = new Random();
+        int margin = 50;
+
+        // Tạo vị trí ngẫu nhiên trong vùng an toàn
+        double x = margin + rand.nextDouble() * (width - 2 * margin - Item.ITEM_SIZE);
+        double y = margin + rand.nextDouble() * (height - 2 * margin - Item.ITEM_SIZE);
+
+        items.add(new Item(x, y));
+    }
+
+
     private void resetGame(){
         score=0;
+        items.clear();
+        hasAmmo = false;
         enemies.clear();
         bullets.clear();
         player.changeLocation(150, 150);
         player.reset();
-    }
+        ammoCount = 0;    }
 
     // Khởi tạo xử lý bàn phím
     private void initKeyboard() {
@@ -200,7 +228,6 @@ public class PanelGame extends JComponent {
 
         // Khởi động luồng xử lý di chuyển của player và enemies
         new Thread(() -> {
-            float rotationSpeed = 0.5f; // Tốc độ thay đổi góc của Player
             while (start) {
                 if(player.isAlive()) {
                     float speed = 1f; // Tốc độ di chuyển của Player
@@ -217,12 +244,25 @@ public class PanelGame extends JComponent {
                         player.changeLocation(player.getX(), player.getY() + speed); // Di chuyển xuống
                     }
                     if (key.isKey_j() || key.isKey_k()) {
+                        long currentTime = System.currentTimeMillis();
                         if (shotTime == 0) {
                             if (key.isKey_j()) {
                                 bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
-                            } else {
-                                bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 20, 3f));
+                                Sound.soundShoot();
                             }
+                            if (key.isKey_k()) {
+                                if (ammoCount > 0) { // Chỉ bắn được khi có đạn
+                                    // Kiểm tra đã qua 1 giây kể từ lần bắn trước
+                                    if (currentTime - lastShotTime >= 1000) { // 1000ms = 1 giây
+                                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 20, 3f));
+                                        Sound.soundShotgun();
+                                        ammoCount--; // Giảm số đạn sau khi bắn
+                                        hasAmmo = ammoCount > 0; // Cập nhật trạng thái đạn
+                                        lastShotTime = currentTime; // Cập nhật thời điểm bắn mới nhất
+                                    }
+                                }
+                            }
+
                         }
                         shotTime++;
                         if (shotTime == 15) {
@@ -230,6 +270,7 @@ public class PanelGame extends JComponent {
                         }
                     }
                     player.update();
+                    checkItems();
                 }
                 else{
                     if(key.isKey_enter()) {
@@ -257,30 +298,37 @@ public class PanelGame extends JComponent {
                         }
                     }
                 }
+
                 sleep(5); // Ngủ 5ms để giảm tải cho CPU
             }
         }).start();
     }
 
     private void checkBullets(Bullet bullet){
+        // Duyệt qua danh sách zombie
         for(int i=0; i<enemies.size(); i++){
             Enemy enemy = enemies.get(i);
             if(enemy!=null){
+                // Tạo một vùng (Area) dựa trên hình dạng của viên đạn
                 Area area = new Area(bullet.getShape());
+                // Tính toán giao cắt giữa hình dạng của viên đạn và kẻ thù
                 area.intersect(enemy.getShape());
+                // Nếu vùng giao nhau không rỗng, tức là viên đạn đã va chạm với zombie
                 if(!area.isEmpty()){
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
-                    if(!enemy.updateHP(bullet.getSize())){
+                    // Cập nhật HP của kẻ thù dựa trên kích thước viên đạn, nếu HP = 0
+                    if(!enemy.updateHP(bullet.getSize())) {
                         score++;
                         enemies.remove(enemy);
-                        double x=enemy.getX()+Enemy.ENEMY_SIZE/2;
-                        double y=enemy.getY()+Enemy.ENEMY_SIZE/2;
-                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
-                        boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
-                        boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
-                        boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
-                        boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                        //Sound.soundZombie();
+                        double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
+                        double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
+                        boomEffects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y, 5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                        boomEffects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                        boomEffects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                        boomEffects.add(new Effect(x, y, 10, 5, 150, 0.2f, new Color(255, 255, 255)));
 
                     }
 
@@ -292,43 +340,57 @@ public class PanelGame extends JComponent {
 
     private void checkPlayer(Enemy enemy) {
         if (enemy != null) {
+            // Tạo vùng giao nhau giữa hình dạng của player và enemy
             Area area = new Area(player.getShape());
             area.intersect(enemy.getShape());
+
+            // Kiểm tra nếu có va chạm (vùng giao nhau không rỗng)
             if (!area.isEmpty()) {
+                // Lấy máu của enemy
                 double enemyHp = enemy.getHP();
 
                 // Lấy thời gian hiện tại
                 long currentTime = System.currentTimeMillis();
 
-                // Kiểm tra nếu đã qua 3 giây kể từ lần nổ trước
+                // Chỉ xử lý va chạm nếu đã qua 3 giây kể từ lần va chạm trước
                 if (currentTime - lastExplosionTime >= 3000) {
+                    // Kiểm tra nếu enemy chết khi va chạm với player
                     if (!enemy.updateHP(player.getHP())) {
                         enemies.remove(enemy);
+                        Sound.soundZombie();
+
+                        // Tính toán vị trí trung tâm của enemy để tạo hiệu ứng nổ
                         double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
                         double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
 
-                        // Thêm hiệu ứng nổ vào danh sách hiệu ứng
+                        // Tạo nhiều hiệu ứng nổ với các màu và kích thước khác nhau
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
 
-                        // Cập nhật lại thời gian của lần nổ cuối
                         lastExplosionTime = currentTime;
                     }
 
+                    // Kiểm tra nếu player chết khi va chạm với enemy
                     if (!player.updateHP(enemyHp)) {
                         player.setAlive(false);
+                        Sound.soundZombie();
+
+                        // Tính toán vị trí trung tâm của player để tạo hiệu ứng nổ
                         double x = player.getX() + Player.PLAYER_SIZE / 2;
                         double y = player.getY() + Player.PLAYER_SIZE / 2;
 
-                        // Thêm hiệu ứng nổ cho người chơi
+                        // Tạo nhiều hiệu ứng nổ cho player giống như enemy
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.05f, new Color(32, 178, 169)));
                         boomEffects.add(new Effect(x, y,5, 5, 75, 0.1f, new Color(32, 178, 169)));
                         boomEffects.add(new Effect(x, y,10, 10, 100, 0.3f, new Color(230, 207, 105)));
                         boomEffects.add(new Effect(x, y,10, 5, 100, 0.5f, new Color(255, 70, 70)));
                         boomEffects.add(new Effect(x, y,10, 5, 150, 0.2f, new Color(255, 255, 255)));
+                    }
+                    else{
+                        Sound.soundHit();
                     }
                 }
             }
@@ -402,8 +464,6 @@ public class PanelGame extends JComponent {
         }).start(); // Bắt đầu luồng xử lý đạn
     }
 
-
-
     // Vẽ các đối tượng trong game
     private void drawGame() {
         if (player.isAlive()) {
@@ -429,8 +489,16 @@ public class PanelGame extends JComponent {
             }
         }
 
+        for (Item item : items) {
+            if (!item.isCollected()) {
+                item.draw(g2);
+            }
+        }
+
+        //hiển thị trạng thái
         g2.setColor(Color.WHITE);
         g2.drawString("Score: "+score, 30, 40);
+        g2.drawString("Ammo: " + ammoCount, 30, 60);
 
         if(!player.isAlive()){
             String text = "GAME OVER";
@@ -450,6 +518,32 @@ public class PanelGame extends JComponent {
             x = (width - textWidth) / 2;
             y = (height - textHeight) / 2;
             g2.drawString(textKey, (int)x, (int)y + fm.getAscent() + 50);
+        }
+    }
+
+    //kiểm tra chạm item
+    private void checkItems() {
+        Iterator<Item> iterator = items.iterator();
+        // Lặp qua tất cả các items trên bản đồ
+        while (iterator.hasNext()) {
+            Item item = iterator.next();
+            if (!item.isCollected()) {
+                // Tạo vùng va chạm bằng cách lấy hình dạng của player
+                Area area = new Area(player.getShape());
+                // Tính phần giao của hình dạng player và item
+                area.intersect(new Area(item.getShape()));
+                // Nếu có va chạm (phần giao không rỗng)
+                if (!area.isEmpty()) {
+                    // Đánh dấu item đã được thu thập
+                    item.collect();
+                    ammoCount+=10;
+                    // Cập nhật trạng thái đạn của player
+                    hasAmmo = true;
+                    //Sound.soundCollectItem(); // Thêm âm thanh nhặt item nếu có
+                    // Xóa item khỏi danh sách
+                    iterator.remove();
+                }
+            }
         }
     }
 

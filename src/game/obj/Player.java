@@ -104,21 +104,29 @@ public class Player extends HpRender {
         int width = image.getWidth(null);
         int height = image.getHeight(null);
         g2.drawImage(image, -width / 2, -height / 2, null);
-
+        Shape shape = getShape();
         hpRender(g2, getShape(), PLAYER_SIZE);
 
         // Restore the original transformation
         g2.setTransform(oldTransform);
+        //test
+        //g2.setColor(Color.red);
+        //g2.draw(shape.getBounds2D());
 
     }
 
     public Area getShape() {
-        // Tạo ra hình chữ nhật với toạ độ x, y và chiều dài chiều rộng cho trước
-        Rectangle rectangle = new Rectangle(0, 0, 50, 50);
+        // Tạo hitbox với kích thước phù hợp với sprite
+        Rectangle rectangle = new Rectangle(
+                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều ngang
+                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều dọc
+                (int)PLAYER_SIZE,      // Chiều rộng
+                (int)PLAYER_SIZE       // Chiều cao
+        );
 
-        // Apply transformations: translation and rotation
         AffineTransform afx = new AffineTransform();
-        afx.translate(x, y); // dịch chuyển zombie theo toạ độ x,y
+        // Dịch chuyển đến tâm của nhân vật
+        afx.translate(x + PLAYER_SIZE/2, y + PLAYER_SIZE/2);
         afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
 
         // Create an Area from the transformed rectangle
