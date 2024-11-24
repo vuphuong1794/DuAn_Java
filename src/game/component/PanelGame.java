@@ -157,11 +157,11 @@ public class PanelGame extends JComponent {
     private void drawVolumeControl() {
         // Vẽ nhãn âm lượng
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 14));
+        g2.setFont(new Font("Arial", Font.BOLD, 20));
         g2.drawString("Âm lượng:", 30, 80);
     
         // Vẽ thanh trượt tùy chỉnh
-        int sliderX = 100;
+        int sliderX = 133;
         int sliderY = 65;
         int sliderWidth = 150;
         int sliderHeight = 20;
@@ -263,6 +263,12 @@ public class PanelGame extends JComponent {
         player.reset();
         ammoCount = 0;    }
 
+        private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
+            // Tính toán âm lượng dựa trên vị trí chuột
+            float volume = Math.max(0, Math.min(1, (float) (mouseX - sliderX) / sliderWidth));
+            Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
+        }
+        
     private void initKeyboard() {
         key = new Key();
         requestFocus(); // Ensure the JComponent has focus to receive keyboard events
@@ -273,6 +279,20 @@ public class PanelGame extends JComponent {
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
                     key.setMouseLeftClick(true);
+                }
+                int mouseX = e.getX();
+                int mouseY = e.getY();
+
+                // Vị trí thanh trượt
+                int sliderX = 133;
+                int sliderY = 65;
+                int sliderWidth = 150;
+                int sliderHeight = 20;
+
+                // Kiểm tra nếu chuột nằm trên thanh trượt
+                if (mouseX >= sliderX && mouseX <= sliderX + sliderWidth &&
+                    mouseY >= sliderY && mouseY <= sliderY + sliderHeight) {
+                    updateVolume(mouseX, sliderX, sliderWidth);
                 }
             }
 
@@ -294,9 +314,22 @@ public class PanelGame extends JComponent {
             @Override
             public void mouseDragged(MouseEvent e) {
                 mousePosition = e.getPoint(); // Update mouse position while dragging
+                int mouseX = e.getX();
+                int mouseY = e.getY();
+
+                // Vị trí thanh trượt
+                int sliderX = 100;
+                int sliderY = 65;
+                int sliderWidth = 150;
+                int sliderHeight = 20;
+
+                // Kiểm tra nếu chuột kéo qua thanh trượt
+                if (mouseY >= sliderY && mouseY <= sliderY + sliderHeight) {
+                    updateVolume(mouseX, sliderX, sliderWidth);
+                }
             }
         });
-
+        
         // Key listeners for keyboard input
         addKeyListener(new KeyAdapter() {
             @Override
