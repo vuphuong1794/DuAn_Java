@@ -182,7 +182,6 @@ public class PanelGame extends JComponent {
         items.add(new Item(x, y));
     }
 
-
     private void resetGame(){
         score=0;
         items.clear();
@@ -521,7 +520,7 @@ public class PanelGame extends JComponent {
         }
     }
 
-    //kiểm tra chạm item
+    //kiểm tra chạm itemI
     private void checkItems() {
         Iterator<Item> iterator = items.iterator();
         // Lặp qua tất cả các items trên bản đồ

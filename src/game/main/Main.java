@@ -1,12 +1,18 @@
 package game.main;
 
 import game.component.PanelGame;
-import javax.swing.JFrame;
+import game.component.MainMenuPanel;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Main extends JFrame {
+    private CardLayout cardLayout;
+    private JPanel mainPanel;
+    private PanelGame panelGame;
+
     public Main() {
         init();
     }
@@ -17,19 +23,49 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        PanelGame panelGame = new PanelGame();
-        add(panelGame);
+
+        // CardLayout to switch between menu and game
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
+
+        // Create the menu screen
+        MainMenuPanel menuPanel = new MainMenuPanel(
+                e -> showGameScreen(), // Event for "Start"
+                e -> System.exit(0)    // Event for "Exit"
+        );
+
+        // Create the game screen
+        panelGame = new PanelGame();
+
+        // Add screens to CardLayout
+        mainPanel.add(menuPanel, "Menu");
+        mainPanel.add(panelGame, "Game");
+
+        add(mainPanel);
+
+        // Show the menu initially
+        cardLayout.show(mainPanel, "Menu");
+
+        // Add a listener to start the game when the window opens
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
-                panelGame.start();
+                // Preload resources if necessary
             }
         });
     }
 
+    private void showGameScreen() {
+        cardLayout.show(mainPanel, "Game");
+
+        // Start the game only once
+        SwingUtilities.invokeLater(panelGame::start);
+    }
+
     public static void main(String[] args) {
-        Main main = new Main();
-        main.setVisible(true);
+        SwingUtilities.invokeLater(() -> {
+            Main main = new Main();
+            main.setVisible(true);
+        });
     }
 }
