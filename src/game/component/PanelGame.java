@@ -8,10 +8,7 @@ import game.obj.item.Item;
 import game.obj.sound.sound;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -81,22 +78,7 @@ public class PanelGame extends JComponent {
                 long startTime = System.nanoTime();
                 drawBackground();
 
-                // Tính góc quay Player - chuột
-                if (mousePosition != null) {
-                    double dx = mousePosition.x - player.getX();
-                    double dy = mousePosition.y - player.getY();
 
-                    // Tính toán góc của Player và chuột
-                    double angleToMouse = Math.toDegrees(Math.atan2(dy, dx));
-
-                    // Góc quay được 360 độ
-                    if (angleToMouse < 0) {
-                        angleToMouse += 360;
-                    }
-
-                    // Cập nhật góc xoay của Player
-                    player.changeAngle((float) angleToMouse);
-                }
 
                 drawGame();
                 render();
@@ -196,27 +178,41 @@ public class PanelGame extends JComponent {
         player.reset();
         ammoCount = 0;    }
 
-    // Khởi tạo xử lý bàn phím
     private void initKeyboard() {
         key = new Key();
-        requestFocus(); // Đảm bảo JComponent có focus để nhận sự kiện bàn phím
-        
+        requestFocus(); // Ensure the JComponent has focus to receive keyboard events
+
+        // Mouse listeners for click and release
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) { // Chuột trái
+                if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
                     key.setMouseLeftClick(true);
                 }
             }
-    
+
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) { // Chuột trái
+                if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
                     key.setMouseLeftClick(false);
                 }
             }
         });
 
+        // Mouse motion listener to track mouse position
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                mousePosition = e.getPoint(); // Update mouse position
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                mousePosition = e.getPoint(); // Update mouse position while dragging
+            }
+        });
+
+        // Key listeners for keyboard input
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -228,7 +224,7 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_ENTER -> key.setKey_enter(true);
                 }
             }
-        
+
             @Override
             public void keyReleased(KeyEvent e) {
                 switch (e.getKeyCode()) {
@@ -237,87 +233,99 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_S -> key.setKey_down(false);
                     case KeyEvent.VK_W -> key.setKey_up(false);
                     case KeyEvent.VK_ENTER -> key.setKey_enter(false);
-
                 }
             }
         });
 
-        // Khởi động luồng xử lý di chuyển của player và enemies
+        // Main game loop thread
         new Thread(() -> {
             while (start) {
-                if(player.isAlive()) {
-                    float speed = 1f; // Tốc độ di chuyển của Player
+                if (player.isAlive()) {
+                    float speed = 1f; // Movement speed
+
+                    // Player movement
                     if (key.isKey_left()) {
-                        player.changeLocation(player.getX() - speed, player.getY()); // Di chuyển sang trái
+                        player.changeLocation(player.getX() - speed, player.getY());
                     }
                     if (key.isKey_right()) {
-                        player.changeLocation(player.getX() + speed, player.getY()); // Di chuyển sang phải
+                        player.changeLocation(player.getX() + speed, player.getY());
                     }
                     if (key.isKey_up()) {
-                        player.changeLocation(player.getX(), player.getY() - speed); // Di chuyển lên
+                        player.changeLocation(player.getX(), player.getY() - speed);
                     }
                     if (key.isKey_down()) {
-                        player.changeLocation(player.getX(), player.getY() + speed); // Di chuyển xuống
+                        player.changeLocation(player.getX(), player.getY() + speed);
                     }
-                    if (key.isMouseLeftClick()) {
-                        long currentTime = System.currentTimeMillis();
-                        if (shotTime == 0) {
-                            bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
-                            Sound.soundShoot();
-                            // if (key.isKey_j()) {
-                            //     bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
-                            //     Sound.soundShoot();
-                            // }
-                            // if (key.isKey_k()) {
-                            //     if (ammoCount > 0) { // Chỉ bắn được khi có đạn
-                            //         // Kiểm tra đã qua 1 giây kể từ lần bắn trước
-                            //         if (currentTime - lastShotTime >= 1000) { // 1000ms = 1 giây
-                            //             bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 20, 3f));
-                            //             Sound.soundShotgun();
-                            //             ammoCount--; // Giảm số đạn sau khi bắn
-                            //             hasAmmo = ammoCount > 0; // Cập nhật trạng thái đạn
-                            //             lastShotTime = currentTime; // Cập nhật thời điểm bắn mới nhất
-                            //         }
-                            //     }
-                            // }
 
+                    // Rotation logic (calculate angle between player and mouse)
+                    if (mousePosition != null) {
+                        double dx = mousePosition.x - player.getX();
+                        double dy = mousePosition.y - player.getY();
+
+                        // Calculate angle between player and mouse
+                        double angleToMouse = Math.toDegrees(Math.atan2(dy, dx));
+
+                        // Ensure angle is between 0 and 360
+                        if (angleToMouse < 0) {
+                            angleToMouse += 360;
                         }
-                        shotTime++;
-                        if (shotTime == 15) {
-                            shotTime = 0;
-                        }
+
+                        // Update player's rotation angle
+                        player.changeAngle((float) angleToMouse);
                     }
+
                     player.update();
                     checkItems();
-                }
-                else{
-                    if(key.isKey_enter()) {
+                } else {
+                    if (key.isKey_enter()) {
                         resetGame();
                     }
                 }
 
-                for(int i=0; i<enemies.size(); i++){
+                // Enemy logic
+                for (int i = 0; i < enemies.size(); i++) {
                     Enemy enemy = enemies.get(i);
-                    if(enemy != null){
+                    if (enemy != null) {
                         enemy.updateMovement(
                                 player.getX(),
                                 player.getY(),
                                 player.getAngle(),
-                                player.getSpeed()  // Giả sử bạn có getter cho speed của player
+                                player.getSpeed()
                         );
-                        if(!enemy.check(width, height)){
+                        if (!enemy.check(width, height)) {
                             enemies.remove(i);
                             System.out.println("removed");
-                        }else{
-                            //cham vao thi zombie se ....
-                            if(player.isAlive()) {
+                        } else {
+                            if (player.isAlive()) {
                                 checkPlayer(enemy);
                             }
                         }
                     }
                 }
 
-                sleep(5); // Ngủ 5ms để giảm tải cho CPU
+                sleep(5); // Sleep for 5ms to reduce CPU load
+            }
+        }).start();
+
+        // Shooting logic thread
+        new Thread(() -> {
+            while (start) {
+                if (key.isMouseLeftClick()) {
+                    long currentTime = System.currentTimeMillis();
+                    if (shotTime == 0) {
+                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                        Sound.soundShoot();
+                    }
+                    shotTime++;
+                    if (shotTime == 15) {
+                        shotTime = 0;
+                    }
+                }
+                try {
+                    Thread.sleep(10); // Sleep to prevent CPU overload
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
