@@ -281,20 +281,14 @@ public class PanelGame extends JComponent {
                 if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
                     key.setMouseLeftClick(true);
                 }
-                int mouseX = e.getX();
-                int mouseY = e.getY();
 
-                // Vị trí thanh trượt
-                int sliderX = 133;
-                int sliderY = 65;
-                int sliderWidth = 150;
-                int sliderHeight = 20;
 
-                // Kiểm tra nếu chuột nằm trên thanh trượt
-                if (mouseX >= sliderX && mouseX <= sliderX + sliderWidth &&
-                    mouseY >= sliderY && mouseY <= sliderY + sliderHeight) {
-                    updateVolume(mouseX, sliderX, sliderWidth);
+                // Check if the mouse is within the slider bounds using mousePosition
+                if (mousePosition.x >= 135 && mousePosition.x <= 280 &&
+                        mousePosition.y >= 85 && mousePosition.y <= 105) {
+                    updateVolume(mousePosition.x, 135, 280 - 135); // Pass slider bounds as parameters
                 }
+
             }
 
             @Override
@@ -435,10 +429,10 @@ public class PanelGame extends JComponent {
         // Shooting logic thread
         new Thread(() -> {
             while (start) {
-                if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>100 || mousePosition.y<80)) {
+                if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>105 || mousePosition.y<85)) {
                     long currentTime = System.currentTimeMillis();
                     if (shotTime == 0) {
-                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle()));
                         Sound.soundShoot();
                     }
                     shotTime++;

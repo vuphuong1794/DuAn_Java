@@ -7,21 +7,17 @@ import java.awt.geom.Ellipse2D;
 public class Bullet {
     private double x;
     private double y;
-    private final Shape shape;
+    private final Shape shape= new Ellipse2D.Double(0,0,50,50);;
     private final Color color=new Color(255,255,255);
     private final float angle;
-    private double size;
-    private float speed=1f;
-    public Bullet(double x, double y, float angle, double size, float speed) {
-        x+=50;
-        y+=50;
+    private double size=3;
+    private float speed=3f;
+    public Bullet (double x, double y, float angle) {
         this.x=x;
         this.y=y;
         this.angle=angle;
-        this.size=size;
-        this.speed=speed;
-        shape = new Ellipse2D.Double(0,0,size,size);
     }
+
     public void update(){
         x+=Math.cos(Math.toRadians(angle))*speed;
         y+=Math.sin(Math.toRadians(angle))*speed;
