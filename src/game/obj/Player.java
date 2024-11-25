@@ -9,7 +9,7 @@ public class Player extends HpRender {
     private static final int GAME_WIDTH = 1920;
     private static final int GAME_HEIGHT = 940;
     public static final double PLAYER_SIZE = 100;
-    private String playerName;
+    private String playerName = "player";
 
     // Vị trí x, y của nhân vật trên màn hình
     private double x, y;
@@ -25,9 +25,6 @@ public class Player extends HpRender {
 
     // Hình ảnh của nhân vật
     private final Image image;
-
-    // Biến kiểm tra xem nhân vật có đang tăng tốc không
-    private boolean speedUp;
 
     private boolean alive=true;
 
@@ -173,14 +170,11 @@ public class Player extends HpRender {
         speed = 0;
     }
 
-    // Phương thức set tên người chơi
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
-
-    public String getPlayerName() {
+    public String getPlayerName(){
         return playerName;
     }
-
 
 }

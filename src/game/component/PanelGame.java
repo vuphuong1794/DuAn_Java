@@ -6,7 +6,6 @@ import game.obj.Player;
 import game.obj.Enemy;
 import game.obj.item.Item;
 import game.obj.sound.sound;
-import javax.sound.sampled.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -52,6 +51,10 @@ public class PanelGame extends JComponent {
     private int score = 0;
     private int ammoCount = 0; // Số lượng đạn hiện có
     private long lastShotTime = 0; // Thời điểm bắn viên đạn cuối cùng
+    private long startTime;  // Thời gian bắt đầu
+    private long endTime;    // Thời gian kết thúc
+
+
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
     private boolean hasAmmo = false; // Kiểm tra có đạn hay không
@@ -86,9 +89,6 @@ public class PanelGame extends JComponent {
             while (start) {
                 long startTime = System.nanoTime();
                 drawBackground();
-
-
-
                 drawGame();
                 render();
                 long time = System.nanoTime() - startTime;
@@ -149,7 +149,7 @@ public class PanelGame extends JComponent {
 
         // Draw the minimap on the main graphics context
         // Position it below score and ammo
-        int minimapX = 1410;
+        int minimapX = 1510;
         int minimapY = 10; // Adjust this value based on where your score/ammo text ends
         g2.drawImage(minimapBuffer, minimapX, minimapY, null);
     }
@@ -158,11 +158,11 @@ public class PanelGame extends JComponent {
         // Vẽ nhãn âm lượng
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.drawString("Âm lượng:", 30, 80);
+        g2.drawString("Âm lượng:", 30, 100);
 
         // Vẽ thanh trượt tùy chỉnh
         int sliderX = 133;
-        int sliderY = 65;
+        int sliderY = 85;
         int sliderWidth = 150;
         int sliderHeight = 20;
 
@@ -171,7 +171,7 @@ public class PanelGame extends JComponent {
         g2.fillRect(sliderX, sliderY, sliderWidth, sliderHeight);
 
         // Tính toán vị trí của nút trượt dựa trên âm lượng hiện tại
-        int knobWidth = 10;
+        int knobWidth = 20;
         int knobX = sliderX + (int)(Sound.getVolume() * (sliderWidth - knobWidth));
 
         // Vẽ nút trượt
@@ -260,7 +260,9 @@ public class PanelGame extends JComponent {
         bullets.clear();
         player.changeLocation(150, 150);
         player.reset();
-        ammoCount = 0;    }
+        ammoCount = 0;
+        startTime = System.nanoTime();
+    }
 
         private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
             // Tính toán âm lượng dựa trên vị trí chuột
@@ -641,32 +643,36 @@ public class PanelGame extends JComponent {
         //hiển thị trạng thái
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.drawString("Player: " + player.getPlayerName(), 30, 80);
-        g2.drawString("Score: "+score, 30, 40);
-        g2.drawString("Ammo: " + ammoCount, 30, 60);
+        g2.drawString("Player: " + player.getPlayerName(), 30, 40);
+        g2.drawString("Score: "+score, 30, 60);
+        g2.drawString("Ammo: " + ammoCount, 30, 80);
 
         drawVolumeControl();
         drawMinimap();
 
         if(!player.isAlive()){
-            String text = "GAME OVER";
-            String textKey = "Press enter to continue";
-            g2.setFont(getFont().deriveFont(Font.BOLD, 50f));
-            FontMetrics fm = g2.getFontMetrics();
-            Rectangle2D r2 = fm.getStringBounds(text, g2);
-            double textWidth = r2.getWidth();
-            double textHeight = r2.getHeight();
-            double x = (width - textWidth) / 2;
-            double y = (height - textHeight) / 2;
-            g2.setColor(Color.WHITE);
-            g2.drawString(text, (int)x, (int)y + fm.getAscent());
-            g2.setFont(getFont().deriveFont(Font.BOLD, 15f));
-            fm = g2.getFontMetrics();
-            r2 = fm.getStringBounds(textKey, g2);
-            textWidth = r2.getWidth();
-            x = (width - textWidth) / 2;
-            y = (height - textHeight) / 2;
-            g2.drawString(textKey, (int)x, (int)y + fm.getAscent() + 50);
+            endTime = System.nanoTime();  // Lưu thời gian kết thúc
+
+            // Thiết lập font và màu sắc
+            g2.setFont(new Font("Arial", Font.BOLD, 50));
+            g2.setColor(new Color(255, 255, 255, 180)); // Màu trắng mờ cho Game Over
+
+            // Hiển thị Game Over
+            g2.drawString("Game Over", width / 2 - 150, height / 2 - 100);
+
+            // Hiển thị điểm số
+            g2.setFont(new Font("Arial", Font.PLAIN, 30));
+            g2.setColor(Color.YELLOW);
+            g2.drawString("Score: " + score, width / 2 - 100, height / 2 - 50);
+
+            // Hiển thị thời gian chơi
+            g2.setColor(Color.GREEN);
+            long elapsedTime = (endTime - startTime) / 1000000000;
+            g2.drawString("Time Played: " + elapsedTime + " seconds", width / 2 - 150, height / 2);
+
+            // Hiển thị tên người chơi
+            g2.setColor(Color.CYAN);
+            g2.drawString("Player: " + player.getPlayerName(), width / 2 - 100, height / 2 + 50);
         }
     }
 
@@ -688,7 +694,7 @@ public class PanelGame extends JComponent {
                     ammoCount+=10;
                     // Cập nhật trạng thái đạn của player
                     hasAmmo = true;
-                    //Sound.soundCollectItem(); // Thêm âm thanh nhặt item nếu có
+                    //Sound.soundCollectItem(); // Thêm âm thanh nhặt item
                     // Xóa item khỏi danh sách
                     iterator.remove();
                 }
