@@ -463,7 +463,7 @@ public class PanelGame extends JComponent {
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
                     // Cập nhật HP của kẻ thù dựa trên kích thước viên đạn, nếu HP = 0
-                    if(!enemy.updateHP(bullet.getSize())) {
+                    if(!enemy.updateHP(bullet.getDamage())) {
                         score++;
                         enemies.remove(enemy);
                         //Sound.soundZombie();

@@ -7,10 +7,10 @@ import java.awt.geom.Ellipse2D;
 public class Bullet {
     private double x;
     private double y;
-    private final Shape shape= new Ellipse2D.Double(0,0,50,50);;
+    private final Shape shape= new Ellipse2D.Double(0,0,10,10);;
     private final Color color=new Color(255,255,255);
     private final float angle;
-    private double size=3;
+    private double damage=13f;
     private float speed=3f;
     public Bullet (double x, double y, float angle) {
         this.x=x;
@@ -24,7 +24,7 @@ public class Bullet {
 
     }
     public boolean check(int width, int height){
-        if(x<=-size || x>width || y<=-size || y>height){
+        if(x<=-damage || x>width || y<=-damage || y>height){
             return false;
         }
         else {
@@ -40,7 +40,7 @@ public class Bullet {
     }
 
     public Shape getShape(){
-        return new Area(new Ellipse2D.Double(x,y,size,size));
+        return new Area(new Ellipse2D.Double(x,y,damage,damage));
     }
 
     public double getX() {
@@ -49,14 +49,14 @@ public class Bullet {
     public double getY() {
         return y;
     }
-    public double getSize() {
-        return size;
+    public double getDamage() {
+        return damage;
     }
     public double getCenterX() {
-        return x+size/2;
+        return x+damage/2;
     }
     public double getCenterY() {
-        return y+size/2;
+        return y+damage/2;
     }
 
 }
