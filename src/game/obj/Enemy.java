@@ -105,19 +105,6 @@ public class Enemy extends HpRender  {
         this.angle = angle;
     }
 
-//    public void update() {
-//        x += Math.cos(Math.toRadians(angle)) * speed;
-//        y += Math.sin(Math.toRadians(angle)) * speed;
-//
-//        // Kiểm tra xem enemy đã vào trong màn hình chưa
-//        Rectangle bounds = getShape().getBounds();
-//        if (!hasEnteredScreen &&
-//                x + bounds.width > 0 && x < bounds.width + ENEMY_SIZE &&
-//                y + bounds.height > 0 && y < bounds.height + ENEMY_SIZE) {
-//            hasEnteredScreen = true;
-//        }
-//    }
-
     public void draw(Graphics2D g2) {
         if (!isActive) return;  // Không vẽ nếu zombie không còn hoạt động
 

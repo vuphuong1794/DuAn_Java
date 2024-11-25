@@ -35,6 +35,8 @@ public class Bullet {
         AffineTransform oldTransform = g2.getTransform();
         g2.setColor(color);
         g2.translate(x,y);
+        g2.rotate(Math.toRadians(angle)); // Rotate gun based on player's angle
+        g2.translate(40, 0);
         g2.fill(shape);
         g2.setTransform(oldTransform);
     }

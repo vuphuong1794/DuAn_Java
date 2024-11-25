@@ -1,16 +1,13 @@
 package game.component;
 
-import game.obj.Bullet;
-import game.obj.Effect;
-import game.obj.Player;
-import game.obj.Enemy;
+import game.obj.*;
 import game.obj.item.Item;
 import game.obj.sound.sound;
+import game.obj.Gun;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
@@ -29,7 +26,7 @@ public class PanelGame extends JComponent {
     private Key key;
     private Image imagemap;
     private float shotTime;
-
+    private Gun gunEquip;
     // Game FPS
     private final int FPS = 60;
     private final int TARGET_TIME = 1000000000 / FPS;
@@ -228,6 +225,7 @@ public class PanelGame extends JComponent {
         player.changeLocation(150, 150);
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
+        gunEquip =new Gun("rifle",100,500, player.getX(), player.getY());
         // Tạo luồng riêng để sinh kẻ thù định kỳ
         new Thread(() -> {
             while (start) {
@@ -374,8 +372,8 @@ public class PanelGame extends JComponent {
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-                        System.out.println("mouse position is not null");
-                        System.out.println(mousePosition.x+"  "+mousePosition.y);
+//                        System.out.println("mouse position is not null");
+//                        System.out.println(mousePosition.x+"  "+mousePosition.y);
 
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
@@ -615,7 +613,9 @@ public class PanelGame extends JComponent {
     private void drawGame() {
         if (player.isAlive()) {
             player.draw(g2); // Vẽ player
+            gunEquip.drawGun(g2,player.getX(),player.getY(), player.getAngle(), gunEquip.getName());
         }
+
 
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
