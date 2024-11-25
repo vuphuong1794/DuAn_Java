@@ -15,7 +15,7 @@ public class sound {
     private final URL shotgun;
 
     // Biến điều chỉnh âm lượng
-    private float volume = 1.0f;
+    private float volume = 0.5f;
     private JSlider volumeSlider;
 
     public sound(){
@@ -55,8 +55,8 @@ public class sound {
 
     // Phương thức để set âm lượng từ bên ngoài
     public void setVolume(float volume) {
-        this.volume = volume;
-        volumeSlider.setValue((int)(volume * 100));
+            this.volume = volume;
+        volumeSlider.setValue((int)(volume));
     }
 
     // Lấy âm lượng hiện tại
@@ -82,29 +82,30 @@ public class sound {
     }
 
     // Phương thức chung để phát âm thanh
-    private void play(URL url){
+    private void play(URL url) {
         try {
+            // Mở file âm thanh
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
-            
-            // Điều chỉnh âm lượng
-            FloatControl gainControl = 
-                (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            float dB = (float) (Math.log(volume) / Math.log(10.0) * 20.0); // Tính dB dựa trên volume
+
+            // Điều chỉnh âm lượng xuống còn 10% của âm lượng thực tế
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            float dB = 20f * (float) Math.log10(volume * 0.1f); // Giảm volume xuống 10%
             gainControl.setValue(dB);
 
             // Lắng nghe sự kiện kết thúc âm thanh để đóng clip
             clip.addLineListener(new LineListener() {
                 @Override
                 public void update(LineEvent event) {
-                    if(event.getType() == LineEvent.Type.STOP){
+                    if (event.getType() == LineEvent.Type.STOP) {
                         clip.close();
                     }
                 }
             });
+
             clip.start(); // Phát âm thanh
-        }catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Không thể phát âm thanh: " + e);
         }
     }

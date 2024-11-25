@@ -110,7 +110,9 @@ public class PanelGame extends JComponent {
     //Minimap
     private void drawMinimap() {
         Graphics2D mg = minimapBuffer.createGraphics();
-
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int widthScreen = (int)screenSize.getWidth();
+        int heightScreen = (int)screenSize.getHeight();
         // Clear minimap background
         mg.setColor(new Color(0, 0, 0, 180));
         mg.fillRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
@@ -149,7 +151,7 @@ public class PanelGame extends JComponent {
 
         // Draw the minimap on the main graphics context
         // Position it below score and ammo
-        int minimapX = 1510;
+        int minimapX = widthScreen-200;
         int minimapY = 10; // Adjust this value based on where your score/ammo text ends
         g2.drawImage(minimapBuffer, minimapX, minimapY, null);
     }
@@ -266,7 +268,7 @@ public class PanelGame extends JComponent {
 
         private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
             // Tính toán âm lượng dựa trên vị trí chuột
-            float volume = Math.max(0, Math.min(1, (float) (mouseX - sliderX) / sliderWidth));
+            float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
             Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
         }
 
@@ -281,20 +283,14 @@ public class PanelGame extends JComponent {
                 if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
                     key.setMouseLeftClick(true);
                 }
-                int mouseX = e.getX();
-                int mouseY = e.getY();
 
-                // Vị trí thanh trượt
-                int sliderX = 133;
-                int sliderY = 65;
-                int sliderWidth = 150;
-                int sliderHeight = 20;
 
-                // Kiểm tra nếu chuột nằm trên thanh trượt
-                if (mouseX >= sliderX && mouseX <= sliderX + sliderWidth &&
-                    mouseY >= sliderY && mouseY <= sliderY + sliderHeight) {
-                    updateVolume(mouseX, sliderX, sliderWidth);
+                // Check if the mouse is within the slider bounds using mousePosition
+                if (mousePosition.x >= 135 && mousePosition.x <= 280 &&
+                        mousePosition.y >= 85 && mousePosition.y <= 105) {
+                    updateVolume(mousePosition.x, 135, 280 - 135); // Pass slider bounds as parameters
                 }
+
             }
 
             @Override
@@ -378,6 +374,9 @@ public class PanelGame extends JComponent {
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
+                        System.out.println("mouse position is not null");
+                        System.out.println(mousePosition.x+"  "+mousePosition.y);
+
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
 
@@ -391,6 +390,9 @@ public class PanelGame extends JComponent {
 
                         // Update player's rotation angle
                         player.changeAngle((float) angleToMouse);
+                    }
+                    else{
+                        System.out.println("mouse position is null");
                     }
 
                     player.update();
@@ -429,10 +431,10 @@ public class PanelGame extends JComponent {
         // Shooting logic thread
         new Thread(() -> {
             while (start) {
-                if (key.isMouseLeftClick()) {
+                if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>105 || mousePosition.y<85)) {
                     long currentTime = System.currentTimeMillis();
                     if (shotTime == 0) {
-                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
+                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle()));
                         Sound.soundShoot();
                     }
                     shotTime++;
@@ -463,7 +465,7 @@ public class PanelGame extends JComponent {
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
                     // Cập nhật HP của kẻ thù dựa trên kích thước viên đạn, nếu HP = 0
-                    if(!enemy.updateHP(bullet.getSize())) {
+                    if(!enemy.updateHP(bullet.getDamage())) {
                         score++;
                         enemies.remove(enemy);
                         //Sound.soundZombie();
