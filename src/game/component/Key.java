@@ -34,32 +34,27 @@ public class Key {
         this.key_down = key_down;
     }
 
-    public boolean isKey_j(){
-        return key_j;
+    public boolean isMouseLeftClick() {
+        return mouseLeftClick;
     }
 
-    public void setKey_j(boolean key_j){
-        this.key_j = key_j;
+    public void setMouseLeftClick(boolean mouseLeftClick) {
+        this.mouseLeftClick = mouseLeftClick;
     }
 
-    public boolean isKey_k(){
-        return key_k;
+    public boolean isKey_enter(){
+        return key_enter;
     }
 
-    public void setKey_k(boolean key_k){
-        this.key_k = key_k;
+    public void setKey_enter(boolean key_enter){
+        this.key_enter = key_enter;
     }
-
-    public boolean isKey_enter(){ return key_enter;}
-
-    public void setKey_enter(boolean key_enter){this.key_enter = key_enter;}
 
     private boolean key_right;
     private boolean key_left;
     private boolean key_up;
     private boolean key_down;
-    private boolean key_j;
-    private boolean key_k;
+    private boolean mouseLeftClick;
     private boolean key_enter;
 
 
