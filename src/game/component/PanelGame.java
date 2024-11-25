@@ -65,7 +65,7 @@ public class PanelGame extends JComponent {
     }
 
     // Khởi động game
-    public void start() {
+    public void start(Player player) {
         width = getWidth(); // Lấy chiều rộng của panel
         height = getHeight(); // Lấy chiều cao của panel
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -83,8 +83,8 @@ public class PanelGame extends JComponent {
 
                 // Tính góc quay Player - chuột
                 if (mousePosition != null) {
-                    double dx = mousePosition.x - player.getX();
-                    double dy = mousePosition.y - player.getY();
+                    double dx = mousePosition.x - this.player.getX();
+                    double dy = mousePosition.y - this.player.getY();
 
                     // Tính toán góc của Player và chuột
                     double angleToMouse = Math.toDegrees(Math.atan2(dy, dx));
@@ -95,7 +95,7 @@ public class PanelGame extends JComponent {
                     }
 
                     // Cập nhật góc xoay của Player
-                    player.changeAngle((float) angleToMouse);
+                    this.player.changeAngle((float) angleToMouse);
                 }
 
                 drawGame();
@@ -514,6 +514,7 @@ public class PanelGame extends JComponent {
 
         //hiển thị trạng thái
         g2.setColor(Color.WHITE);
+        g2.drawString("Player: " + player.getPlayerName(), 30, 80);
         g2.drawString("Score: "+score, 30, 40);
         g2.drawString("Ammo: " + ammoCount, 30, 60);
 

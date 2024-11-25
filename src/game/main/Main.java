@@ -2,6 +2,7 @@ package game.main;
 
 import game.component.PanelGame;
 import game.component.MainMenuPanel;
+import game.obj.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,7 @@ public class Main extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private PanelGame panelGame;
+    private Player player;
 
     public Main() {
         init();
@@ -55,11 +57,15 @@ public class Main extends JFrame {
         });
     }
 
+
     private void showGameScreen() {
+
         cardLayout.show(mainPanel, "Game");
 
-        // Start the game only once
-        SwingUtilities.invokeLater(panelGame::start);
+        // Start the game with the player object
+        SwingUtilities.invokeLater(() -> {
+            panelGame.start(player);
+        });
     }
 
     public static void main(String[] args) {

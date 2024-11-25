@@ -9,6 +9,7 @@ public class Player extends HpRender {
     private static final int GAME_WIDTH = 1920;
     private static final int GAME_HEIGHT = 940;
     public static final double PLAYER_SIZE = 100;
+    private String playerName;
 
     // Vị trí x, y của nhân vật trên màn hình
     private double x, y;
@@ -104,6 +105,14 @@ public class Player extends HpRender {
         int width = image.getWidth(null);
         int height = image.getHeight(null);
         g2.drawImage(image, -width / 2, -height / 2, null);
+
+        // Vẽ tên người chơi
+        if (playerName != null) {
+            g2.setFont(new Font("Arial", Font.BOLD, 18));
+            g2.setColor(Color.WHITE);
+            g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);  // Hiển thị tên ngay phía trên nhân vật
+        }
+
         Shape shape = getShape();
         hpRender(g2, getShape(), PLAYER_SIZE);
 
@@ -163,4 +172,15 @@ public class Player extends HpRender {
         angle = 0;
         speed = 0;
     }
+
+    // Phương thức set tên người chơi
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+
 }
