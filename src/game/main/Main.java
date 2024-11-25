@@ -16,7 +16,8 @@ public class Main extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private PanelGame panelGame;
-    private Player player;  // Player object
+    private Player player;
+    private long startTime;
 
     public Main() {
         init();
@@ -42,7 +43,7 @@ public class Main extends JFrame {
         // Initialize the player object here
         player = new Player();  // Initialize player
 
-        panelGame = new PanelGame(player);
+        panelGame = new PanelGame(player, this);
         System.out.println("Player in Main: " + player.getPlayerName());
 
 
@@ -74,6 +75,7 @@ public class Main extends JFrame {
     }
 
     private void startGame() {
+        startTime = System.nanoTime();
         cardLayout.show(mainPanel, "Game");
 
         // Start the game with the player object
@@ -81,6 +83,11 @@ public class Main extends JFrame {
             panelGame.start(player);  // Pass player to the game panel
         });
     }
+
+    public long getStartTime() {
+        return startTime; // Getter để lấy thời gian trong các lớp khác (nếu cần)
+    }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

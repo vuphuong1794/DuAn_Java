@@ -1,5 +1,6 @@
 package game.component;
 
+import game.main.Main;
 import game.obj.Bullet;
 import game.obj.Effect;
 import game.obj.Player;
@@ -41,6 +42,7 @@ public class PanelGame extends JComponent {
     private List<Item> items;
     private sound Sound;
     private Point mousePosition; // Mouse position
+    private Main main;
 
     //minimap
     private static final int MINIMAP_SIZE = 100;  // Size of the minimap
@@ -53,7 +55,9 @@ public class PanelGame extends JComponent {
     private long startTime;  // Thời gian bắt đầu
     private long endTime;    // Thời gian kết thúc
     private String playerName;
+    private Long finalElapsedTime = null; // Lưu thời gian cuối cùng khi game kết thúc
 
+    private JButton btnBackToMenu;  // Nút quay về menu
 
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
@@ -70,14 +74,16 @@ public class PanelGame extends JComponent {
         });
     }
 
-    public PanelGame(Player player) {
+    public PanelGame(Player player, Main main) {
         this.player = player;
+        this.main = main;
     }
 
     // Khởi động game
     public void start(Player player) {
         System.out.println("Starting game with player: " + player.getPlayerName());
         playerName = player.getPlayerName();
+        finalElapsedTime = null; // Reset thời gian chơi khi bắt đầu lại game
 
         width = getWidth(); // Lấy chiều rộng của panel
         height = getHeight(); // Lấy chiều cao của panel
@@ -660,7 +666,15 @@ public class PanelGame extends JComponent {
         drawMinimap();
 
         if (!player.isAlive()) {
-            endTime = System.nanoTime(); // Lưu thời gian kết thúc
+            // Nếu finalElapsedTime chưa được lưu, tính toán thời gian và lưu lại
+            if (finalElapsedTime == null) {
+                long endTime = System.nanoTime(); // Lấy thời gian kết thúc
+                finalElapsedTime = (endTime - main.getStartTime()) / 1000000000; // Tính thời gian chơi (giây)
+            }
+
+            // Chuyển đổi thời gian thành phút và giây
+            long minutes = finalElapsedTime / 60;
+            long seconds = finalElapsedTime % 60;
 
             // Hiệu ứng nền gradient
             GradientPaint gradient = new GradientPaint(0, 0, new Color(0, 0, 0, 200),
@@ -688,9 +702,6 @@ public class PanelGame extends JComponent {
 
             // Thời gian chơi
             g2.setColor(Color.GREEN);
-            long elapsedTime = (endTime - startTime) / 1000000000; // Đổi sang giây
-            long minutes = elapsedTime / 60;
-            long seconds = elapsedTime % 60;
             g2.drawString("Time Played: " + minutes + "m " + seconds + "s", width / 2 - 260, height / 2 - 20);
 
             // Tên người chơi
@@ -701,7 +712,9 @@ public class PanelGame extends JComponent {
             g2.setFont(new Font("Arial", Font.BOLD, 25));
             g2.setColor(Color.WHITE);
             g2.drawString("Press Enter to restart game!", width / 2 - 220, height / 2 + 80);
+
         }
+
     }
 
     //kiểm tra chạm item
