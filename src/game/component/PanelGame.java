@@ -10,7 +10,6 @@ import game.obj.sound.sound;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
@@ -53,6 +52,7 @@ public class PanelGame extends JComponent {
     private long lastShotTime = 0; // Thời điểm bắn viên đạn cuối cùng
     private long startTime;  // Thời gian bắt đầu
     private long endTime;    // Thời gian kết thúc
+    private String playerName;
 
 
     // Lưu thời gian tạo hiệu ứng nổ
@@ -70,8 +70,15 @@ public class PanelGame extends JComponent {
         });
     }
 
+    public PanelGame(Player player) {
+        this.player = player;
+    }
+
     // Khởi động game
     public void start(Player player) {
+        System.out.println("Starting game with player: " + player.getPlayerName());
+        playerName = player.getPlayerName();
+
         width = getWidth(); // Lấy chiều rộng của panel
         height = getHeight(); // Lấy chiều cao của panel
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -374,7 +381,7 @@ public class PanelGame extends JComponent {
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-                        System.out.println("mouse position is not null");
+                        //System.out.println("mouse position is not null");
                         System.out.println(mousePosition.x+"  "+mousePosition.y);
 
                         double dx = mousePosition.x - player.getX();
@@ -645,39 +652,55 @@ public class PanelGame extends JComponent {
         //hiển thị trạng thái
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.drawString("Player: " + player.getPlayerName(), 30, 40);
+        g2.drawString("Player: " + playerName, 30, 40);
         g2.drawString("Score: "+score, 30, 60);
         g2.drawString("Ammo: " + ammoCount, 30, 80);
 
         drawVolumeControl();
         drawMinimap();
 
-        if(!player.isAlive()){
-            endTime = System.nanoTime();  // Lưu thời gian kết thúc
+        if (!player.isAlive()) {
+            endTime = System.nanoTime(); // Lưu thời gian kết thúc
 
-            // Thiết lập font và màu sắc
-            g2.setFont(new Font("Arial", Font.BOLD, 50));
-            g2.setColor(new Color(255, 255, 255, 180)); // Màu trắng mờ cho Game Over
+            // Hiệu ứng nền gradient
+            GradientPaint gradient = new GradientPaint(0, 0, new Color(0, 0, 0, 200),
+                    0, height, new Color(50, 50, 50, 150));
+            Graphics2D g2d = (Graphics2D) g2;
+            g2d.setPaint(gradient);
+            g2d.fillRect(0, 0, width, height);
 
-            // Hiển thị Game Over
-            g2.drawString("Game Over", width / 2 - 150, height / 2 - 100);
+            // Tiêu đề "GAME OVER"
+            g2.setFont(new Font("Arial", Font.BOLD, 80));
+            g2.setColor(Color.RED);
+            g2.drawString("GAME OVER", width / 2 - 250, height / 2 - 180);
 
-            // Hiển thị điểm số
+            // Vẽ hộp thông báo
+            g2.setColor(new Color(30, 30, 30, 200)); // Hộp nền màu xám mờ
+            g2.fillRoundRect(width / 2 - 300, height / 2 - 120, 600, 250, 20, 20);
+
+            g2.setColor(Color.WHITE); // Viền hộp
+            g2.drawRoundRect(width / 2 - 300, height / 2 - 120, 600, 250, 20, 20);
+
+            // Thông tin điểm số
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
             g2.setColor(Color.YELLOW);
-            g2.drawString("Score: " + score, width / 2 - 100, height / 2 - 50);
+            g2.drawString("Score: " + score, width / 2 - 260, height / 2 - 60);
 
-            // Hiển thị thời gian chơi
+            // Thời gian chơi
             g2.setColor(Color.GREEN);
-            long elapsedTime = (endTime - startTime) / 1000000000;
-            g2.drawString("Time Played: " + elapsedTime + " seconds", width / 2 - 150, height / 2);
+            long elapsedTime = (endTime - startTime) / 1000000000; // Đổi sang giây
+            long minutes = elapsedTime / 60;
+            long seconds = elapsedTime % 60;
+            g2.drawString("Time Played: " + minutes + "m " + seconds + "s", width / 2 - 260, height / 2 - 20);
 
-            // Hiển thị tên người chơi
+            // Tên người chơi
             g2.setColor(Color.CYAN);
-            g2.drawString("Player: " + player.getPlayerName(), width / 2 - 100, height / 2 + 50);
+            g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 20);
 
+            // Hướng dẫn khởi động lại
+            g2.setFont(new Font("Arial", Font.BOLD, 25));
             g2.setColor(Color.WHITE);
-            g2.drawString("Press Enter to restart game!", width / 2 - 150, height / 2 + 100);
+            g2.drawString("Press Enter to restart game!", width / 2 - 220, height / 2 + 80);
         }
     }
 

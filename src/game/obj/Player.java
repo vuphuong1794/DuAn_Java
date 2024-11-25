@@ -9,7 +9,7 @@ public class Player extends HpRender {
     private static final int GAME_WIDTH = 1920;
     private static final int GAME_HEIGHT = 940;
     public static final double PLAYER_SIZE = 100;
-    private String playerName = "player";
+    public String playerName;
 
     // Vị trí x, y của nhân vật trên màn hình
     private double x, y;

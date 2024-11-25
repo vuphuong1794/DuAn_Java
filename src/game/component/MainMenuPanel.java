@@ -13,11 +13,11 @@ public class MainMenuPanel extends JPanel {
     private final JButton startButton;
     private final JButton exitButton;
     private final JButton instructionsButton;
-    private Player player;
+    private Player player = new Player();
     private Image backgroundImage;
 
-    public MainMenuPanel(ActionListener onStartGame, ActionListener onExitGame, Player player) {
-        this.player = this.player;
+    public MainMenuPanel(Player player, ActionListener onStartGame, ActionListener onExitGame) {
+        this.player = player;
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
 
@@ -46,7 +46,9 @@ public class MainMenuPanel extends JPanel {
             }
 
             private void updatePlayerName() {
-                MainMenuPanel.this.player.setPlayerName(playerNameField.getText());
+                if (player != null) {
+                    player.setPlayerName(playerNameField.getText());
+                }
             }
         });
 
@@ -121,9 +123,5 @@ public class MainMenuPanel extends JPanel {
             g2.setColor(new Color(30, 30, 30));
             g2.fillRect(0, 0, getWidth(), getHeight());
         }
-    }
-
-    public String getPlayerName() {
-        return playerNameField.getText();
     }
 }

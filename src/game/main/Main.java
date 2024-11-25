@@ -42,11 +42,12 @@ public class Main extends JFrame {
         // Initialize the player object here
         player = new Player();  // Initialize player
 
+        panelGame = new PanelGame(player);
+        System.out.println("Player in Main: " + player.getPlayerName());
+
+
         // Create the menu screen and pass the player object
         MainMenuPanel menuPanel = createMenuPanel(player);
-
-        // Create the game screen
-        panelGame = new PanelGame();
 
         // Add panels to CardLayout
         mainPanel.add(menuPanel, "Menu");
@@ -66,19 +67,13 @@ public class Main extends JFrame {
 
     private MainMenuPanel createMenuPanel(Player player) {
         // Pass the player object to the MainMenuPanel constructor
-        return new MainMenuPanel(
+        return new MainMenuPanel(player,
                 e -> startGame(),  // Start the game when button is clicked
-                e -> System.exit(0),  // Exit the application when button is clicked
-                player  // Pass player object
+                e -> System.exit(0)  // Exit the application when button is clicked
         );
     }
 
     private void startGame() {
-        // Initialize player inside startGame to be sure player is ready
-        if (player == null) {
-            player = new Player();  // Initialize player if not already initialized
-        }
-
         cardLayout.show(mainPanel, "Game");
 
         // Start the game with the player object
