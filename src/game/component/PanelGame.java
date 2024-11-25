@@ -266,7 +266,7 @@ public class PanelGame extends JComponent {
 
         private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
             // Tính toán âm lượng dựa trên vị trí chuột
-            float volume = Math.max(0, Math.min(1, (float) (mouseX - sliderX) / sliderWidth));
+            float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
             Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
         }
 
@@ -378,6 +378,9 @@ public class PanelGame extends JComponent {
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
+                        System.out.println("mouse position is not null");
+                        System.out.println(mousePosition.x+"  "+mousePosition.y);
+
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
 
@@ -391,6 +394,9 @@ public class PanelGame extends JComponent {
 
                         // Update player's rotation angle
                         player.changeAngle((float) angleToMouse);
+                    }
+                    else{
+                        System.out.println("mouse position is null");
                     }
 
                     player.update();
@@ -429,7 +435,7 @@ public class PanelGame extends JComponent {
         // Shooting logic thread
         new Thread(() -> {
             while (start) {
-                if (key.isMouseLeftClick()) {
+                if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>100 || mousePosition.y<80)) {
                     long currentTime = System.currentTimeMillis();
                     if (shotTime == 0) {
                         bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 5, 3f));
