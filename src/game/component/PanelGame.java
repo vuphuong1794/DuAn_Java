@@ -673,6 +673,9 @@ public class PanelGame extends JComponent {
             // Hiển thị tên người chơi
             g2.setColor(Color.CYAN);
             g2.drawString("Player: " + player.getPlayerName(), width / 2 - 100, height / 2 + 50);
+
+            g2.setColor(Color.WHITE);
+            g2.drawString("Press Enter to restart game!", width / 2 - 150, height / 2 + 100);
         }
     }
 
