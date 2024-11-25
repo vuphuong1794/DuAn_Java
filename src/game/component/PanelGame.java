@@ -6,11 +6,11 @@ import game.obj.Player;
 import game.obj.Enemy;
 import game.obj.item.Item;
 import game.obj.sound.sound;
+import game.obj.Map;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
@@ -35,6 +35,7 @@ public class PanelGame extends JComponent {
     private final int TARGET_TIME = 1000000000 / FPS;
 
     // Game Object
+    private Map map;
     private Player player;
     private List<Enemy> enemies;
     private List<Bullet> bullets;
@@ -45,7 +46,6 @@ public class PanelGame extends JComponent {
 
     //minimap
     private static final int MINIMAP_SIZE = 100;  // Size of the minimap
-    private static final int MINIMAP_MARGIN = 10;  // Margin from the edges
     private BufferedImage minimapBuffer;  // Buffer for the minimap
 
     private int score = 0;
@@ -68,6 +68,13 @@ public class PanelGame extends JComponent {
                 mousePosition = e.getPoint();
             }
         });
+        map = new Map();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
     }
 
     // Khởi động game
@@ -106,6 +113,7 @@ public class PanelGame extends JComponent {
         initBullets();
         thread.start();
     }
+
 
     //Minimap
     private void drawMinimap() {
@@ -357,25 +365,31 @@ public class PanelGame extends JComponent {
             while (start) {
                 if (player.isAlive()) {
                     float speed = 1f; // Movement speed
-
-                    // Player movement
                     if (key.isKey_left()) {
-                        player.changeLocation(player.getX() - speed, player.getY());
+                        if (map.checkCollision(player)!="left") {
+                            player.changeLocation(player.getX() - speed, player.getY());
+                        }
                     }
                     if (key.isKey_right()) {
-                        player.changeLocation(player.getX() + speed, player.getY());
+                        if (map.checkCollision(player)!="right") {
+                            player.changeLocation(player.getX() + speed, player.getY());
+                        }
                     }
                     if (key.isKey_up()) {
-                        player.changeLocation(player.getX(), player.getY() - speed);
+                        if (map.checkCollision(player)!="up") {
+                            player.changeLocation(player.getX(), player.getY() - speed);
+                        }
                     }
                     if (key.isKey_down()) {
-                        player.changeLocation(player.getX(), player.getY() + speed);
+                        if (map.checkCollision(player)!="down") {
+                            player.changeLocation(player.getX(), player.getY() + speed);
+                        }
                     }
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-                        System.out.println("mouse position is not null");
-                        System.out.println(mousePosition.x+"  "+mousePosition.y);
+                        // System.out.println("mouse position is not null");
+                        // System.out.println(mousePosition.x+"  "+mousePosition.y);
 
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
@@ -543,7 +557,7 @@ public class PanelGame extends JComponent {
             }
         }
     }
-
+    
     // Vẽ nền game
     private void drawBackground() {
         // Tải hình ảnh bản đồ nếu chưa được tải
@@ -651,6 +665,8 @@ public class PanelGame extends JComponent {
 
         drawVolumeControl();
         drawMinimap();
+        map.draw(g2);
+
 
         if(!player.isAlive()){
             endTime = System.nanoTime();  // Lưu thời gian kết thúc

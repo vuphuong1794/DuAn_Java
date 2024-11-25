@@ -21,7 +21,7 @@ public class Player extends HpRender {
     // Góc xoay của nhân vật (tính bằng độ)
     private float angle = 0f;
 
-    private final Area playerShap;
+    private final Area playerShape;
 
     // Hình ảnh của nhân vật
     private final Image image;
@@ -30,7 +30,7 @@ public class Player extends HpRender {
 
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
-        super(new HP(50,50));
+        super(new HP(100,100));
         this.image = loadImage("/game/image/CharacterPlayer.png");
 
         Path2D p = new Path2D.Double();
@@ -40,7 +40,7 @@ public class Player extends HpRender {
         p.lineTo(20, PLAYER_SIZE - 5);
         p.lineTo(0, PLAYER_SIZE - 15);
 
-        playerShap = new Area(p);
+        playerShape = new Area(p);
     }
 
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
@@ -95,7 +95,7 @@ public class Player extends HpRender {
         AffineTransform oldTransform = g2.getTransform();
 
         // Move to the player's center and rotate around it
-        g2.translate(x + PLAYER_SIZE / 2, y + PLAYER_SIZE / 2);
+        g2.translate(x, y);
         g2.rotate(Math.toRadians(angle));
 
         // Draw the player image centered at (-width / 2, -height / 2)
@@ -132,7 +132,7 @@ public class Player extends HpRender {
 
         AffineTransform afx = new AffineTransform();
         // Dịch chuyển đến tâm của nhân vật
-        afx.translate(x + PLAYER_SIZE/2, y + PLAYER_SIZE/2);
+        afx.translate(x + PLAYER_SIZE/2 +10, y + PLAYER_SIZE/2+10);
         afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
 
         // Create an Area from the transformed rectangle
@@ -141,11 +141,11 @@ public class Player extends HpRender {
 
     // Getters cho vị trí x, y và góc xoay
     public float getX() {
-        return (float) x;
+        return (float) (x);
     }
 
     public float getY() {
-        return (float) y;
+        return (float) (y );
     }
 
     public float getAngle() {
@@ -176,5 +176,4 @@ public class Player extends HpRender {
     public String getPlayerName(){
         return playerName;
     }
-
 }
