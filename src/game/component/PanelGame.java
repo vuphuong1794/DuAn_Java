@@ -432,8 +432,27 @@ public class PanelGame extends JComponent {
                 if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>105 || mousePosition.y<85)) {
                     long currentTime = System.currentTimeMillis();
                     if (shotTime == 0) {
-                        bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle()));
-                        Sound.soundShoot();
+                        switch (gunEquip.getName()) {
+                            case "rifle" -> {
+                                if (gunEquip.getCurrentAmmo()>0){
+                                bullets.add(0, gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+                                }
+
+                            }
+                            case "pistol" -> {
+                                bullets.add(0, gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),40,8));
+                            }
+                            case "sniper" -> {
+                                if (gunEquip.getCurrentAmmo()>0) {
+                                    bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 40, 0));
+                                }
+                            }
+                            case "grenade" -> {
+                                if (gunEquip.getCurrentAmmo()>0) {
+                                    bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 40, 0));
+                                }
+                            }
+                        }
                     }
                     shotTime++;
                     if (shotTime == 15) {
@@ -647,7 +666,7 @@ public class PanelGame extends JComponent {
         g2.setFont(new Font("Arial", Font.BOLD, 20));
         g2.drawString("Player: " + player.getPlayerName(), 30, 40);
         g2.drawString("Score: "+score, 30, 60);
-        g2.drawString("Ammo: " + ammoCount, 30, 80);
+        g2.drawString("Ammo: " + gunEquip.getCurrentAmmo(), 30, 80);
 
         drawVolumeControl();
         drawMinimap();

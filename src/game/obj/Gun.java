@@ -1,5 +1,7 @@
 package game.obj;
 
+import game.obj.sound.sound;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ public class Gun {
     private final Image image;       // Gun image
     private final Area gunShape;     // Gun shape for collision or rendering
     public static final double Gun_size = 1;
+    private sound Sound;
 
     // Constructor
     public Gun(String name, int ammoCapacity, int reloadTime, float playerX, float playerY) {
@@ -29,7 +32,7 @@ public class Gun {
         this.isReloading = false;
         this.bullets = new ArrayList<>();
         this.image = loadImageByName(name); // Dynamically load the gun image based on the gun's name
-
+        this.Sound = new sound();
         // Define the gun shape (example shape, scaled dynamically)
         double scaleFactor = Gun_size / 30; // Scale relative to the reference size (10.0)
         Path2D p = new Path2D.Double();
@@ -86,7 +89,7 @@ public class Gun {
         g2.translate(x, y); // Position at player's location
         if (name.equals("rifle")) {
             g2.rotate(Math.toRadians(angle - 90)); // Rotate gun based on player's angle
-            g2.translate(-65, 35);
+            g2.translate(-75, 45);
         } else if (name.equals("pistol")) {
             g2.rotate(Math.toRadians(angle + 90)); // Rotate gun based on player's angle
             g2.translate(0, 40);
@@ -108,7 +111,7 @@ public class Gun {
     }
 
     // Method to shoot a bullet
-    public Bullet shoot(float x, float y, float angle) {
+    public Bullet shoot(float x, float y, float angle, float offsetX, float offsetY) {
         if (isReloading) {
             System.out.println(name + " is reloading!");
             return null;
@@ -117,10 +120,9 @@ public class Gun {
         if (currentAmmo > 0) {
             currentAmmo--;
             System.out.println("Bang! " + name + " fired. Ammo left: " + currentAmmo);
-
+            Sound.soundShoot();
             // Create a new bullet at the gun's position and angle
-            Bullet bullet = new Bullet(x, y, angle);
-            bullets.add(bullet);
+            Bullet bullet = new Bullet(x, y, angle,offsetX,offsetY);
             return bullet;
         } else {
             System.out.println("Click! Out of ammo.");

@@ -12,10 +12,14 @@ public class Bullet {
     private final float angle;
     private double damage=13f;
     private float speed=3f;
-    public Bullet (double x, double y, float angle) {
+    private float offsetX;
+    private float offsetY;
+    public Bullet (double x, double y, float angle, float offsetX, float offsetY) {
         this.x=x;
         this.y=y;
         this.angle=angle;
+        this.offsetX=offsetX;
+        this.offsetY=offsetY;
     }
 
     public void update(){
@@ -36,7 +40,7 @@ public class Bullet {
         g2.setColor(color);
         g2.translate(x,y);
         g2.rotate(Math.toRadians(angle)); // Rotate gun based on player's angle
-        g2.translate(40, 0);
+        g2.translate(offsetX, offsetY);
         g2.fill(shape);
         g2.setTransform(oldTransform);
     }
