@@ -24,10 +24,16 @@ public class Main extends JFrame {
 
     private void init() {
         setTitle("Zombies Doomsday");
-        setSize(WIDTH, HEIGHT);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        double width = screenSize.getWidth();
+        double height = screenSize.getHeight();
+
+        setSize((int) width,(int) height);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
         // Set up CardLayout for panel switching
         cardLayout = new CardLayout();

@@ -110,7 +110,9 @@ public class PanelGame extends JComponent {
     //Minimap
     private void drawMinimap() {
         Graphics2D mg = minimapBuffer.createGraphics();
-
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int widthScreen = (int)screenSize.getWidth();
+        int heightScreen = (int)screenSize.getHeight();
         // Clear minimap background
         mg.setColor(new Color(0, 0, 0, 180));
         mg.fillRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE);
@@ -149,7 +151,7 @@ public class PanelGame extends JComponent {
 
         // Draw the minimap on the main graphics context
         // Position it below score and ammo
-        int minimapX = 1510;
+        int minimapX = widthScreen-200;
         int minimapY = 10; // Adjust this value based on where your score/ammo text ends
         g2.drawImage(minimapBuffer, minimapX, minimapY, null);
     }
