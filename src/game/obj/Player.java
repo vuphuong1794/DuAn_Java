@@ -147,10 +147,15 @@ public class Player extends HpRender {
         g2.setColor(Color.WHITE);
         g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);  // Hiển thị tên ngay phía trên nhân vật
 
+        Shape shape = getShape();
         hpRender(g2, getShape(), PLAYER_SIZE);
 
         // Restore the original transformation
         g2.setTransform(oldTransform);
+        //test
+        //g2.setColor(Color.red);
+        //g2.draw(shape.getBounds2D());
+
     }
 
     public Area getShape() {
@@ -208,4 +213,5 @@ public class Player extends HpRender {
     public String getPlayerName() {
         return playerName != null ? playerName : "player";
     }
+
 }

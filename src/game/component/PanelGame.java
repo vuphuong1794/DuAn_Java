@@ -3,6 +3,7 @@ package game.component;
 import game.obj.*;
 import game.obj.item.Item;
 import game.obj.sound.sound;
+import game.obj.Map;
 import game.obj.Gun;
 
 import game.main.Main;
@@ -27,11 +28,13 @@ public class PanelGame extends JComponent {
     private Key key;
     private Image imagemap;
     private float shotTime;
+
     // Game FPS
     private final int FPS = 60;
     private final int TARGET_TIME = 1000000000 / FPS;
 
     // Game Object
+    private Map map;
     private Player player;
     private List<Enemy> enemies;
     private List<Bullet> bullets;
@@ -114,6 +117,7 @@ public class PanelGame extends JComponent {
         initBullets();
         thread.start();
     }
+
 
     //Minimap
     private void drawMinimap() {
@@ -234,7 +238,7 @@ public class PanelGame extends JComponent {
         player = new Player();
         player.setPlayerName(playerName);
         items = new ArrayList<>();
-        player.changeLocation(150, 150);
+        player.changeLocation(300, 300);
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
         GunList = new ArrayList<>();
@@ -284,8 +288,9 @@ public class PanelGame extends JComponent {
         GunList.clear();
         enemies.clear();
         bullets.clear();
-        player.changeLocation(150, 150);
+        player.changeLocation(300, 300);
         player.reset();
+        ammoCount = 0;
         startTime = System.nanoTime();
         // Create and add different gun types to GunList
         Gun pistol = new Gun("pistol", 100, 300, player.getX(), player.getY());
@@ -388,7 +393,6 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_ENTER -> key.setKey_enter(false);
                 }
             }
-
         });
 
         // Main game loop thread
@@ -399,22 +403,46 @@ public class PanelGame extends JComponent {
 
                     // Player movement
                     if (key.isKey_left()) {
-                        player.changeLocation(player.getX() - speed, player.getY());
+                        if ((!map.checkCollision(player).contains("left")) ) {
+                            player.changeLocation(player.getX () - speed, player.getY());
+                        }
+                        else {
+                            System.out.println("left is prevent");
+                        }
+
                     }
                     if (key.isKey_right()) {
-                        player.changeLocation(player.getX() + speed, player.getY());
+                        if (!map.checkCollision(player).contains("right")) {
+                            player.changeLocation(player.getX() + speed, player.getY());
+                        }
+                        else{
+                            System.out.println("right is prevent");
+                        }
+
                     }
                     if (key.isKey_up()) {
-                        player.changeLocation(player.getX(), player.getY() - speed);
+                        if (!map.checkCollision(player).contains("up")) {
+                            player.changeLocation(player.getX(), player.getY() - speed);
+                        }
+                        else {
+                            System.out.println("up is prevent");
+                        }
+
                     }
                     if (key.isKey_down()) {
-                        player.changeLocation(player.getX(), player.getY() + speed);
+                        if (!map.checkCollision(player).contains("down")) {
+                            player.changeLocation(player.getX(), player.getY() + speed);
+                        }
+                        else {
+                            System.out.println("down is prevent");
+                        }
+
                     }
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-//                        System.out.println("mouse position is not null");
-//                        System.out.println(mousePosition.x+"  "+mousePosition.y);
+                        // System.out.println("mouse position is not null");
+                        // System.out.println(mousePosition.x+"  "+mousePosition.y);
 
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
@@ -689,7 +717,6 @@ public class PanelGame extends JComponent {
             gunEquip.drawGun(g2,player.getX(),player.getY(), player.getAngle(), gunEquip.getName());
         }
 
-
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
@@ -724,6 +751,8 @@ public class PanelGame extends JComponent {
 
         drawVolumeControl();
         drawMinimap();
+        map.draw(g2);
+
 
         if(!player.isAlive()){
             // Nếu finalElapsedTime chưa được lưu, tính toán thời gian và lưu lại
