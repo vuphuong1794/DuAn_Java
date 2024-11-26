@@ -62,7 +62,7 @@ public class PanelGame extends JComponent {
     private boolean hasAmmo = false; // Kiểm tra có đạn hay không
     private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
-    public PanelGame(Player player) {
+    public PanelGame(Player player, Main main) {
         // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
@@ -70,9 +70,7 @@ public class PanelGame extends JComponent {
                 mousePosition = e.getPoint();
             }
         });
-    }
 
-    public PanelGame(Player player, Main main) {
         this.player = player;
         this.main = main;
     }
@@ -438,7 +436,8 @@ public class PanelGame extends JComponent {
 
                     player.update();
                     checkItems();
-                } else {
+                }
+                else {
                     if (key.isKey_enter()) {
                         resetGame();
                     }
