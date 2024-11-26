@@ -19,7 +19,8 @@ public class Main extends JFrame {
     private Player player;  // Player object
 
     public Main() {
-        init();
+        init()
+        ;
     }
 
     private void init() {
