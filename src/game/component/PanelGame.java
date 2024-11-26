@@ -398,6 +398,7 @@ public class PanelGame extends JComponent {
                         }
                         else {                        
                             System.out.println("down is prevent");
+
                         }
 
                     }
@@ -615,16 +616,26 @@ public class PanelGame extends JComponent {
                     Bullet bullet = bulletsCopy.get(i);
                     if (bullet != null) {
                         bullet.update(); // Cập nhật vị trí của viên đạn
-                        checkBullets(bullet); //kiểm tra nếu viên đạn bắn trúng zombie
-                        // Kiểm tra nếu viên đạn còn trong khung hình
+                        
+                        // Kiểm tra đạn va chạm tường
+                        if (map.isBulletCollidingWithWall(bullet)) {
+                            synchronized (bullets) {
+                                bullets.remove(bullet); 
+                            }
+                            continue;
+                        }
+                        
+                        checkBullets(bullet); // Kiểm tra đạn trúng kẻ thù
+                        
+                        // Kiểm tra viên đạn còn tr
                         if (!bullet.check(width, height)) {
-                            // Nếu viên đạn ra ngoài khung hình, thêm vào danh sách xóa
                             synchronized (bullets) {
                                 bullets.remove(bullet); // Xóa viên đạn khỏi danh sách gốc
                             }
                         }
                     }
                 }
+                
                 for(int i = 0; i<boomEffects.size(); i++){
                     Effect boomEffect = boomEffects.get(i);
                     if (boomEffect != null) {

@@ -51,42 +51,43 @@
         // Kiểm tra nếu có va chạm chung với các bức tường
             for (Rectangle wall : walls) {
 
-                if (player.getShape().getBounds().intersects(wall)) {
-                    StringBuilder bounds = new StringBuilder();
-        
-                    // Kiểm tra va chạm trên
-                    if (player.getY() <= wall.getY() + wall.getHeight() &&
-                        player.getY() > wall.getY()) {
-                        bounds.append("up");
-                    }
-                    // Kiểm tra va chạm dưới
-                    if (player.getY() + Player.PLAYER_SIZE >= wall.getY() &&
-                        player.getY() < wall.getY()) {
-                        bounds.append("down");
-                    }
-                    // Kiểm tra va chạm trái
-                    if (player.getX() <= wall.getX() + wall.getWidth() &&
-                        player.getX() > wall.getX()) {
-                        bounds.append("left");
-                    }
-                    // Kiểm tra va chạm phải
-                    if (player.getX() + Player.PLAYER_SIZE >= wall.getX() &&
-                        player.getX() < wall.getX()) {
-                        bounds.append("right");
-                    }
-        
-                    return bounds.toString(); // Trả về hướng va chạm
-                }
+             if (player.getShape().getBounds().intersects(wall)) {
+            StringBuilder bounds = new StringBuilder();
+
+            // Kiểm tra va chạm trên
+            if (player.getY() <= wall.getY() + wall.getHeight() &&
+                player.getY() > wall.getY()) {
+                bounds.append("up");
             }
-            return ""; // Không có va chạm
-        }
-        // Kiểm tra va chạm giữa enemy và tường
-        public boolean isEnemyCollidingWithWall(Enemy enemy) {
-            for (Rectangle wall : walls) {
-                if (enemy.getShape().intersects(wall)) {
-                    return true; // Enemy va chạm với tường
-                }
+            // Kiểm tra va chạm dưới
+            if (player.getY() + Player.PLAYER_SIZE >= wall.getY() &&
+                player.getY() < wall.getY()) {
+                bounds.append("down");
             }
-            return false; // Không có va chạm
+            // Kiểm tra va chạm trái
+            if (player.getX() <= wall.getX() + wall.getWidth() &&
+                player.getX() > wall.getX()) {
+                bounds.append("left");
+            }
+            // Kiểm tra va chạm phải
+            if (player.getX() + Player.PLAYER_SIZE >= wall.getX() &&
+                player.getX() < wall.getX()) {
+                bounds.append("right");
+            }
+
+            return bounds.toString(); // Trả về hướng va chạm
         }
+    }
+    return ""; // Không có va chạm
 }
+        // Kiểm tra va chạm giữa enemy và tường
+        public boolean isEnemyCollidingWithWall(Shape enemyShape) {
+            for (Rectangle wall : walls) {
+                if (enemyShape.getBounds2D().intersects(wall)) {
+                    return true; // Nếu va chạm với tường
+                }
+            }
+            return false; // Không va chạm
+        }
+        
+    }        
