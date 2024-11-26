@@ -12,7 +12,7 @@ public class Player extends HpRender {
     private static final int GAME_WIDTH = 1920;
     private static final int GAME_HEIGHT = 940;
     public static final double PLAYER_SIZE = 100;
-    private String playerName = "player";
+    private String playerName = getPlayerName();
 
     // Vị trí x, y của nhân vật trên màn hình
     private double x, y;
@@ -41,7 +41,6 @@ public class Player extends HpRender {
         this.inventory = new ArrayList<>();
         this.currentGunIndex = 0; // No gun equipped initially
 
-
         Path2D p = new Path2D.Double();
         p.moveTo(50, 50);
         p.lineTo(20, 5);
@@ -60,7 +59,6 @@ public class Player extends HpRender {
             e.printStackTrace();
             return null;
         }
-
     }
 
     // Add a gun to the player's inventory
@@ -142,19 +140,14 @@ public class Player extends HpRender {
         g2.drawImage(image, -width / 2, -height / 2, null);
 
         // Vẽ tên người chơi
-        if (playerName != null) {
-            g2.setFont(new Font("Arial", Font.BOLD, 18));
-            g2.setColor(Color.WHITE);
-            g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);  // Hiển thị tên ngay phía trên nhân vật
-        }
+        g2.setFont(new Font("Arial", Font.BOLD, 18));
+        g2.setColor(Color.WHITE);
+        g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);  // Hiển thị tên ngay phía trên nhân vật
 
-        Shape shape = getShape();
         hpRender(g2, getShape(), PLAYER_SIZE);
 
         // Restore the original transformation
         g2.setTransform(oldTransform);
-
-
     }
 
     public Area getShape() {
@@ -209,8 +202,7 @@ public class Player extends HpRender {
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
-    public String getPlayerName(){
-        return playerName;
+    public String getPlayerName() {
+        return playerName != null ? playerName : "player";
     }
-
 }

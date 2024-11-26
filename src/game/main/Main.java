@@ -16,7 +16,8 @@ public class Main extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private PanelGame panelGame;
-    private Player player;  // Player object
+    private Player player;
+    private long startTime;
 
     public Main() {
         init()
@@ -35,7 +36,6 @@ public class Main extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-
         // Set up CardLayout for panel switching
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
@@ -43,11 +43,10 @@ public class Main extends JFrame {
         // Initialize the player object here
         player = new Player();  // Initialize player
 
+        panelGame = new PanelGame(player, this);
+
         // Create the menu screen and pass the player object
         MainMenuPanel menuPanel = createMenuPanel(player);
-
-        // Create the game screen
-        panelGame = new PanelGame();
 
         // Add panels to CardLayout
         mainPanel.add(menuPanel, "Menu");
@@ -67,19 +66,14 @@ public class Main extends JFrame {
 
     private MainMenuPanel createMenuPanel(Player player) {
         // Pass the player object to the MainMenuPanel constructor
-        return new MainMenuPanel(
+        return new MainMenuPanel(player,
                 e -> startGame(),  // Start the game when button is clicked
-                e -> System.exit(0),  // Exit the application when button is clicked
-                player  // Pass player object
+                e -> System.exit(0)  // Exit the application when button is clicked
         );
     }
 
     private void startGame() {
-        // Initialize player inside startGame to be sure player is ready
-        if (player == null) {
-            player = new Player();  // Initialize player if not already initialized
-        }
-
+        startTime = System.nanoTime();
         cardLayout.show(mainPanel, "Game");
 
         // Start the game with the player object
@@ -93,5 +87,9 @@ public class Main extends JFrame {
             Main mainApp = new Main();
             mainApp.setVisible(true);
         });
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 }
