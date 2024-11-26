@@ -233,7 +233,7 @@ public class PanelGame extends JComponent {
         Sound = new sound();
         player = new Player();
         items = new ArrayList<>();
-        player.changeLocation(150, 150);
+        player.changeLocation(300, 300);
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
         // Tạo luồng riêng để sinh kẻ thù định kỳ
@@ -268,7 +268,7 @@ public class PanelGame extends JComponent {
         hasAmmo = false;
         enemies.clear();
         bullets.clear();
-        player.changeLocation(150, 150);
+        player.changeLocation(300, 300);
         player.reset();
         ammoCount = 0;
         startTime = System.nanoTime();
@@ -366,24 +366,40 @@ public class PanelGame extends JComponent {
                 if (player.isAlive()) {
                     float speed = 1f; // Movement speed
                     if (key.isKey_left()) {
-                        if (map.checkCollision(player)!="left") {
-                            player.changeLocation(player.getX() - speed, player.getY());
+                        if ((!map.checkCollision(player).contains("left")) ) {
+                            player.changeLocation(player.getX () - speed, player.getY());
                         }
+                        else {
+                            System.out.println("left is prevent");
+                        }
+
                     }
                     if (key.isKey_right()) {
-                        if (map.checkCollision(player)!="right") {
+                        if (!map.checkCollision(player).contains("right")) {
                             player.changeLocation(player.getX() + speed, player.getY());
                         }
+                        else{
+                            System.out.println("right is prevent");
+                        }
+
                     }
                     if (key.isKey_up()) {
-                        if (map.checkCollision(player)!="up") {
+                        if (!map.checkCollision(player).contains("up")) {
                             player.changeLocation(player.getX(), player.getY() - speed);
                         }
+                        else {
+                            System.out.println("up is prevent");
+                        }
+
                     }
                     if (key.isKey_down()) {
-                        if (map.checkCollision(player)!="down") {
+                        if (!map.checkCollision(player).contains("down")) {
                             player.changeLocation(player.getX(), player.getY() + speed);
                         }
+                        else {                        
+                            System.out.println("down is prevent");
+                        }
+
                     }
 
                     // Rotation logic (calculate angle between player and mouse)
@@ -406,7 +422,7 @@ public class PanelGame extends JComponent {
                         player.changeAngle((float) angleToMouse);
                     }
                     else{
-                        System.out.println("mouse position is null");
+                        //System.out.println("mouse position is null");
                     }
 
                     player.update();
