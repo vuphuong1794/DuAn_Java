@@ -3,6 +3,7 @@ package game.component;
 import game.obj.*;
 import game.obj.item.Item;
 import game.obj.sound.sound;
+import game.obj.Map;
 import game.obj.Gun;
 
 import game.main.Main;
@@ -31,11 +32,13 @@ public class PanelGame extends JComponent {
     private Key key;
     private Image imagemap;
     private float shotTime;
+
     // Game FPS
     private final int FPS = 60;
     private final int TARGET_TIME = 1000000000 / FPS;
 
     // Game Object
+    private Map map;
     private Player player;
     private List<Enemy> enemies;
     private List<Bullet> bullets;
@@ -63,10 +66,9 @@ public class PanelGame extends JComponent {
 
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
-    private boolean hasAmmo = false; // Kiểm tra có đạn hay không
     private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
-    public PanelGame(Player player) {
+    public PanelGame(Player player, Main main) {
         // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
@@ -74,9 +76,7 @@ public class PanelGame extends JComponent {
                 mousePosition = e.getPoint();
             }
         });
-    }
 
-    public PanelGame(Player player, Main main) {
         this.player = player;
         this.main = main;
     }
@@ -130,12 +130,17 @@ public class PanelGame extends JComponent {
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "INSERT INTO game_scores (player_name, score, play_time) VALUES (?, ?, ?)")) {
 
+            System.out.println("test loi 1");
             preparedStatement.setString(1, playerName);
+            System.out.println("test loi 2");
             preparedStatement.setInt(2, score);
+            System.out.println("test loi 3");
             preparedStatement.setLong(3, finalElapsedTime != null ? finalElapsedTime : 0);
+            System.out.println("test loi 4");
 
             preparedStatement.executeUpdate();
 
+            System.out.println("test loi");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -165,29 +170,17 @@ public class PanelGame extends JComponent {
         mg.setColor(Color.WHITE);
         mg.fillOval(playerMinimapX - 2, playerMinimapY - 2, 4, 4);
 
-        // Create a thread-safe copy of the enemies list
-        List<Enemy> enemiesCopy;
-        synchronized (enemies) {
-            enemiesCopy = new ArrayList<>(enemies);
-        }
-
         // Draw enemies (as red dots)
         mg.setColor(Color.RED);
-        for (Enemy enemy : enemiesCopy) {
+        for (Enemy enemy : enemies) {
             int enemyMinimapX = (int) (enemy.getX() * scaleX);
             int enemyMinimapY = (int) (enemy.getY() * scaleY);
             mg.fillOval(enemyMinimapX - 2, enemyMinimapY - 2, 4, 4);
         }
 
-        // Create a thread-safe copy of the items list
-        List<Item> itemsCopy;
-        synchronized (items) {
-            itemsCopy = new ArrayList<>(items);
-        }
-
         // Draw items (as yellow dots)
         mg.setColor(Color.YELLOW);
-        for (Item item : itemsCopy) {
+        for (Item item : items) {
             int itemMinimapX = (int) (item.getX() * scaleX);
             int itemMinimapY = (int) (item.getY() * scaleY);
             mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
@@ -196,7 +189,8 @@ public class PanelGame extends JComponent {
         mg.dispose();
 
         // Draw the minimap on the main graphics context
-        int minimapX = widthScreen - 200;
+        // Position it below score and ammo
+        int minimapX = widthScreen-200;
         int minimapY = 10; // Adjust this value based on where your score/ammo text ends
         g2.drawImage(minimapBuffer, minimapX, minimapY, null);
     }
@@ -271,10 +265,11 @@ public class PanelGame extends JComponent {
         player = new Player();
         player.setPlayerName(playerName);
         items = new ArrayList<>();
-        player.changeLocation(150, 150);
+        player.changeLocation(300, 300);
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
         GunList = new ArrayList<>();
+        map=new Map();
         // Create and add different gun types to GunList
         Gun pistol = new Gun("pistol", 100, 500, player.getX(), player.getY());
         Gun rifle = new Gun("rifle", 0, 300, player.getX(), player.getY());
@@ -286,8 +281,7 @@ public class PanelGame extends JComponent {
         GunList.add(rifle);
         GunList.add(sniper);
         GunList.add(grenade);
-        // Set the initial equipped gun
-        gunEquip = rifle;
+        gunEquip=GunList.getFirst();
         // Tạo luồng riêng để sinh kẻ thù định kỳ
         new Thread(() -> {
             while (start) {
@@ -317,31 +311,21 @@ public class PanelGame extends JComponent {
     private void resetGame(){
         score=0;
         items.clear();
-        hasAmmo = false;
-        GunList.clear();
+//        GunList.clear();
         enemies.clear();
         bullets.clear();
-        player.changeLocation(150, 150);
+        player.changeLocation(300, 300);
         player.reset();
+        ammoCount = 0;
         startTime = System.nanoTime();
-        // Create and add different gun types to GunList
-        Gun pistol = new Gun("pistol", 100, 300, player.getX(), player.getY());
-        Gun rifle = new Gun("rifle", 0, 500, player.getX(), player.getY());
-        Gun sniper = new Gun("sniper", 0, 1000, player.getX(), player.getY());
-        Gun grenade = new Gun("grenade", 0, 2000, player.getX(), player.getY());
 
-        // Add guns to GunList
-        GunList.add(pistol);
-        GunList.add(rifle);
-        GunList.add(sniper);
-        GunList.add(grenade);
     }
 
-    private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
-        // Tính toán âm lượng dựa trên vị trí chuột
-        float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
-        Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
-    }
+        private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
+            // Tính toán âm lượng dựa trên vị trí chuột
+            float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
+            Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
+        }
 
     private void initKeyboard() {
         key = new Key();
@@ -425,33 +409,59 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_ENTER -> key.setKey_enter(false);
                 }
             }
-
         });
 
         // Main game loop thread
         new Thread(() -> {
             while (start) {
                 if (player.isAlive()) {
+                    //System.out.println("Player is alive");
                     float speed = 1f; // Movement speed
 
                     // Player movement
                     if (key.isKey_left()) {
-                        player.changeLocation(player.getX() - speed, player.getY());
+                        if ((!map.checkCollision(player).contains("left")) ) {
+                            player.changeLocation(player.getX () - speed, player.getY());
+                        }
+                        else {
+                            System.out.println("left is prevent");
+                        }
+
                     }
                     if (key.isKey_right()) {
-                        player.changeLocation(player.getX() + speed, player.getY());
+                        if (!map.checkCollision(player).contains("right")) {
+                            player.changeLocation(player.getX() + speed, player.getY());
+                        }
+                        else{
+                            System.out.println("right is prevent");
+                        }
+
                     }
                     if (key.isKey_up()) {
-                        player.changeLocation(player.getX(), player.getY() - speed);
+                        if (!map.checkCollision(player).contains("up")) {
+                            player.changeLocation(player.getX(), player.getY() - speed);
+                            System.out.println("player is move up");
+
+                        }
+                        else {
+                            System.out.println("up is prevent");
+                        }
+
                     }
                     if (key.isKey_down()) {
-                        player.changeLocation(player.getX(), player.getY() + speed);
+                        if (!map.checkCollision(player).contains("down")) {
+                            player.changeLocation(player.getX(), player.getY() + speed);
+                        }
+                        else {
+                            System.out.println("down is prevent");
+                        }
+
                     }
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-//                        System.out.println("mouse position is not null");
-//                        System.out.println(mousePosition.x+"  "+mousePosition.y);
+                        // System.out.println("mouse position is not null");
+                        // System.out.println(mousePosition.x+"  "+mousePosition.y);
 
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
@@ -473,7 +483,8 @@ public class PanelGame extends JComponent {
 
                     player.update();
                     checkItems();
-                } else {
+                }
+                else {
                     if (key.isKey_enter()) {
                         resetGame();
                     }
@@ -532,7 +543,7 @@ public class PanelGame extends JComponent {
                             }
                             case "rifle" -> {
                                 if (gunEquip.getCurrentAmmo()>0){
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
                                 }
                             }
                             case "sniper" -> {
@@ -725,7 +736,6 @@ public class PanelGame extends JComponent {
             gunEquip.drawGun(g2,player.getX(),player.getY(), player.getAngle(), gunEquip.getName());
         }
 
-
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
@@ -760,6 +770,8 @@ public class PanelGame extends JComponent {
 
         drawVolumeControl();
         drawMinimap();
+        map.draw(g2);
+
 
         if(!player.isAlive()){
             // Nếu finalElapsedTime chưa được lưu, tính toán thời gian và lưu lại
@@ -768,6 +780,7 @@ public class PanelGame extends JComponent {
                 finalElapsedTime = (endTime - main.getStartTime()) / 1000000000; // Tính thời gian chơi (giây)
                 savePlayerScore();
             }
+
             // Chuyển đổi thời gian thành phút và giây
             long minutes = finalElapsedTime / 60;
             long seconds = finalElapsedTime % 60;
@@ -804,8 +817,6 @@ public class PanelGame extends JComponent {
             g2.setColor(Color.CYAN);
             g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 20);
 
-            //savePlayerScore();
-
             // Hướng dẫn khởi động lại
             g2.setFont(new Font("Arial", Font.BOLD, 25));
             g2.setColor(Color.WHITE);
@@ -831,8 +842,7 @@ public class PanelGame extends JComponent {
                     int randomGun = (int)(Math.random() * 4); // 0 to 100
                     int randomBullet = (int)(Math.random() * 30);
                     GunList.get(randomGun).addCurrentAmmo(randomBullet);
-                    // Cập nhật trạng thái đạn của player
-                    hasAmmo = true;
+
                     //Sound.soundCollectItem(); // Thêm âm thanh nhặt item
                     // Xóa item khỏi danh sách
                     iterator.remove();

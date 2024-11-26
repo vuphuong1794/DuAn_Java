@@ -110,7 +110,7 @@ public class Enemy extends HpRender  {
 
         AffineTransform oldTransform = g2.getTransform();
         // Dịch chuyển đến vị trí trung tâm của Enemy và xoay quanh tâm
-        g2.translate(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2);
+        g2.translate(x, y);
         g2.rotate(Math.toRadians(angle));
 
         // Vẽ hình ảnh Enemy tại (-width / 2, -height / 2) để căn giữa
@@ -152,7 +152,7 @@ public class Enemy extends HpRender  {
 
         // Create a transformation for the enemy's position and angle
         AffineTransform afx = new AffineTransform();
-        afx.translate(x + ENEMY_SIZE / 2, y + ENEMY_SIZE / 2); // Move to enemy's center
+        afx.translate(x, y ); // Move to enemy's center
         afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around center
 
         // Return the transformed shape of the image area
