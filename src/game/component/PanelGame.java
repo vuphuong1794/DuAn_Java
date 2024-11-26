@@ -12,6 +12,10 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -115,6 +119,26 @@ public class PanelGame extends JComponent {
         initKeyboard();
         initBullets();
         thread.start();
+    }
+
+    public void savePlayerScore() {
+        String url = "jdbc:mysql://localhost:3306/zombiedoomdays";
+        String user = "root";
+        String password = "";
+
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "INSERT INTO game_scores (player_name, score, play_time) VALUES (?, ?, ?)")) {
+
+            preparedStatement.setString(1, playerName);
+            preparedStatement.setInt(2, score);
+            preparedStatement.setLong(3, finalElapsedTime != null ? finalElapsedTime : 0);
+
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     //Minimap
@@ -302,11 +326,11 @@ public class PanelGame extends JComponent {
         GunList.add(grenade);
     }
 
-        private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
-            // Tính toán âm lượng dựa trên vị trí chuột
-            float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
-            Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
-        }
+    private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
+        // Tính toán âm lượng dựa trên vị trí chuột
+        float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
+        Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
+    }
 
     private void initKeyboard() {
         key = new Key();
@@ -497,7 +521,7 @@ public class PanelGame extends JComponent {
                             }
                             case "rifle" -> {
                                 if (gunEquip.getCurrentAmmo()>0){
-                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
                                 }
                             }
                             case "sniper" -> {
@@ -731,6 +755,7 @@ public class PanelGame extends JComponent {
             if (finalElapsedTime == null) {
                 long endTime = System.nanoTime(); // Lấy thời gian kết thúc
                 finalElapsedTime = (endTime - main.getStartTime()) / 1000000000; // Tính thời gian chơi (giây)
+                savePlayerScore();
             }
             // Chuyển đổi thời gian thành phút và giây
             long minutes = finalElapsedTime / 60;
@@ -767,6 +792,8 @@ public class PanelGame extends JComponent {
             // Hiển thị tên người chơi
             g2.setColor(Color.CYAN);
             g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 20);
+
+            //savePlayerScore();
 
             // Hướng dẫn khởi động lại
             g2.setFont(new Font("Arial", Font.BOLD, 25));

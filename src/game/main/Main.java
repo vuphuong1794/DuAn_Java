@@ -58,7 +58,7 @@ public class Main extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
-                // You can load resources here if necessary (e.g., preload images)
+
             }
         });
     }
@@ -77,7 +77,7 @@ public class Main extends JFrame {
 
         // Start the game with the player object
         SwingUtilities.invokeLater(() -> {
-            panelGame.start(player);  // Pass player to the game panel
+            panelGame.start(player);
         });
     }
 
