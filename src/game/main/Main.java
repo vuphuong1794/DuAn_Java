@@ -44,8 +44,6 @@ public class Main extends JFrame {
 
         panelGame = new PanelGame(player, this);
 
-        panelGame = new PanelGame(player);
-
         // Create the menu screen and pass the player object
         MainMenuPanel menuPanel = createMenuPanel(player);
 

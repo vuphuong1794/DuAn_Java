@@ -693,17 +693,29 @@ public class PanelGame extends JComponent {
             long minutes = finalElapsedTime / 60;
             long seconds = finalElapsedTime % 60;
 
-            // Thiết lập font và màu sắc
-            g2.setFont(new Font("Arial", Font.BOLD, 50));
-            g2.setColor(new Color(255, 255, 255, 180)); // Màu trắng mờ cho Game Over
+            // Hiệu ứng nền gradient
+            GradientPaint gradient = new GradientPaint(0, 0, new Color(0, 0, 0, 200),
+                    0, height, new Color(50, 50, 50, 150));
+            Graphics2D g2d = (Graphics2D) g2;
+            g2d.setPaint(gradient);
+            g2d.fillRect(0, 0, width, height);
 
-            // Hiển thị Game Over
-            g2.drawString("Game Over", width / 2 - 150, height / 2 - 100);
+            // Tiêu đề "GAME OVER"
+            g2.setFont(new Font("Arial", Font.BOLD, 80));
+            g2.setColor(Color.RED);
+            g2.drawString("GAME OVER", width / 2 - 250, height / 2 - 180);
 
-            // Hiển thị điểm số
+            // Vẽ hộp thông báo
+            g2.setColor(new Color(30, 30, 30, 200)); // Hộp nền màu xám mờ
+            g2.fillRoundRect(width / 2 - 300, height / 2 - 120, 600, 250, 20, 20);
+
+            g2.setColor(Color.WHITE); // Viền hộp
+            g2.drawRoundRect(width / 2 - 300, height / 2 - 120, 600, 250, 20, 20);
+
+            // Thông tin điểm số
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
             g2.setColor(Color.YELLOW);
-            g2.drawString("Score: " + score, width / 2 - 100, height / 2 - 50);
+            g2.drawString("Score: " + score, width / 2 - 260, height / 2 - 60);
 
             // Hiển thị thời gian chơi
             g2.setColor(Color.GREEN);
@@ -711,7 +723,12 @@ public class PanelGame extends JComponent {
 
             // Hiển thị tên người chơi
             g2.setColor(Color.CYAN);
-            g2.drawString("Player: " + playerName, width / 2 - 100, height / 2 + 50);
+            g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 20);
+
+            // Hướng dẫn khởi động lại
+            g2.setFont(new Font("Arial", Font.BOLD, 25));
+            g2.setColor(Color.WHITE);
+            g2.drawString("Press Enter to restart game!", width / 2 - 220, height / 2 + 80);
         }
     }
 
