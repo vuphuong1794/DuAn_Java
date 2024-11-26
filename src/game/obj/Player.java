@@ -126,37 +126,48 @@ public class Player extends HpRender {
         this.angle = angle;
     }
 
-    // Phương thức vẽ nhân vật lên màn hình
+    // Method to draw the player on the screen
     public void draw(Graphics2D g2) {
+        // Save the current transformation state
         AffineTransform oldTransform = g2.getTransform();
 
-        // Move to the player's center and rotate around it
+        // Transform to the player's position and rotation
         g2.translate(x, y);
-        g2.rotate(Math.toRadians(angle-90));
+        g2.rotate(Math.toRadians(angle - 90));
+
+        // Scale the player image
+        double scaleFactor = 0.02; // Uniform scaling factor
+        g2.scale(scaleFactor, scaleFactor);
 
         // Draw the player image centered at (-width / 2, -height / 2)
         int width = image.getWidth(null);
         int height = image.getHeight(null);
-        double scaleFactorX = 0.02; // Scale relative to reference size (10.0)
-        double scaleFactorY = 0.02;
-        g2.scale(scaleFactorX, scaleFactorY);
         g2.drawImage(image, -width / 2, -height / 2, null);
 
-        // Vẽ tên người chơi
+        // Draw the player's name above the character
         g2.setFont(new Font("Arial", Font.BOLD, 18));
         g2.setColor(Color.WHITE);
-        g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);  // Hiển thị tên ngay phía trên nhân vật
+        g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);
 
-        Shape shape = getShape();
+        // Draw a red rectangle around the player's hitbox
+        g2.setColor(Color.RED);
+        Shape shape = getShape(); // Get the player's shape (rotated hitbox)
+        if (shape != null) {
+
+
+            g2.draw(shape.getBounds2D()); // Draw the bounding rectangle of the shape
+        }
+        else {
+            System.out.println("No shape found");
+        }
+
+        // Render health bar or other overlays
         hpRender(g2, getShape(), PLAYER_SIZE);
 
-        // Restore the original transformation
+        // Restore the original transformation state
         g2.setTransform(oldTransform);
-        //test
-        //g2.setColor(Color.red);
-        //g2.draw(shape.getBounds2D());
-
     }
+
 
     public Area getShape() {
         // Tạo hitbox với kích thước phù hợp với sprite
@@ -169,7 +180,7 @@ public class Player extends HpRender {
 
         AffineTransform afx = new AffineTransform();
         // Dịch chuyển đến tâm của nhân vật
-        afx.translate(x + PLAYER_SIZE/2, y + PLAYER_SIZE/2);
+        afx.translate(x, y );
         afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
 
         // Create an Area from the transformed rectangle

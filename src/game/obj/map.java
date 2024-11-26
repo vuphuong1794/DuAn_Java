@@ -55,26 +55,22 @@
                     StringBuilder bounds = new StringBuilder();
         
                     // Kiểm tra va chạm trên
-                    if (player.getY() <= wall.getY() + wall.getHeight() &&
-                        player.getY() > wall.getY()) {
+                    if (player.getY() == wall.getY() + wall.getHeight()) {
                         bounds.append("up");
                     }
                     // Kiểm tra va chạm dưới
-                    if (player.getY() + Player.PLAYER_SIZE >= wall.getY() &&
-                        player.getY() < wall.getY()) {
+                    if (player.getY() == wall.getY()) {
                         bounds.append("down");
                     }
                     // Kiểm tra va chạm trái
-                    if (player.getX() <= wall.getX() + wall.getWidth() &&
-                        player.getX() > wall.getX()) {
+                    if (player.getX() == wall.getX() + wall.getWidth()) {
                         bounds.append("left");
                     }
                     // Kiểm tra va chạm phải
-                    if (player.getX() + Player.PLAYER_SIZE >= wall.getX() &&
-                        player.getX() < wall.getX()) {
+                    if (player.getX() == wall.getX()) {
                         bounds.append("right");
                     }
-        
+
                     return bounds.toString(); // Trả về hướng va chạm
                 }
             }

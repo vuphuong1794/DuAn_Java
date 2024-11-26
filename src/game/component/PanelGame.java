@@ -62,7 +62,6 @@ public class PanelGame extends JComponent {
 
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
-    private boolean hasAmmo = false; // Kiểm tra có đạn hay không
     private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
     public PanelGame(Player player, Main main) {
@@ -242,6 +241,7 @@ public class PanelGame extends JComponent {
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
         GunList = new ArrayList<>();
+        map=new Map();
         // Create and add different gun types to GunList
         Gun pistol = new Gun("pistol", 100, 500, player.getX(), player.getY());
         Gun rifle = new Gun("rifle", 0, 300, player.getX(), player.getY());
@@ -253,8 +253,7 @@ public class PanelGame extends JComponent {
         GunList.add(rifle);
         GunList.add(sniper);
         GunList.add(grenade);
-        // Set the initial equipped gun
-        gunEquip = rifle;
+        gunEquip=GunList.getFirst();
         // Tạo luồng riêng để sinh kẻ thù định kỳ
         new Thread(() -> {
             while (start) {
@@ -284,25 +283,14 @@ public class PanelGame extends JComponent {
     private void resetGame(){
         score=0;
         items.clear();
-        hasAmmo = false;
-        GunList.clear();
+//        GunList.clear();
         enemies.clear();
         bullets.clear();
         player.changeLocation(300, 300);
         player.reset();
         ammoCount = 0;
         startTime = System.nanoTime();
-        // Create and add different gun types to GunList
-        Gun pistol = new Gun("pistol", 100, 300, player.getX(), player.getY());
-        Gun rifle = new Gun("rifle", 0, 500, player.getX(), player.getY());
-        Gun sniper = new Gun("sniper", 0, 1000, player.getX(), player.getY());
-        Gun grenade = new Gun("grenade", 0, 2000, player.getX(), player.getY());
 
-        // Add guns to GunList
-        GunList.add(pistol);
-        GunList.add(rifle);
-        GunList.add(sniper);
-        GunList.add(grenade);
     }
 
         private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
@@ -399,6 +387,7 @@ public class PanelGame extends JComponent {
         new Thread(() -> {
             while (start) {
                 if (player.isAlive()) {
+                    //System.out.println("Player is alive");
                     float speed = 1f; // Movement speed
 
                     // Player movement
@@ -423,6 +412,8 @@ public class PanelGame extends JComponent {
                     if (key.isKey_up()) {
                         if (!map.checkCollision(player).contains("up")) {
                             player.changeLocation(player.getX(), player.getY() - speed);
+                            System.out.println("player is move up");
+
                         }
                         else {
                             System.out.println("up is prevent");
@@ -821,8 +812,7 @@ public class PanelGame extends JComponent {
                     int randomGun = (int)(Math.random() * 4); // 0 to 100
                     int randomBullet = (int)(Math.random() * 30);
                     GunList.get(randomGun).addCurrentAmmo(randomBullet);
-                    // Cập nhật trạng thái đạn của player
-                    hasAmmo = true;
+
                     //Sound.soundCollectItem(); // Thêm âm thanh nhặt item
                     // Xóa item khỏi danh sách
                     iterator.remove();
