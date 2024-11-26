@@ -37,7 +37,7 @@ public class Player extends HpRender {
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
         super(new HP(50,50));
-        this.image = loadImage("/game/image/CharacterPlayer.png");
+        this.image = loadImage("/game/image/PlayerShortGun.png");
         this.inventory = new ArrayList<>();
         this.currentGunIndex = 0; // No gun equipped initially
 
@@ -132,11 +132,14 @@ public class Player extends HpRender {
 
         // Move to the player's center and rotate around it
         g2.translate(x, y);
-        g2.rotate(Math.toRadians(angle));
+        g2.rotate(Math.toRadians(angle-90));
 
         // Draw the player image centered at (-width / 2, -height / 2)
         int width = image.getWidth(null);
         int height = image.getHeight(null);
+        double scaleFactorX = 0.02; // Scale relative to reference size (10.0)
+        double scaleFactorY = 0.02;
+        g2.scale(scaleFactorX, scaleFactorY);
         g2.drawImage(image, -width / 2, -height / 2, null);
 
         // Vẽ tên người chơi

@@ -20,8 +20,7 @@ public class Main extends JFrame {
     private long startTime;
 
     public Main() {
-        init()
-        ;
+        init();
     }
 
     private void init() {

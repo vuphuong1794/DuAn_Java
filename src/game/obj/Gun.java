@@ -53,8 +53,8 @@ public class Gun {
             case "rifle":
                 path = "/game/image/rifle.png";
                 break;
-            case "shotgun":
-                path = "/game/image/shotgun.png";
+            case "sniper":
+                path = "/game/image/sniper.png";
                 break;
             case "grenade":
                 System.out.println("Gun image not found for name: " + gunName + ". Using default image.");
@@ -87,12 +87,21 @@ public class Gun {
 
         // Move to the player's position and rotate the gun
         g2.translate(x, y); // Position at player's location
-        if (name.equals("rifle")) {
-            g2.rotate(Math.toRadians(angle - 90)); // Rotate gun based on player's angle
-            g2.translate(-75, 45);
-        } else if (name.equals("pistol")) {
+        if (name.equals("pistol")) {
             g2.rotate(Math.toRadians(angle + 90)); // Rotate gun based on player's angle
-            g2.translate(0, 40);
+            g2.translate(5, -40);
+        }
+        else if (name.equals("rifle")) {
+            g2.rotate(Math.toRadians(angle - 90)); // Rotate gun based on player's angle
+            g2.translate(-75, 40);
+        }
+        else if (name.equals("sniper")) {
+            g2.rotate(Math.toRadians(angle -90)); // Rotate gun based on player's angle
+            g2.translate(-70, 40);
+        }
+        else if (name.equals("grenade")) {
+            g2.rotate(Math.toRadians(angle - 90)); // Rotate gun based on player's angle
+            g2.translate(-70, 40);
         }
 
         double scaleFactor = Gun_size / 40.0; // Scale relative to reference size (10.0)
@@ -160,6 +169,10 @@ public class Gun {
      */
     public int getCurrentAmmo() {
         return currentAmmo;
+    }
+
+    public void addCurrentAmmo(int ammo) {
+        currentAmmo += ammo;
     }
 
     /**

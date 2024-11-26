@@ -27,7 +27,6 @@ public class PanelGame extends JComponent {
     private Key key;
     private Image imagemap;
     private float shotTime;
-    private Gun gunEquip;
     // Game FPS
     private final int FPS = 60;
     private final int TARGET_TIME = 1000000000 / FPS;
@@ -38,6 +37,9 @@ public class PanelGame extends JComponent {
     private List<Bullet> bullets;
     private List<Effect> boomEffects;
     private List<Item> items;
+    private List <Gun> GunList;
+    private Gun gunEquip;
+
     private sound Sound;
     private Point mousePosition; // Mouse position
     private Main main;
@@ -237,7 +239,20 @@ public class PanelGame extends JComponent {
         player.changeLocation(150, 150);
         enemies = new ArrayList<>();
         boomEffects = new ArrayList<>();
-        gunEquip =new Gun("rifle",100,500, player.getX(), player.getY());
+        GunList = new ArrayList<>();
+        // Create and add different gun types to GunList
+        Gun pistol = new Gun("pistol", 100, 500, player.getX(), player.getY());
+        Gun rifle = new Gun("rifle", 0, 300, player.getX(), player.getY());
+        Gun sniper = new Gun("sniper", 0, 1000, player.getX(), player.getY());
+        Gun grenade = new Gun("grenade", 0, 2000, player.getX(), player.getY());
+
+        // Add guns to GunList
+        GunList.add(pistol);
+        GunList.add(rifle);
+        GunList.add(sniper);
+        GunList.add(grenade);
+        // Set the initial equipped gun
+        gunEquip = rifle;
         // Tạo luồng riêng để sinh kẻ thù định kỳ
         new Thread(() -> {
             while (start) {
@@ -268,12 +283,23 @@ public class PanelGame extends JComponent {
         score=0;
         items.clear();
         hasAmmo = false;
+        GunList.clear();
         enemies.clear();
         bullets.clear();
         player.changeLocation(150, 150);
         player.reset();
-        ammoCount = 0;
         startTime = System.nanoTime();
+        // Create and add different gun types to GunList
+        Gun pistol = new Gun("pistol", 100, 300, player.getX(), player.getY());
+        Gun rifle = new Gun("rifle", 0, 500, player.getX(), player.getY());
+        Gun sniper = new Gun("sniper", 0, 1000, player.getX(), player.getY());
+        Gun grenade = new Gun("grenade", 0, 2000, player.getX(), player.getY());
+
+        // Add guns to GunList
+        GunList.add(pistol);
+        GunList.add(rifle);
+        GunList.add(sniper);
+        GunList.add(grenade);
     }
 
         private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
@@ -347,6 +373,10 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_S -> key.setKey_down(true);
                     case KeyEvent.VK_W -> key.setKey_up(true);
                     case KeyEvent.VK_ENTER -> key.setKey_enter(true);
+                    case KeyEvent.VK_1 -> key.setKey_1(true);
+                    case KeyEvent.VK_2 -> key.setKey_2(true);
+                    case KeyEvent.VK_3 -> key.setKey_3(true);
+                    case KeyEvent.VK_4 -> key.setKey_4(true);
                 }
             }
 
@@ -360,6 +390,7 @@ public class PanelGame extends JComponent {
                     case KeyEvent.VK_ENTER -> key.setKey_enter(false);
                 }
             }
+
         });
 
         // Main game loop thread
@@ -441,28 +472,40 @@ public class PanelGame extends JComponent {
         // Shooting logic thread
         new Thread(() -> {
             while (start) {
+                if (key.isKey_1() && GunList.size() > 0) {
+                    gunEquip = GunList.get(0); // Equip the first gun
+                }
+                else if (key.isKey_2() && GunList.size() > 1) {
+                    gunEquip = GunList.get(1); // Equip the second gun
+                }
+                else if (key.isKey_3() && GunList.size() > 2) {
+                    gunEquip = GunList.get(2); // Equip the third gun
+                }
+                else if (key.isKey_4() && GunList.size() > 3) {
+                    gunEquip = GunList.get(3); // Equip the third gun
+                }
+                else {
+                    gunEquip = GunList.get(0); // Equip the first gun
+                }
+
                 if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>105 || mousePosition.y<85)) {
                     long currentTime = System.currentTimeMillis();
                     if (shotTime == 0) {
                         switch (gunEquip.getName()) {
+                            case "pistol" -> {
+                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),40,8));
+                            }
                             case "rifle" -> {
                                 if (gunEquip.getCurrentAmmo()>0){
-                                bullets.add(0, gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
                                 }
-
-                            }
-                            case "pistol" -> {
-                                bullets.add(0, gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),40,8));
                             }
                             case "sniper" -> {
-                                if (gunEquip.getCurrentAmmo()>0) {
-                                    bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 40, 0));
-                                }
+                                bullets.add( gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+
                             }
                             case "grenade" -> {
-                                if (gunEquip.getCurrentAmmo()>0) {
-                                    bullets.add(0, new Bullet(player.getX(), player.getY(), player.getAngle(), 40, 0));
-                                }
+                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
                             }
                         }
                     }
@@ -747,7 +790,9 @@ public class PanelGame extends JComponent {
                 if (!area.isEmpty()) {
                     // Đánh dấu item đã được thu thập
                     item.collect();
-                    ammoCount+=10;
+                    int randomGun = (int)(Math.random() * 4); // 0 to 100
+                    int randomBullet = (int)(Math.random() * 30);
+                    GunList.get(randomGun).addCurrentAmmo(randomBullet);
                     // Cập nhật trạng thái đạn của player
                     hasAmmo = true;
                     //Sound.soundCollectItem(); // Thêm âm thanh nhặt item
