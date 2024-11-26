@@ -5,6 +5,7 @@ import game.obj.item.Item;
 import game.obj.sound.sound;
 import game.obj.Gun;
 
+import game.main.Main;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Area;
@@ -39,6 +40,7 @@ public class PanelGame extends JComponent {
     private List<Item> items;
     private sound Sound;
     private Point mousePosition; // Mouse position
+    private Main main;
 
     //minimap
     private static final int MINIMAP_SIZE = 100;  // Size of the minimap
@@ -50,14 +52,15 @@ public class PanelGame extends JComponent {
     private long lastShotTime = 0; // Thời điểm bắn viên đạn cuối cùng
     private long startTime;  // Thời gian bắt đầu
     private long endTime;    // Thời gian kết thúc
-
+    private String playerName;
+    private Long finalElapsedTime = null; // Lưu thời gian cuối cùng khi game kết thúc
 
     // Lưu thời gian tạo hiệu ứng nổ
     private long lastExplosionTime = 0;
     private boolean hasAmmo = false; // Kiểm tra có đạn hay không
     private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
-    public PanelGame() {
+    public PanelGame(Player player) {
         // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
@@ -67,8 +70,16 @@ public class PanelGame extends JComponent {
         });
     }
 
+    public PanelGame(Player player, Main main) {
+        this.player = player;
+        this.main = main;
+    }
+
     // Khởi động game
     public void start(Player player) {
+        playerName = player.getPlayerName();
+        finalElapsedTime = null; // Reset thời gian chơi khi bắt đầu lại game
+
         width = getWidth(); // Lấy chiều rộng của panel
         height = getHeight(); // Lấy chiều cao của panel
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -221,6 +232,7 @@ public class PanelGame extends JComponent {
     private void initObjectGame() {
         Sound = new sound();
         player = new Player();
+        player.setPlayerName(playerName);
         items = new ArrayList<>();
         player.changeLocation(150, 150);
         enemies = new ArrayList<>();
@@ -664,7 +676,7 @@ public class PanelGame extends JComponent {
         //hiển thị trạng thái
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 20));
-        g2.drawString("Player: " + player.getPlayerName(), 30, 40);
+        g2.drawString("Player: " + playerName, 30, 40);
         g2.drawString("Score: "+score, 30, 60);
         g2.drawString("Ammo: " + gunEquip.getCurrentAmmo(), 30, 80);
 
@@ -672,7 +684,14 @@ public class PanelGame extends JComponent {
         drawMinimap();
 
         if(!player.isAlive()){
-            endTime = System.nanoTime();  // Lưu thời gian kết thúc
+            // Nếu finalElapsedTime chưa được lưu, tính toán thời gian và lưu lại
+            if (finalElapsedTime == null) {
+                long endTime = System.nanoTime(); // Lấy thời gian kết thúc
+                finalElapsedTime = (endTime - main.getStartTime()) / 1000000000; // Tính thời gian chơi (giây)
+            }
+            // Chuyển đổi thời gian thành phút và giây
+            long minutes = finalElapsedTime / 60;
+            long seconds = finalElapsedTime % 60;
 
             // Thiết lập font và màu sắc
             g2.setFont(new Font("Arial", Font.BOLD, 50));
@@ -688,12 +707,11 @@ public class PanelGame extends JComponent {
 
             // Hiển thị thời gian chơi
             g2.setColor(Color.GREEN);
-            long elapsedTime = (endTime - startTime) / 1000000000;
-            g2.drawString("Time Played: " + elapsedTime + " seconds", width / 2 - 150, height / 2);
+            g2.drawString("Time Played: " + minutes + "m " + seconds + "s", width / 2 - 260, height / 2 - 20);
 
             // Hiển thị tên người chơi
             g2.setColor(Color.CYAN);
-            g2.drawString("Player: " + player.getPlayerName(), width / 2 - 100, height / 2 + 50);
+            g2.drawString("Player: " + playerName, width / 2 - 100, height / 2 + 50);
         }
     }
 
