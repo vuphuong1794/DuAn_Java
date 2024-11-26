@@ -48,8 +48,8 @@ K - Bắn đạn phóng lựu
 - [x] v0.1 - Test
   - [x] Hệ thống bắn súng đơn giản
   - [x] AI zombie đơn giản
-  - [ ] Hệ thống nhặt đạn, vật phẩm
-  - [ ] Lưu điểm mà người chơi đạt được trong CSDL
+  - [x] Hệ thống nhặt đạn, vật phẩm
+  - [x] Lưu thông tin mà người chơi đạt được trong CSDL
 
 - [ ] v0.2 - Beta
   - [ ] Hệ thống bắn súng nâng cao
@@ -58,7 +58,7 @@ K - Bắn đạn phóng lựu
 
 - [ ] v1.0 - Phiên bản chính thức
   - [ ] Hệ thống bắn súng nâng cao
-  - [ ] Hệ thống nhặt đạn, vật phẩm
+  - [ ] Hệ thống kho đồ
   - [ ] Zombie có tính năng riêng biệt
   - [ ] Multiplayer
 
@@ -75,8 +75,8 @@ Chúng tôi luôn chào đón sự đóng góp từ cộng đồng! Hãy làm th
 
 ## 👥 Team phát triển
 
-- 🤺 **Player Developer**: [Ngô Xuân Diệu](https://github.com/Yuno04)
-- 🧟 **Zombie Developer**: [Vũ Nguyễn Phương](https://github.com/vuphuong1794)
+- 🤺 **Player Developer, Health Bar**: [Ngô Xuân Diệu](https://github.com/Yuno04)
+- 🧟 **Zombie Developer, Menu**: [Vũ Nguyễn Phương](https://github.com/vuphuong1794)
 - 🎨,🎮 **Leader, Art and Game Director**: [Mai Nguyễn Đăng Khoa](https://github.com/MaiKhoa0101)
 - 🖥️ **Game Features**: [Nguyễn Hồng Tồn](https://github.com/PolyEtilen1909)
 
