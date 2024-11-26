@@ -165,17 +165,29 @@ public class PanelGame extends JComponent {
         mg.setColor(Color.WHITE);
         mg.fillOval(playerMinimapX - 2, playerMinimapY - 2, 4, 4);
 
+        // Create a thread-safe copy of the enemies list
+        List<Enemy> enemiesCopy;
+        synchronized (enemies) {
+            enemiesCopy = new ArrayList<>(enemies);
+        }
+
         // Draw enemies (as red dots)
         mg.setColor(Color.RED);
-        for (Enemy enemy : enemies) {
+        for (Enemy enemy : enemiesCopy) {
             int enemyMinimapX = (int) (enemy.getX() * scaleX);
             int enemyMinimapY = (int) (enemy.getY() * scaleY);
             mg.fillOval(enemyMinimapX - 2, enemyMinimapY - 2, 4, 4);
         }
 
+        // Create a thread-safe copy of the items list
+        List<Item> itemsCopy;
+        synchronized (items) {
+            itemsCopy = new ArrayList<>(items);
+        }
+
         // Draw items (as yellow dots)
         mg.setColor(Color.YELLOW);
-        for (Item item : items) {
+        for (Item item : itemsCopy) {
             int itemMinimapX = (int) (item.getX() * scaleX);
             int itemMinimapY = (int) (item.getY() * scaleY);
             mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
@@ -184,8 +196,7 @@ public class PanelGame extends JComponent {
         mg.dispose();
 
         // Draw the minimap on the main graphics context
-        // Position it below score and ammo
-        int minimapX = widthScreen-200;
+        int minimapX = widthScreen - 200;
         int minimapY = 10; // Adjust this value based on where your score/ammo text ends
         g2.drawImage(minimapBuffer, minimapX, minimapY, null);
     }
