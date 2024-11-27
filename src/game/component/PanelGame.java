@@ -240,32 +240,36 @@ public class PanelGame extends JComponent {
         try (Connection connection = DriverManager.getConnection(url, user, password);
              Statement statement = connection.createStatement()) {
 
-            // Truy vấn 5 người chơi có điểm cao nhất
             String query = "SELECT player_name, score FROM game_scores ORDER BY score DESC LIMIT 5";
             ResultSet resultSet = statement.executeQuery(query);
 
-            // Vẽ thông tin top 5 người chơi
-            g2.setColor(Color.WHITE);
-            g2.setFont(new Font("Arial", Font.PLAIN, 20));
+            // Top 5 title
+            g2.setFont(new Font("Arial", Font.BOLD, 35));
+            g2.setColor(new Color(173, 216, 230));
+            g2.drawString("Top 5 Players", width / 2 + 150, height / 2 - 70);
 
-            int yPosition = height / 2 + 120; // Vị trí y để hiển thị thông tin
-            g2.drawString("Top 5 Player Has High Scores:", width / 2 - 90, yPosition);
-            yPosition += 30; // Tăng khoảng cách cho các mục
-
-            // Duyệt qua kết quả và hiển thị thông tin
+            // Table content
+            g2.setFont(new Font("Arial", Font.PLAIN, 25));
+            int yPosition = height / 2 - 30;
             int rank = 1;
+
             while (resultSet.next() && rank <= 5) {
-                String playerName = resultSet.getString("player_name");
-                int score = resultSet.getInt("score");
-                g2.drawString(rank + ". " + playerName + " - " + score, width / 2 - 90, yPosition);
-                yPosition += 30; // Tăng khoảng cách
+                String playerInfo = rank + ". " +
+                        resultSet.getString("player_name") +
+                        " - " +
+                        resultSet.getInt("score");
+
+                g2.setColor(rank % 2 == 0 ? Color.LIGHT_GRAY : Color.WHITE);
+                g2.drawString(playerInfo, width / 2 + 150, yPosition);
+
+                yPosition += 50;
                 rank++;
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
 
     public void savePlayerScore() {
         String url = "jdbc:mysql://localhost:3306/zombiedoomdays";
@@ -936,55 +940,48 @@ public class PanelGame extends JComponent {
 
 
         if(!player.isAlive()){
-            // Nếu finalElapsedTime chưa được lưu, tính toán thời gian và lưu lại
+            // Calculate and save final time if not already done
             if (finalElapsedTime == null) {
-                long endTime = System.nanoTime(); // Lấy thời gian kết thúc
-                finalElapsedTime = (endTime - main.getStartTime()) / 1000000000; // Tính thời gian chơi (giây)
+                long endTime = System.nanoTime();
+                finalElapsedTime = (endTime - main.getStartTime()) / 1000000000;
                 savePlayerScore();
             }
 
-            // Chuyển đổi thời gian thành phút và giây
+            // Convert time to minutes and seconds
             long minutes = finalElapsedTime / 60;
             long seconds = finalElapsedTime % 60;
 
-            // Hiệu ứng nền gradient
-            GradientPaint gradient = new GradientPaint(0, 0, new Color(0, 0, 0, 200),
-                    0, height, new Color(50, 50, 50, 150));
+            // Gradient background
+            GradientPaint gradient = new GradientPaint(0, 0, new Color(0, 0, 0, 200), 0, height, new Color(50, 50, 50, 150));
             Graphics2D g2d = (Graphics2D) g2;
             g2d.setPaint(gradient);
             g2d.fillRect(0, 0, width, height);
 
-            // Tiêu đề "GAME OVER"
+// "GAME OVER" title
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.setColor(Color.RED);
-            g2.drawString("GAME OVER", width / 2 - 250, height / 2 - 180);
+            g2.drawString("GAME OVER", width / 2 - 210, height / 2 - 180);
 
-            // Vẽ hộp thông báo
-            g2.setColor(new Color(30, 30, 30, 200)); // Hộp nền màu xám mờ
-            g2.fillRoundRect(width / 2 - 300, height / 2 - 120, 600, 450, 20, 20);
+// Player info and top players box
+            g2.setColor(new Color(30, 30, 30, 200));
+            g2.fillRoundRect(width / 2 - 300, height / 2 - 120, 700, 450, 20, 20);
+            g2.setColor(Color.WHITE);
+            g2.drawRoundRect(width / 2 - 300, height / 2 - 120, 700, 450, 20, 20);
 
-            g2.setColor(Color.WHITE); // Viền hộp
-            g2.drawRoundRect(width / 2 - 300, height / 2 - 120, 600, 450, 20, 20);
-
-            // Thông tin điểm số
+// Player score, time, and name
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
             g2.setColor(Color.YELLOW);
             g2.drawString("Score: " + score, width / 2 - 260, height / 2 - 60);
-
-            // Hiển thị thời gian chơi
             g2.setColor(Color.GREEN);
-            g2.drawString("Time Played: " + minutes + "m " + seconds + "s", width / 2 - 260, height / 2 - 20);
-
-            // Hiển thị tên người chơi
+            g2.drawString("Time Played: " + (finalElapsedTime / 60) + "m " + (finalElapsedTime % 60) + "s", width / 2 - 260, height / 2 );
             g2.setColor(Color.CYAN);
-            g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 20);
-
-            // Hướng dẫn khởi động lại
-            g2.setFont(new Font("Arial", Font.BOLD, 25));
-            g2.setColor(Color.WHITE);
-            g2.drawString("Press Enter to restart game!", width / 2 - 220, height / 2 + 80);
+            g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 100);
 
             displayTop5Players(g2);
+// Restart instructions
+            g2.setFont(new Font("Arial", Font.BOLD, 25));
+            g2.setColor(Color.WHITE);
+            g2.drawString("Press Enter to restart game!", width / 2 - 110, height / 2 + 300);
         }
     }
 
