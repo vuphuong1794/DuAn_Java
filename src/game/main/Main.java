@@ -26,25 +26,28 @@ public class Main extends JFrame {
     private void init() {
         setTitle("Zombies Doomsday");
 
+        //lấy kích thước màn hình của người dùng
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
 
+        //set kích thước game bằng với độ phân giải màn hình của người dùng
         setSize((int) width,(int) height);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Set up CardLayout for panel switching
+        // Khởi tạo CardLayout để chuyển đổi giữa các panel khác nhau.
         cardLayout = new CardLayout();
+        //Khởi tạo mainPanel với CardLayout để quản lý các màn hình khác nhau.
         mainPanel = new JPanel(cardLayout);
 
-        // Initialize the player object here
-        player = new Player();  // Initialize player
+        player = new Player();  // khoi tao player
 
+        //Khởi tạo panel game và truyền đối tượng player vào panel game. this là đối tượng Main, được dùng để tham chiếu tới frame chính.
         panelGame = new PanelGame(player, this);
 
-        // Create the menu screen and pass the player object
+        // Tạo một đối tượng MainMenuPanel, là màn hình menu của game, và truyền đối tượng player vào.
         MainMenuPanel menuPanel = createMenuPanel(player);
 
         // Add panels to CardLayout

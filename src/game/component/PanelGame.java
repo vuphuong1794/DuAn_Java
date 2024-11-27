@@ -276,17 +276,17 @@ public class PanelGame extends JComponent {
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "INSERT INTO game_scores (player_name, score, play_time) VALUES (?, ?, ?)")) {
 
-            System.out.println("test loi 1");
+            //System.out.println("test loi 1");
             preparedStatement.setString(1, playerName);
-            System.out.println("test loi 2");
+            //System.out.println("test loi 2");
             preparedStatement.setInt(2, score);
-            System.out.println("test loi 3");
+            //System.out.println("test loi 3");
             preparedStatement.setLong(3, finalElapsedTime != null ? finalElapsedTime : 0);
-            System.out.println("test loi 4");
+            //System.out.println("test loi 4");
 
             preparedStatement.executeUpdate();
 
-            System.out.println("test loi");
+            //System.out.println("test loi");
         } catch (SQLException e) {
             e.printStackTrace();
         }
