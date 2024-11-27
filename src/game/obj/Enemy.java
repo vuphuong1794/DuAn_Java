@@ -8,7 +8,7 @@ import java.util.Random;
 import java.awt.geom.Path2D;
 
 public class Enemy extends HpRender  {
-    public static final double ENEMY_SIZE = 84;
+    public static final double ENEMY_SIZE = 50;
     private double x, y;
     private static final float ENEMY_SPEED = 0.3f;
     private float angle = 0;
@@ -122,10 +122,6 @@ public class Enemy extends HpRender  {
         // Gan gia tri hp cho Hprender
         hpRender(g2, shape, y);
         g2.setTransform(oldTransform);
-
-        //test
-        //g2.setColor(Color.red);
-        //g2.draw(shape.getBounds2D());
     }
 
     public double getX() {
@@ -148,7 +144,7 @@ public class Enemy extends HpRender  {
         int height = image.getHeight(null);
 
         // Define the bounding area of the image centered at (0,0)
-        Rectangle imageRect = new Rectangle(-width / 2, -height / 2, width, height);
+        Rectangle imageRect = new Rectangle(-(int)(ENEMY_SIZE/2), -(int)(ENEMY_SIZE/2), (int)ENEMY_SIZE, (int)ENEMY_SIZE);
 
         // Create a transformation for the enemy's position and angle
         AffineTransform afx = new AffineTransform();
@@ -157,6 +153,20 @@ public class Enemy extends HpRender  {
 
         // Return the transformed shape of the image area
         return new Area(afx.createTransformedShape(imageRect));
+    }
+    public void drawBorder(Graphics2D g2) {
+        AffineTransform oldTransform = g2.getTransform();
+        g2.setColor(Color.RED);
+        Shape shape = getShape(); // Get the player's shape (rotated hitbox)
+        if (shape != null) {
+            g2.draw(shape.getBounds2D()); // Draw the bounding rectangle of the shape
+        }
+        else {
+            System.out.println("No shape found");
+        }
+
+        // Restore the original transformation state
+        g2.setTransform(oldTransform);
     }
 
     public boolean check(int width, int height) {

@@ -11,7 +11,7 @@ public class Player extends HpRender {
 
     private static final int GAME_WIDTH = 1920;
     private static final int GAME_HEIGHT = 940;
-    public static final double PLAYER_SIZE = 100;
+    public static final double PLAYER_SIZE = 50;
     private String playerName = getPlayerName();
 
     // Vị trí x, y của nhân vật trên màn hình
@@ -149,34 +149,40 @@ public class Player extends HpRender {
         g2.setColor(Color.WHITE);
         g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);
 
+
+        // Restore the original transformation state
+        g2.setTransform(oldTransform);
+    }
+    public void drawBorder(Graphics2D g2) {
+        AffineTransform oldTransform = g2.getTransform();
         // Draw a red rectangle around the player's hitbox
         g2.setColor(Color.RED);
         Shape shape = getShape(); // Get the player's shape (rotated hitbox)
         if (shape != null) {
-
-
             g2.draw(shape.getBounds2D()); // Draw the bounding rectangle of the shape
         }
         else {
             System.out.println("No shape found");
         }
-
+        g2.scale(1, 1);
         // Render health bar or other overlays
         hpRender(g2, getShape(), PLAYER_SIZE);
 
         // Restore the original transformation state
         g2.setTransform(oldTransform);
     }
-
-
     public Area getShape() {
-        // Tạo hitbox với kích thước phù hợp với sprite
-        Rectangle rectangle = new Rectangle(
-                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều ngang
-                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều dọc
-                (int)PLAYER_SIZE,      // Chiều rộng
-                (int)PLAYER_SIZE       // Chiều cao
-        );
+        int width = image.getWidth(null);
+        int height = image.getHeight(null);
+        Rectangle rectangle = new Rectangle(-(int)(PLAYER_SIZE/2), -(int)(PLAYER_SIZE/2), (int)PLAYER_SIZE, (int)PLAYER_SIZE  );
+
+//        // Tạo hitbox với kích thước phù hợp với sprite
+//        Rectangle rectangle = new Rectangle(
+//                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều ngang
+//                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều dọc
+//                (int)PLAYER_SIZE,      // Chiều rộng
+//                (int)PLAYER_SIZE       // Chiều cao
+//        );
 
         AffineTransform afx = new AffineTransform();
         // Dịch chuyển đến tâm của nhân vật
@@ -185,6 +191,7 @@ public class Player extends HpRender {
 
         // Create an Area from the transformed rectangle
         return new Area(afx.createTransformedShape(rectangle));
+
     }
 
     // Getters cho vị trí x, y và góc xoay
