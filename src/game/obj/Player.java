@@ -131,10 +131,13 @@ public class Player {
     public void draw(Graphics2D g2) {
         // Save the current transformation state
         AffineTransform oldTransform = g2.getTransform();
-        //System.out.println("Player position: " + getX() + ", " + getY());
         // Transform to the player's position and rotation
         g2.translate(x, y);
-        g2.rotate(Math.toRadians(angle - 90));
+        // Draw the player's name above the character
+        g2.setFont(new Font("Arial", Font.BOLD, 18));
+        g2.setColor(Color.WHITE);
+        g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2)-10);
+        g2.rotate(Math.toRadians(angle- 90));
 
         // Scale the player image
         double scaleFactor = 0.02; // Uniform scaling factor
@@ -143,16 +146,13 @@ public class Player {
         // Draw the player image centered at (-width / 2, -height / 2)
         int width = image.getWidth(null);
         int height = image.getHeight(null);
+        System.out.println("Player position: " + -width / 2 +", "+ -height / 2);
         g2.drawImage(image, -width / 2, -height / 2, null);
-
-        // Draw the player's name above the character
-        g2.setFont(new Font("Arial", Font.BOLD, 18));
-        g2.setColor(Color.WHITE);
-        g2.drawString(playerName, -(int)(PLAYER_SIZE / 2), -(int)(PLAYER_SIZE / 2) - 10);
 
 
         // Restore the original transformation state
         g2.setTransform(oldTransform);
+        drawBorder(g2); // Vẽ player
     }
     public void drawBorder(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
@@ -166,9 +166,10 @@ public class Player {
             System.out.println("No shape found");
         }
         g2.scale(1, 1);
-        // Render health bar or other overlays
-        hpPlayer.hpRender(g2, getShape(),x, y);
 
+        // Restore the original transformation state
+        // Render health bar or other overlays
+        hpPlayer.hpRender(g2, getShape(),0, (int)(PLAYER_SIZE / 2));
         // Restore the original transformation state
         g2.setTransform(oldTransform);
     }
@@ -185,7 +186,7 @@ public class Player {
         AffineTransform afx = new AffineTransform();
         // Dịch chuyển đến tâm của nhân vật
         afx.translate(x, y );
-        afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
+        //afx.rotate(Math.toRadians(angle), 0, 0);// Xoay 1 độ angle với tâm là x, y
 
         // Create an Area from the transformed rectangle
         return new Area(afx.createTransformedShape(rectangle));

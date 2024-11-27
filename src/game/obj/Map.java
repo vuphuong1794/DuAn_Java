@@ -127,22 +127,18 @@ public class Map {
             if (enemy.getShape().intersects(wall)) { // Check if enemy's shape intersects the wall
                 // Check collision with the top of the wall
                 if (Math.abs(enemy.getY()-20 - (wall.getY() + wall.getHeight())) < threshold) {
-                    System.out.println("Colliding with wall up");
                     bounds.append("up,");
                 }
                 // Check collision with the bottom of the wall
                 if (Math.abs(enemy.getY()+20 - wall.getY()) < threshold) {
-                    System.out.println("Colliding with wall down");
                     bounds.append("down,");
                 }
                 // Check collision with the left of the wall
                 if (Math.abs(enemy.getX()-20 - (wall.getX() + wall.getWidth())) < threshold) {
-                    System.out.println("Colliding with wall left");
                     bounds.append("left,");
                 }
                 // Check collision with the right of the wall
                 if (Math.abs(enemy.getX()+20 - wall.getX()) < threshold) {
-                    System.out.println("Colliding with wall right");
                     bounds.append("right,");
                 }
             }
@@ -151,7 +147,6 @@ public class Map {
         // Remove the trailing comma for cleaner output
         if (bounds.length() > 0) {
             bounds.setLength(bounds.length() - 1); // Remove last comma
-            System.out.println("Zombie collide with: " + bounds);
         }
 
         return bounds.toString(); // Return all collision directions

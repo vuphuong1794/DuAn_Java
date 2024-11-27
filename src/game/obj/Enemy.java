@@ -55,7 +55,7 @@ public class Enemy {
         }
     }
     public void updateMovement(double playerX, double playerY, String collider) {
-        System.out.println("Enemy position: " + getX() + ", " + getY());
+        //System.out.println("Enemy position: " + getX() + ", " + getY());
 
         // Tính khoảng cách hiện tại đến player
         double distanceToPlayer = Math.sqrt(Math.pow(playerX - x, 2) + Math.pow(playerY - y, 2));
@@ -172,11 +172,12 @@ public class Enemy {
         int width = image.getWidth(null);
         int height = image.getHeight(null);
         g2.drawImage(image, -width / 2, -height / 2, null);
+        g2.rotate(Math.toRadians(-angle));
         Shape shape = getShape();
-
         // Gan gia tri hp cho Hprender
-        hpEnemey.hpRender(g2, shape,x, y);
+        hpEnemey.hpRender(g2, shape,x, y+10);
         g2.setTransform(oldTransform);
+        drawBorder(g2);
     }
 
     public double getX() {
@@ -200,7 +201,7 @@ public class Enemy {
         // Create a transformation for the enemy's position and angle
         AffineTransform afx = new AffineTransform();
         afx.translate(x, y ); // Move to enemy's center
-        afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around center
+        //afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around center
 
         // Return the transformed shape of the image area
         return new Area(afx.createTransformedShape(imageRect));

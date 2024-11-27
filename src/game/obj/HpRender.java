@@ -13,14 +13,14 @@ public class HpRender {
     }
 
     protected void hpRender(Graphics2D g2, Shape shape, double x,double y) {
-        if(hp.getCurrentHp()!=hp.getMAX_HP()) {
+            double hpx = shape.getBounds().getX() - x ;
             double hpY = shape.getBounds().getY() - y - 10;
+
             g2.setColor(new Color(70, 70, 70));
-            g2.fill(new Rectangle2D.Double(0, hpY, Player.PLAYER_SIZE, 2));
+            g2.fill(new Rectangle2D.Double(hpx, hpY, Player.PLAYER_SIZE, 2));
             g2.setColor(new Color(253, 91, 91));
             double hpSize = hp.getCurrentHp() / hp.getMAX_HP() * Player.PLAYER_SIZE;
-            g2.fill(new Rectangle2D.Double(0, hpY, hpSize, 2));
-        }
+            g2.fill(new Rectangle2D.Double(hpx, hpY, hpSize, 2));
     }
 
 
@@ -30,7 +30,12 @@ public class HpRender {
     }
 
     public void restoreHP(double HP) {
-        hp.setCurrentHp(hp.getCurrentHp()+HP);
+        if ( hp.getCurrentHp()+HP > hp.getMAX_HP()){
+            hp.setCurrentHp(hp.getMAX_HP());
+        }
+        else {
+            hp.setCurrentHp(hp.getCurrentHp() + HP);
+        }
     }
 
     public double getHP() {
@@ -41,8 +46,8 @@ public class HpRender {
         hp.setCurrentHp(hp.getMAX_HP());
     }
 
-    public void draw(Graphics2D g2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'draw'");
-    }
+//    public void draw(Graphics2D g2) {
+//        // TODO Auto-generated method stub
+//        throw new UnsupportedOperationException("Unimplemented method 'draw'");
+//    }
 }

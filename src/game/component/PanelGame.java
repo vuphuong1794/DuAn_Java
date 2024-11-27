@@ -121,7 +121,9 @@ public class PanelGame extends JComponent {
 
         initObjectGame();
         initKeyboard();
+
         //initGamepad();
+
         initBullets();
         thread.start();
     }
@@ -897,11 +899,10 @@ public class PanelGame extends JComponent {
 
     // Vẽ các đối tượng trong game
     private void drawGame() {
-
         try {
         if (player.isAlive()) {
             player.draw(g2); // Vẽ player
-            player.drawBorder(g2); // Vẽ player
+            //player.drawBorder(g2);
             gunEquip.drawGun(g2,player.getX(),player.getY(), player.getAngle(), gunEquip.getName());
         }
 
@@ -909,7 +910,7 @@ public class PanelGame extends JComponent {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
                 enemy.draw(g2); // Vẽ từng kẻ thù
-                enemy.drawBorder(g2); // Vẽ từng kẻ thù
+//                enemy.drawBorder(g2); // Vẽ từng kẻ thù
 
             }
         }
