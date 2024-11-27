@@ -831,7 +831,7 @@ public class PanelGame extends JComponent {
 
         // Vẽ hình ảnh bản đồ lên nền
         if (imagemap != null) {
-            g2.drawImage(imagemap, 0, 0, width, height, null); // Vẽ hình ảnh với kích thước của panel
+            g2.drawImage(imagemap, -1200, -900, width * 3, height * 3, null); // Vẽ hình ảnh với kích thước của panel
         } else {
             g2.setColor(new Color(30, 30, 30)); // Màu nền xám đậm nếu không tải được hình ảnh
             g2.fillRect(0, 0, width, height); // Vẽ hình chữ nhật với kích thước của panel

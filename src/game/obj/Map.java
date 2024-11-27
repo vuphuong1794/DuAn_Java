@@ -1,5 +1,6 @@
 package game.obj;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +11,18 @@ import java.awt.geom.Area;
 
 public class Map {
     private List<Rectangle> walls;
-
+    private Image wallImage;
     public Map() {
         walls = new ArrayList<>();
 
-        createWallWidth(0, 200, 100, 3);
-        createWallHeight(830, 0, 100, 4);
+        createWallWidth(0, 200, 50, 6);
+        createWallWidth(200, 600, 50, 3);
+        createWallWidth(950, 550, 50, 3);
+        createWallWidth(1400, 700, 50, 3);
+        createWallHeight(500, 300, 50, 1);
+        createWallHeight(1200, 300, 50, 3);
+        createWallHeight(830, 50, 50, 7);
+        createWallHeight(600, 600, 50, 8);
     }
 
     // Phương thức lấy danh sách tường
@@ -24,26 +31,53 @@ public class Map {
     }
     public void createWallWidth(int startX, int startY, int length, int numberOfWall){
         for (int i=1;i<=numberOfWall;i++){
-            walls.add(new Rectangle(startX, startY, length, length));  // Tường ngang 1
-            startX =i*length;
-        }
 
+            walls.add(new Rectangle(startX, startY, length, length));  // Tường ngang
+            startX = startX + length;
+        }
     }
 
     public void createWallHeight(int startX, int startY, int length, int numberOfWall) {
         for (int i = 1; i <= numberOfWall; i++) {
-            walls.add(new Rectangle(startX, startY, length, length));  // Tường ngang 1
-            startY = i * length;
-        }
-    }
-    // Vẽ bản đồ và các tường
-    public void draw(Graphics2D g2) {
-        g2.setColor(new java.awt.Color(255, 0, 0, 100)); // Màu đỏ với alpha = 0 (hoàn toàn trong suốt)
-        for (Rectangle wall : walls) {
-            g2.fill(wall);
+            walls.add(new Rectangle(startX, startY, length, length));  // Tường dọc
+            startY = startY + length;
         }
     }
 
+    // Vẽ bản đồ và các tường
+//    public void draw(Graphics2D g2) {
+//        g2.setColor(new java.awt.Color(255, 0, 0, 100)); // Màu đỏ với alpha = 0 (hoàn toàn trong suốt)
+//        for (Rectangle wall : walls) {
+//            g2.fill(wall);
+//        }
+//    }
+    public void draw(Graphics2D g2) {
+        // Kiểm tra nếu ảnh tường đã được tải
+        if (wallImage == null) {
+            wallImage = loadImage("/game/image/wall.png");  // Tải hình ảnh tường (thay đường dẫn)
+        }
+
+        for (Rectangle wall : walls) {
+            // Vẽ ảnh tường thay cho hình chữ nhật màu đỏ
+            if (wallImage != null) {
+                g2.drawImage(wallImage, wall.x, wall.y, wall.width, wall.height, null);
+            } else {
+                // Nếu không tải được ảnh, vẽ hình chữ nhật với màu đỏ
+                g2.setColor(new Color(255, 0, 0, 100)); // Màu đỏ với alpha
+                g2.fill(wall);
+            }
+        }
+    }
+    // Phương thức tải hình ảnh và xử lý lỗi nếu có
+    private Image loadImage(String path) {
+        try {
+            return new ImageIcon(getClass().getResource(path)).getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Không tải được map");
+            return null; // Trả về null nếu xảy ra lỗi khi tải hình ảnh
+        }
+    }
     // Kiểm tra va chạm giữa đạn và tường
     public boolean isBulletCollidingWithWall(Bullet bullet) {
         for (Rectangle wall : walls) {
