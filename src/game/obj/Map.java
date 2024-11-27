@@ -14,8 +14,11 @@ public class Map {
     public Map() {
         walls = new ArrayList<>();
 
-        createWallWidth(0, 200, 100, 3);
-        createWallHeight(830, 0, 100, 4);
+        createWallWidth(0, 200, 30, 3);
+        createWallHeight(830, 0, 30, 4);
+        createWallWidth(0, 500, 30, 3);
+        createWallHeight(5, 600, 30, 4);
+
     }
 
     // Phương thức lấy danh sách tường
