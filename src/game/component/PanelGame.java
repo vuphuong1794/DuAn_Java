@@ -1,5 +1,6 @@
 package game.component;
 
+
 import game.obj.*;
 import game.obj.item.Item;
 import game.obj.sound.sound;
@@ -13,19 +14,16 @@ import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Component;
-
 public class PanelGame extends JComponent {
 
     private Controller ps5Controller;
@@ -123,41 +121,23 @@ public class PanelGame extends JComponent {
 
         initObjectGame();
         initKeyboard();
+        //initGamepad();
         initBullets();
         thread.start();
-    }
-
-    public void savePlayerScore() {
-        String url = "jdbc:mysql://localhost:3306/zombiedoomdays";
-        String user = "root";
-        String password = "";
-
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO game_scores (player_name, score, play_time) VALUES (?, ?, ?)")) {
-
-            System.out.println("test loi 1");
-            preparedStatement.setString(1, playerName);
-            System.out.println("test loi 2");
-            preparedStatement.setInt(2, score);
-            System.out.println("test loi 3");
-            preparedStatement.setLong(3, finalElapsedTime != null ? finalElapsedTime : 0);
-            System.out.println("test loi 4");
-
-            preparedStatement.executeUpdate();
-
-            System.out.println("test loi");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     private void initGamepad() {
         // Detect PS5 controller
         Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
-        for (Controller controller : controllers) {
-            if (controller.getName().contains("DualSense") || controller.getName().contains("PS5 Controller")) {
-                ps5Controller = controller;
+
+        while (true){
+            for (Controller controller : controllers) {
+                if (controller.getName().contains("DualSense") || controller.getName().contains("PS5 Controller")) {
+                    ps5Controller = controller;
+                    break;
+                }
+            }
+            if (ps5Controller != null) {
                 break;
             }
         }
@@ -179,6 +159,7 @@ public class PanelGame extends JComponent {
 
                         // Horizontal movement
                         if (stickXValue > deadzone) {
+                            System.out.println("OMG. it work");
                             key.setKey_right(true);
                             key.setKey_left(false);
                         } else if (stickXValue < -deadzone) {
@@ -211,7 +192,8 @@ public class PanelGame extends JComponent {
                         // Shooting (R1 button)
                         if (r1Button != null && r1Button.getPollData() > 0.5f) {
                             key.setMouseLeftClick(true);
-                        } else {
+                        }
+                        else {
                             key.setMouseLeftClick(false);
                         }
 
@@ -250,6 +232,65 @@ public class PanelGame extends JComponent {
         }
     }
 
+    public void displayTop5Players(Graphics2D g2) {
+        String url = "jdbc:mysql://localhost:3306/zombiedoomdays";
+        String user = "root";
+        String password = "";
+
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             Statement statement = connection.createStatement()) {
+
+            // Truy vấn 5 người chơi có điểm cao nhất
+            String query = "SELECT player_name, score FROM game_scores ORDER BY score DESC LIMIT 5";
+            ResultSet resultSet = statement.executeQuery(query);
+
+            // Vẽ thông tin top 5 người chơi
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.PLAIN, 20));
+
+            int yPosition = height / 2 + 120; // Vị trí y để hiển thị thông tin
+            g2.drawString("Top 5 Player Has High Scores:", width / 2 - 90, yPosition);
+            yPosition += 30; // Tăng khoảng cách cho các mục
+
+            // Duyệt qua kết quả và hiển thị thông tin
+            int rank = 1;
+            while (resultSet.next() && rank <= 5) {
+                String playerName = resultSet.getString("player_name");
+                int score = resultSet.getInt("score");
+                g2.drawString(rank + ". " + playerName + " - " + score, width / 2 - 90, yPosition);
+                yPosition += 30; // Tăng khoảng cách
+                rank++;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void savePlayerScore() {
+        String url = "jdbc:mysql://localhost:3306/zombiedoomdays";
+        String user = "root";
+        String password = "";
+
+        try (Connection connection = DriverManager.getConnection(url, user, password);
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "INSERT INTO game_scores (player_name, score, play_time) VALUES (?, ?, ?)")) {
+
+            System.out.println("test loi 1");
+            preparedStatement.setString(1, playerName);
+            System.out.println("test loi 2");
+            preparedStatement.setInt(2, score);
+            System.out.println("test loi 3");
+            preparedStatement.setLong(3, finalElapsedTime != null ? finalElapsedTime : 0);
+            System.out.println("test loi 4");
+
+            preparedStatement.executeUpdate();
+
+            System.out.println("test loi");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     //Minimap
     private void drawMinimap() {
@@ -285,10 +326,15 @@ public class PanelGame extends JComponent {
 
         // Draw items (as yellow dots)
         mg.setColor(Color.YELLOW);
-        for (Item item : items) {
-            int itemMinimapX = (int) (item.getX() * scaleX);
-            int itemMinimapY = (int) (item.getY() * scaleY);
-            mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
+        try {
+            for (Item item : items) {
+                int itemMinimapX = (int) (item.getX() * scaleX);
+                int itemMinimapY = (int) (item.getY() * scaleY);
+                mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
+            }
+        }
+        catch ( Exception exception){
+            System.out.println(exception);
         }
 
         mg.dispose();
@@ -525,7 +571,6 @@ public class PanelGame extends JComponent {
                 if (player.isAlive()) {
                     //System.out.println("Player is alive");
                     float speed = 1f; // Movement speed
-
                     // Player movement
                     if (key.isKey_left()) {
                         if ((!map.checkCollision(player).contains("left")) ) {
@@ -673,7 +718,6 @@ public class PanelGame extends JComponent {
                 }
             }
         }).start();
-        initGamepad();
     }
 
     private void checkBullets(Bullet bullet){
@@ -908,10 +952,10 @@ public class PanelGame extends JComponent {
 
             // Vẽ hộp thông báo
             g2.setColor(new Color(30, 30, 30, 200)); // Hộp nền màu xám mờ
-            g2.fillRoundRect(width / 2 - 300, height / 2 - 120, 600, 250, 20, 20);
+            g2.fillRoundRect(width / 2 - 300, height / 2 - 120, 600, 450, 20, 20);
 
             g2.setColor(Color.WHITE); // Viền hộp
-            g2.drawRoundRect(width / 2 - 300, height / 2 - 120, 600, 250, 20, 20);
+            g2.drawRoundRect(width / 2 - 300, height / 2 - 120, 600, 450, 20, 20);
 
             // Thông tin điểm số
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
@@ -930,6 +974,8 @@ public class PanelGame extends JComponent {
             g2.setFont(new Font("Arial", Font.BOLD, 25));
             g2.setColor(Color.WHITE);
             g2.drawString("Press Enter to restart game!", width / 2 - 220, height / 2 + 80);
+
+            displayTop5Players(g2);
         }
     }
 

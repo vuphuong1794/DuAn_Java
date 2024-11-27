@@ -20,7 +20,15 @@ public class Enemy extends HpRender  {
     private double targetX, targetY;  // Vị trí mục tiêu mà enemy sẽ di chuyển đến
     private static final float ROTATION_SPEED = 2.0f; // Tốc độ xoay của enemy
     private static final int MIN_DISTANCE = 150; // Khoảng cách tối thiểu với player
+
+
+    private boolean collideLeft;
+    private boolean collideRight;
+    private boolean collideUp;
+    private boolean collideDown;
     public Enemy()  {
+
+
         // Them HP cho Enemy
         super( new HP(20,20));
         Random random = new Random();
@@ -35,6 +43,8 @@ public class Enemy extends HpRender  {
         p.lineTo(ENEMY_SIZE-5, ENEMY_SIZE-13);
         p.lineTo(15, ENEMY_SIZE-10);
         enemyShape = new Area(p);
+
+        setCollideFalse();
 
     }
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
@@ -95,36 +105,36 @@ public class Enemy extends HpRender  {
         }
 
         //Check va chạm để di chuyển cho đúng
-        if (collider.contains("up")){
-            // Di chuyển enemy
-            x += Math.cos(Math.toRadians(angle)) * currentSpeed;
-            if (Math.sin(Math.toRadians(angle))>=0) {
-                y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+        if (collider.contains("up")||collider.contains("down")||collider.contains("left")||collider.contains("right")) {
+            if (collider.contains("up")) {
+                // Di chuyển enemy
+                if (Math.sin(Math.toRadians(angle)) > 0) {
+                    y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+                }
+
+            }
+            else if (collider.contains("down")) {
+                if (Math.sin(Math.toRadians(angle)) < 0) {
+                    y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+                }
             }
 
-        }
-        else if (collider.contains("down")){
-            x += Math.cos(Math.toRadians(angle)) * currentSpeed;
-            if (Math.sin(Math.toRadians(angle))<=0) {
-                y += Math.sin(Math.toRadians(angle)) * currentSpeed;
-            }
+            if (collider.contains("left")) {
+                if (Math.sin(Math.toRadians(angle)) > 0) {
+                    x += Math.sin(Math.toRadians(angle)) * currentSpeed;
+                }
+                else if (Math.sin(Math.toRadians(angle)) ==0 ) {
 
-        }
-        else if (collider.contains("left")){
-            if (Math.sin(Math.toRadians(angle))>=0) {
-                x += Math.sin(Math.toRadians(angle)) * currentSpeed;
+                }
             }
-            y += Math.sin(Math.toRadians(angle)) * currentSpeed;
-
-        }
-        else if (collider.contains("right")){
-            if (Math.sin(Math.toRadians(angle))<=0) {
-                x += Math.sin(Math.toRadians(angle)) * currentSpeed;
+            else if (collider.contains("right")) {
+                if (Math.sin(Math.toRadians(angle)) < 0) {
+                    x += Math.sin(Math.toRadians(angle)) * currentSpeed;
+                }
             }
-            y += Math.sin(Math.toRadians(angle)) * currentSpeed;
-
         }
         else {
+            setCollideFalse();
             x += Math.cos(Math.toRadians(angle)) * currentSpeed;
             y += Math.sin(Math.toRadians(angle)) * currentSpeed;
         }
@@ -224,6 +234,13 @@ public class Enemy extends HpRender  {
 
         // If out of bounds, return false to mark for removal
         return !isOutOfBounds;
+    }
+
+    void setCollideFalse(){
+        collideRight=false;
+        collideDown=false;
+        collideLeft=false;
+        collideUp=false;
     }
 
 }

@@ -200,6 +200,14 @@ public class Player extends HpRender {
         return (float) y;
     }
 
+    public float getHeight(){
+        return image.getHeight(null);
+    }
+
+    public float getWidth(){
+        return image.getWidth(null);
+    }
+
     public float getAngle() {
         return angle;
     }
