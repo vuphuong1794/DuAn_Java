@@ -13,17 +13,24 @@ public class Item {
     private Shape shape;
     private final BufferedImage image; // Hình ảnh cho item
     private boolean isCollected = false;
-    private int type; // 0: Đạn thường, 1: Đạn lớn
+    private int type; // 0: Đạn trường, 1: Đạn Sniper, 2:Đạn grenade, 3:Health potion
 
-    public Item(double x, double y) {
+    public Item(double x, double y, int type) {
         this.x = x;
         this.y = y;
         this.type = type;
+
         // Tạo hình dạng cho item (hình tròn)
         shape = new Ellipse2D.Double(x, y, ITEM_SIZE, ITEM_SIZE);
-
         // Load hình ảnh dựa vào loại item
-        String imagePath = "/game/image/BulletCircle.png";
+        String imagePath;
+        if (this.getType() == 3) {
+            imagePath = "/game/image/Medkit.png";
+        }
+        else {
+            imagePath = "/game/image/BulletCircle.png";
+        }
+        System.out.println(imagePath);
         image = loadImage(imagePath);
     }
 

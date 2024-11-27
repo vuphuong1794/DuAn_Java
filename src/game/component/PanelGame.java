@@ -289,6 +289,7 @@ public class PanelGame extends JComponent {
                 sleep(3000); // Mỗi 3 giây thêm kẻ thù mới
 
                 if (items.size() < MAX_ITEMS) {
+                    System.out.println("items is created");
                     addRandomItem();
                 }
                 sleep(5000); // 5 giây tạo 1 item mới nếu chưa đạt max
@@ -305,27 +306,29 @@ public class PanelGame extends JComponent {
         double x = margin + rand.nextDouble() * (width - 2 * margin - Item.ITEM_SIZE);
         double y = margin + rand.nextDouble() * (height - 2 * margin - Item.ITEM_SIZE);
 
-        items.add(new Item(x, y));
+        int randomItem = (int)(Math.random() * 4); // 0 to 100
+        System.out.println("items is created at "+x+" "+y+" with type "+randomItem);
+        items.add(new Item(x, y, randomItem));
     }
 
     private void resetGame(){
         score=0;
         items.clear();
-//        GunList.clear();
         enemies.clear();
         bullets.clear();
         player.changeLocation(300, 300);
         player.reset();
         ammoCount = 0;
         startTime = System.nanoTime();
+        finalElapsedTime=null;
 
     }
 
-        private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
-            // Tính toán âm lượng dựa trên vị trí chuột
-            float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
-            Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
-        }
+    private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
+        // Tính toán âm lượng dựa trên vị trí chuột
+        float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
+        Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
+    }
 
     private void initKeyboard() {
         key = new Key();
@@ -440,8 +443,6 @@ public class PanelGame extends JComponent {
                     if (key.isKey_up()) {
                         if (!map.checkCollision(player).contains("up")) {
                             player.changeLocation(player.getX(), player.getY() - speed);
-                            System.out.println("player is move up");
-
                         }
                         else {
                             System.out.println("up is prevent");
@@ -460,8 +461,8 @@ public class PanelGame extends JComponent {
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-                        // System.out.println("mouse position is not null");
-                        // System.out.println(mousePosition.x+"  "+mousePosition.y);
+                         //System.out.println("mouse position is not null");
+                         //System.out.println(mousePosition.x+"  "+mousePosition.y);
 
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
@@ -661,7 +662,6 @@ public class PanelGame extends JComponent {
             }
         }
     }
-
     // Vẽ nền game
     private void drawBackground() {
         // Tải hình ảnh bản đồ nếu chưa được tải
@@ -733,6 +733,8 @@ public class PanelGame extends JComponent {
     private void drawGame() {
         if (player.isAlive()) {
             player.draw(g2); // Vẽ player
+            player.drawBorder(g2); // Vẽ player
+
             gunEquip.drawGun(g2,player.getX(),player.getY(), player.getAngle(), gunEquip.getName());
         }
 
@@ -740,6 +742,8 @@ public class PanelGame extends JComponent {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
                 enemy.draw(g2); // Vẽ từng kẻ thù
+                enemy.drawBorder(g2); // Vẽ từng kẻ thù
+
             }
         }
         for (int i = 0; i < bullets.size(); i++) {
@@ -836,17 +840,22 @@ public class PanelGame extends JComponent {
                 // Tính phần giao của hình dạng player và item
                 area.intersect(new Area(item.getShape()));
                 // Nếu có va chạm (phần giao không rỗng)
-                if (!area.isEmpty()) {
+                if (!area.isEmpty() && item.getType()!=3) {
                     // Đánh dấu item đã được thu thập
                     item.collect();
-                    int randomGun = (int)(Math.random() * 4); // 0 to 100
-                    int randomBullet = (int)(Math.random() * 30);
+                    int randomGun = (int) (Math.random() * 4); // 0 to 100
+                    int randomBullet = (int) (Math.random() * 30);
                     GunList.get(randomGun).addCurrentAmmo(randomBullet);
-
-                    //Sound.soundCollectItem(); // Thêm âm thanh nhặt item
                     // Xóa item khỏi danh sách
                     iterator.remove();
                 }
+                else if (!area.isEmpty() && item.getType()==3){
+                    item.collect();
+                    player.updateHP(20);
+                    // Xóa item khỏi danh sách
+                    iterator.remove();
+                }
+
             }
         }
     }
