@@ -31,8 +31,8 @@
 
 ```plaintext
 W,A,S,D - Di chuyển
-J - Bắn đạn thường
-K - Bắn đạn phóng lựu
+1, 2, 3, 4 - Chuyển đổi súng
+Chuột trái - Bắn súng
 ```
 
 ## 📥 Cài đặt
