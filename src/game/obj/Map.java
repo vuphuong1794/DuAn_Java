@@ -14,20 +14,28 @@ public class Map {
     public Map() {
         walls = new ArrayList<>();
 
-        // Tạo các bức tường cố định
-        walls.add(new Rectangle(0, 160, 490, 88));  // Tường ngang 1
-        walls.add(new Rectangle(330, 0, 160, 240)); // Tường dọc 1
-        walls.add(new Rectangle(735, 0, 30, 240)); // Tường dọc 2
-        walls.add(new Rectangle(735, 220, 605, 20)); // Tường ngang 2
-        walls.add(new Rectangle(925, 240, 45, 290)); // Tường dọc 3
-        walls.add(new Rectangle(920, 715, 45, 290)); // Tường dọc 4
+        createWallWidth(0, 200, 100, 3);
+        createWallHeight(830, 0, 100, 4);
     }
 
     // Phương thức lấy danh sách tường
     public List<Rectangle> getWalls() {
         return walls;
     }
+    public void createWallWidth(int startX, int startY, int length, int numberOfWall){
+        for (int i=1;i<=numberOfWall;i++){
+            walls.add(new Rectangle(startX, startY, length, length));  // Tường ngang 1
+            startX =i*length;
+        }
 
+    }
+
+    public void createWallHeight(int startX, int startY, int length, int numberOfWall) {
+        for (int i = 1; i <= numberOfWall; i++) {
+            walls.add(new Rectangle(startX, startY, length, length));  // Tường ngang 1
+            startY = i * length;
+        }
+    }
     // Vẽ bản đồ và các tường
     public void draw(Graphics2D g2) {
         g2.setColor(new java.awt.Color(255, 0, 0, 100)); // Màu đỏ với alpha = 0 (hoàn toàn trong suốt)

@@ -130,7 +130,7 @@ public class Player extends HpRender {
     public void draw(Graphics2D g2) {
         // Save the current transformation state
         AffineTransform oldTransform = g2.getTransform();
-
+        //System.out.println("Player position: " + getX() + ", " + getY());
         // Transform to the player's position and rotation
         g2.translate(x, y);
         g2.rotate(Math.toRadians(angle - 90));
@@ -166,7 +166,7 @@ public class Player extends HpRender {
         }
         g2.scale(1, 1);
         // Render health bar or other overlays
-        hpRender(g2, getShape(), PLAYER_SIZE);
+        hpRender(g2, getShape(),x, y);
 
         // Restore the original transformation state
         g2.setTransform(oldTransform);

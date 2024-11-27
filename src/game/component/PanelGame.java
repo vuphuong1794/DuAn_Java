@@ -347,36 +347,44 @@ public class PanelGame extends JComponent {
     // Thêm kẻ thù vào game
     private void addEnemy() {
         Sound.soundZombie();
-        if (enemies.size() >= 30) {
+        if (enemies.size() >= 1) {
             return; // If there are already 20 enemies, do not add more
         }
         Random ran = new Random();
         int margin = 50;
         int enemySize = 100;
+        int spawnDirection = ran.nextInt(4) + 1; // Random number between 1 and 4
+        Enemy enemy = new Enemy();
 
-        int locationY1 = ran.nextInt(height - enemySize - 2 * margin) + margin;
-        Enemy enemyLeft = new Enemy();
-        enemyLeft.changeLocation(-enemySize + 5, locationY1); // đứng gần cạnh viền
-        enemyLeft.changeAngle(0);
-        enemies.add(enemyLeft);
+        switch (spawnDirection) {
+            case 1: // Spawn enemy on the left
+                int locationY1 = ran.nextInt(height - enemySize - 2 * margin) + margin;
+                enemy.changeLocation(-enemySize + 5, locationY1); // Near the left edge
+                enemy.changeAngle(0); // Moving right
+                break;
 
-        int locationY2 = ran.nextInt(height - enemySize - 2 * margin) + margin;
-        Enemy enemyRight = new Enemy();
-        enemyRight.changeLocation(width - 10, locationY2);
-        enemyRight.changeAngle(180); // Moving left
-        enemies.add(enemyRight);
+            case 2: // Spawn enemy on the right
+                int locationY2 = ran.nextInt(height - enemySize - 2 * margin) + margin;
+                enemy.changeLocation(width - 10, locationY2); // Near the right edge
+                enemy.changeAngle(180); // Moving left
+                break;
 
-        int locationX3 = ran.nextInt(width - enemySize - 2 * margin) + margin;
-        Enemy enemyTop = new Enemy();
-        enemyTop.changeLocation(locationX3, -enemySize + 10);
-        enemyTop.changeAngle(90); // Moving down
-        enemies.add(enemyTop);
+            case 3: // Spawn enemy on the top
+                int locationX3 = ran.nextInt(width - enemySize - 2 * margin) + margin;
+                enemy.changeLocation(locationX3, -enemySize + 10); // Near the top edge
+                enemy.changeAngle(90); // Moving down
+                break;
 
-        int locationX4 = ran.nextInt(width - enemySize - 2 * margin) + margin;
-        Enemy enemyBottom = new Enemy();
-        enemyBottom.changeLocation(locationX4, height - 10);
-        enemyBottom.changeAngle(270); // Moving up
-        enemies.add(enemyBottom);
+            case 4: // Spawn enemy on the bottom
+                int locationX4 = ran.nextInt(width - enemySize - 2 * margin) + margin;
+                enemy.changeLocation(locationX4, height - 10); // Near the bottom edge
+                enemy.changeAngle(270); // Moving up
+                break;
+        }
+
+// Add the new enemy to the list
+        enemies.add(enemy);
+
     }
 
     // Khởi tạo các đối tượng trong game
@@ -638,52 +646,50 @@ public class PanelGame extends JComponent {
         // Shooting logic thread
         new Thread(() -> {
             while (start) {
-                if (key.isKey_1() && GunList.size() > 0) {
-                    gunEquip = GunList.get(0); // Equip the first gun
-                }
-                else if (key.isKey_2() && GunList.size() > 1) {
-                    gunEquip = GunList.get(1); // Equip the second gun
-                }
-                else if (key.isKey_3() && GunList.size() > 2) {
-                    gunEquip = GunList.get(2); // Equip the third gun
-                }
-                else if (key.isKey_4() && GunList.size() > 3) {
-                    gunEquip = GunList.get(3); // Equip the third gun
-                }
-                else {
-                    gunEquip = GunList.get(0); // Equip the first gun
-                }
+                if (player.isAlive()) {
+                    if (key.isKey_1() && GunList.size() > 0) {
+                        gunEquip = GunList.get(0); // Equip the first gun
+                    } else if (key.isKey_2() && GunList.size() > 1) {
+                        gunEquip = GunList.get(1); // Equip the second gun
+                    } else if (key.isKey_3() && GunList.size() > 2) {
+                        gunEquip = GunList.get(2); // Equip the third gun
+                    } else if (key.isKey_4() && GunList.size() > 3) {
+                        gunEquip = GunList.get(3); // Equip the third gun
+                    } else {
+                        gunEquip = GunList.get(0); // Equip the first gun
+                    }
 
-                if (key.isMouseLeftClick() && (mousePosition.x>280 || mousePosition.x<135 || mousePosition.y>105 || mousePosition.y<85)) {
-                    long currentTime = System.currentTimeMillis();
-                    if (shotTime == 0) {
-                        switch (gunEquip.getName()) {
-                            case "pistol" -> {
-                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),40,8));
-                            }
-                            case "rifle" -> {
-                                if (gunEquip.getCurrentAmmo()>0){
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+                    if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
+                        long currentTime = System.currentTimeMillis();
+                        if (shotTime == 0) {
+                            switch (gunEquip.getName()) {
+                                case "pistol" -> {
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8));
+                                }
+                                case "rifle" -> {
+                                    if (gunEquip.getCurrentAmmo() > 0) {
+                                        bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8));
+                                    }
+                                }
+                                case "sniper" -> {
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8));
+
+                                }
+                                case "grenade" -> {
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8));
                                 }
                             }
-                            case "sniper" -> {
-                                bullets.add( gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
-
-                            }
-                            case "grenade" -> {
-                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
-                            }
+                        }
+                        shotTime++;
+                        if (shotTime == 15) {
+                            shotTime = 0;
                         }
                     }
-                    shotTime++;
-                    if (shotTime == 15) {
-                        shotTime = 0;
+                    try {
+                        Thread.sleep(10); // Sleep to prevent CPU overload
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                }
-                try {
-                    Thread.sleep(10); // Sleep to prevent CPU overload
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }).start();
@@ -822,6 +828,12 @@ public class PanelGame extends JComponent {
                     Bullet bullet = bulletsCopy.get(i);
                     if (bullet != null) {
                         bullet.update(); // Cập nhật vị trí của viên đạn
+                        if (map.isBulletCollidingWithWall(bullet)){
+                            synchronized (bullets) {
+                                bullets.remove(bullet);
+                            }
+                            continue;
+                        }
                         checkBullets(bullet); //kiểm tra nếu viên đạn bắn trúng zombie
                         // Kiểm tra nếu viên đạn còn trong khung hình
                         if (!bullet.check(width, height)) {
@@ -884,8 +896,6 @@ public class PanelGame extends JComponent {
                 item.draw(g2);
             }
         }
-
-            System.out.println("It good");
         }
         catch (Exception exception){
             System.out.println(exception.getMessage());

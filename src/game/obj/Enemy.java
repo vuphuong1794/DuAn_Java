@@ -58,6 +58,8 @@ public class Enemy extends HpRender  {
         }
     }
     public void updateMovement(double playerX, double playerY, String collider) {
+        System.out.println("Enemy position: " + getX() + ", " + getY());
+
         // Tính khoảng cách hiện tại đến player
         double distanceToPlayer = Math.sqrt(Math.pow(playerX - x, 2) + Math.pow(playerY - y, 2));
 
@@ -120,7 +122,7 @@ public class Enemy extends HpRender  {
                     y += Math.sin(Math.toRadians(angle)) * currentSpeed;
                 }
             }
-            if (!collideUp)  {
+            else  {
                 y += Math.sin(Math.toRadians(angle)) * currentSpeed;
             }
 
@@ -136,7 +138,7 @@ public class Enemy extends HpRender  {
                     x += Math.sin(Math.toRadians(angle)) * currentSpeed;
                 }
             }
-            if (!collideUp)  {
+            else  {
                 x += Math.sin(Math.toRadians(angle)) * currentSpeed;
             }
         }
@@ -176,7 +178,7 @@ public class Enemy extends HpRender  {
         Shape shape = getShape();
 
         // Gan gia tri hp cho Hprender
-        hpRender(g2, shape, y);
+        hpRender(g2, shape,x, y);
         g2.setTransform(oldTransform);
     }
 
