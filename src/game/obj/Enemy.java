@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.util.List;
 import java.util.Random;
 import java.awt.geom.Path2D;
 
