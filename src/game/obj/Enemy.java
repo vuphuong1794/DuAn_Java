@@ -107,30 +107,36 @@ public class Enemy extends HpRender  {
         //Check va chạm để di chuyển cho đúng
         if (collider.contains("up")||collider.contains("down")||collider.contains("left")||collider.contains("right")) {
             if (collider.contains("up")) {
+                collideUp = true;
                 // Di chuyển enemy
                 if (Math.sin(Math.toRadians(angle)) > 0) {
                     y += Math.sin(Math.toRadians(angle)) * currentSpeed;
                 }
-
             }
             else if (collider.contains("down")) {
+                collideDown = true;
                 if (Math.sin(Math.toRadians(angle)) < 0) {
                     y += Math.sin(Math.toRadians(angle)) * currentSpeed;
                 }
             }
+            if (!collideUp)  {
+                y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+            }
 
             if (collider.contains("left")) {
+                collideLeft = true;
                 if (Math.sin(Math.toRadians(angle)) > 0) {
                     x += Math.sin(Math.toRadians(angle)) * currentSpeed;
                 }
-                else if (Math.sin(Math.toRadians(angle)) ==0 ) {
-
-                }
             }
             else if (collider.contains("right")) {
+                collideRight = true;
                 if (Math.sin(Math.toRadians(angle)) < 0) {
                     x += Math.sin(Math.toRadians(angle)) * currentSpeed;
                 }
+            }
+            if (!collideUp)  {
+                x += Math.sin(Math.toRadians(angle)) * currentSpeed;
             }
         }
         else {

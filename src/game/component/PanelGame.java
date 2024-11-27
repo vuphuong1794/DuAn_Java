@@ -881,6 +881,8 @@ public class PanelGame extends JComponent {
 
     // Vẽ các đối tượng trong game
     private void drawGame() {
+
+        try {
         if (player.isAlive()) {
             player.draw(g2); // Vẽ player
             player.drawBorder(g2); // Vẽ player
@@ -913,6 +915,13 @@ public class PanelGame extends JComponent {
                 item.draw(g2);
             }
         }
+
+            System.out.println("It good");
+        }
+        catch (Exception exception){
+            System.out.println(exception.getMessage());
+        };
+
 
         //hiển thị trạng thái
         g2.setColor(Color.WHITE);
