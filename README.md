@@ -48,8 +48,8 @@ K - Bắn đạn phóng lựu
 - [x] v0.1 - Test
   - [x] Hệ thống bắn súng đơn giản
   - [x] AI zombie đơn giản
-  - [ ] Hệ thống nhặt đạn, vật phẩm
-  - [ ] Lưu điểm mà người chơi đạt được trong CSDL
+  - [x] Hệ thống nhặt đạn, vật phẩm
+  - [x] Lưu điểm mà người chơi đạt được trong CSDL
 
 - [ ] v0.2 - Beta
   - [ ] Hệ thống bắn súng nâng cao
