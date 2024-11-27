@@ -77,33 +77,42 @@ public class Map {
         return ""; // Không có va chạm
     }
 
-    // Kiểm tra va chạm giữa enemy và tường
     public String isEnemyCollidingWithWall(Enemy enemy) {
         StringBuilder bounds = new StringBuilder();
+        double threshold = 1.0; // Allow for small inaccuracies in position comparison
+
         for (Rectangle wall : walls) {
-            if (enemy.getShape().getBounds().intersects(wall)) {
-                // Kiểm tra va chạm trên
-                if (enemy.getY()== wall.getY() + wall.getHeight()) {
-                    bounds.append("up");
+            if (enemy.getShape().intersects(wall)) { // Check if enemy's shape intersects the wall
+                // Check collision with the top of the wall
+                if (Math.abs(enemy.getY()-20 - (wall.getY() + wall.getHeight())) < threshold) {
+                    System.out.println("Colliding with wall up");
+                    bounds.append("up,");
                 }
-                // Kiểm tra va chạm dưới
-                if (enemy.getY() == wall.getY()) {
-                    bounds.append("down");
+                // Check collision with the bottom of the wall
+                if (Math.abs(enemy.getY()+20 - wall.getY()) < threshold) {
+                    System.out.println("Colliding with wall down");
+                    bounds.append("down,");
                 }
-                // Kiểm tra va chạm trái
-                if (enemy.getX() == wall.getX() + wall.getWidth()) {
-                    bounds.append("left");
+                // Check collision with the left of the wall
+                if (Math.abs(enemy.getX()-20 - (wall.getX() + wall.getWidth())) < threshold) {
+                    System.out.println("Colliding with wall left");
+                    bounds.append("left,");
                 }
-                // Kiểm tra va chạm phải
-                if (enemy.getX() == wall.getX()) {
-                    bounds.append("right");
+                // Check collision with the right of the wall
+                if (Math.abs(enemy.getX()+20 - wall.getX()) < threshold) {
+                    System.out.println("Colliding with wall right");
+                    bounds.append("right,");
                 }
-                if (bounds.toString()!="") {
-                    System.out.println("zombie collide with "+bounds.toString());
-                }
-                return bounds.toString(); // Trả về hướng va chạm
             }
         }
-        return ""; // Không có va chạm
+
+        // Remove the trailing comma for cleaner output
+        if (bounds.length() > 0) {
+            bounds.setLength(bounds.length() - 1); // Remove last comma
+            System.out.println("Zombie collide with: " + bounds);
+        }
+
+        return bounds.toString(); // Return all collision directions
     }
+
 }

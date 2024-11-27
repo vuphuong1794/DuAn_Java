@@ -1,5 +1,6 @@
 package game.component;
 
+
 import game.obj.*;
 import game.obj.item.Item;
 import game.obj.sound.sound;
@@ -22,7 +23,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Component;
 public class PanelGame extends JComponent {
+
+    private Controller ps5Controller;
 
     private Graphics2D g2;
     private BufferedImage image;
@@ -117,9 +124,117 @@ public class PanelGame extends JComponent {
 
         initObjectGame();
         initKeyboard();
+        //initGamepad();
         initBullets();
         thread.start();
     }
+
+    private void initGamepad() {
+        // Detect PS5 controller
+        Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
+
+        while (true){
+            for (Controller controller : controllers) {
+                if (controller.getName().contains("DualSense") || controller.getName().contains("PS5 Controller")) {
+                    ps5Controller = controller;
+                    break;
+                }
+            }
+            if (ps5Controller != null) {
+                break;
+            }
+        }
+
+        if (ps5Controller != null) {
+            // Add a gamepad input thread
+            new Thread(() -> {
+                while (start) {
+                    if (ps5Controller.poll()) {
+                        // Movement using left analog stick
+                        Component leftStickX = ps5Controller.getComponent(Component.Identifier.Axis.X);
+                        Component leftStickY = ps5Controller.getComponent(Component.Identifier.Axis.Y);
+
+                        float stickXValue = leftStickX.getPollData();
+                        float stickYValue = leftStickY.getPollData();
+
+                        // Deadzone to prevent drift
+                        float deadzone = 0.2f;
+
+                        // Horizontal movement
+                        if (stickXValue > deadzone) {
+                            System.out.println("OMG. it work");
+                            key.setKey_right(true);
+                            key.setKey_left(false);
+                        } else if (stickXValue < -deadzone) {
+                            key.setKey_left(true);
+                            key.setKey_right(false);
+                        } else {
+                            key.setKey_left(false);
+                            key.setKey_right(false);
+                        }
+
+                        // Vertical movement
+                        if (stickYValue > deadzone) {
+                            key.setKey_down(true);
+                            key.setKey_up(false);
+                        } else if (stickYValue < -deadzone) {
+                            key.setKey_up(true);
+                            key.setKey_down(false);
+                        } else {
+                            key.setKey_up(false);
+                            key.setKey_down(false);
+                        }
+
+                        // Button mappings
+                        Component crossButton = ps5Controller.getComponent(Component.Identifier.Button._0);
+                        Component circleButton = ps5Controller.getComponent(Component.Identifier.Button._1);
+                        Component squareButton = ps5Controller.getComponent(Component.Identifier.Button._2);
+                        Component triangleButton = ps5Controller.getComponent(Component.Identifier.Button._3);
+                        Component r1Button = ps5Controller.getComponent(Component.Identifier.Button._4);
+
+                        // Shooting (R1 button)
+                        if (r1Button != null && r1Button.getPollData() > 0.5f) {
+                            key.setMouseLeftClick(true);
+                        }
+                        else {
+                            key.setMouseLeftClick(false);
+                        }
+
+                        // Gun selection
+                        if (crossButton != null && crossButton.getPollData() > 0.5f) {
+                            key.setKey_1(true);
+                        }
+                        if (circleButton != null && circleButton.getPollData() > 0.5f) {
+                            key.setKey_2(true);
+                        }
+                        if (squareButton != null && squareButton.getPollData() > 0.5f) {
+                            key.setKey_3(true);
+                        }
+                        if (triangleButton != null && triangleButton.getPollData() > 0.5f) {
+                            key.setKey_4(true);
+                        }
+
+                        // Reset/Enter
+                        Component startButton = ps5Controller.getComponent(Component.Identifier.Button._9);
+                        if (startButton != null && startButton.getPollData() > 0.5f) {
+                            key.setKey_enter(true);
+                        } else {
+                            key.setKey_enter(false);
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            System.out.println("No PS5 controller detected");
+        }
+    }
+
 
     public void savePlayerScore() {
         String url = "jdbc:mysql://localhost:3306/zombiedoomdays";
@@ -180,10 +295,15 @@ public class PanelGame extends JComponent {
 
         // Draw items (as yellow dots)
         mg.setColor(Color.YELLOW);
-        for (Item item : items) {
-            int itemMinimapX = (int) (item.getX() * scaleX);
-            int itemMinimapY = (int) (item.getY() * scaleY);
-            mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
+        try {
+            for (Item item : items) {
+                int itemMinimapX = (int) (item.getX() * scaleX);
+                int itemMinimapY = (int) (item.getY() * scaleY);
+                mg.fillOval(itemMinimapX - 1, itemMinimapY - 1, 3, 3);
+            }
+        }
+        catch ( Exception exception){
+            System.out.println(exception);
         }
 
         mg.dispose();
@@ -420,7 +540,6 @@ public class PanelGame extends JComponent {
                 if (player.isAlive()) {
                     //System.out.println("Player is alive");
                     float speed = 1f; // Movement speed
-
                     // Player movement
                     if (key.isKey_left()) {
                         if ((!map.checkCollision(player).contains("left")) ) {
