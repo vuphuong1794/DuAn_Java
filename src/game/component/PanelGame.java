@@ -451,13 +451,13 @@ public class PanelGame extends JComponent {
         new Thread(() -> {
             while (start) {
                 addEnemy();
-                sleep(3000); // Mỗi 3 giây thêm kẻ thù mới
+                sleep(2000); // Mỗi 2 giây thêm kẻ thù mới
 
                 if (items.size() < MAX_ITEMS) {
                     System.out.println("items is created");
                     addRandomItem();
                 }
-                sleep(5000); // 5 giây tạo 1 item mới nếu chưa đạt max
+                sleep(1000); // 5 giây tạo 1 item mới nếu chưa đạt max
             }
         }).start();
     }
