@@ -12,7 +12,7 @@ public class HpRender {
         this.hp = hp;
     }
 
-    protected void hpRender(Graphics2D g2, Shape shape, double y) {
+    protected void hpRender(Graphics2D g2, Shape shape, double x,double y) {
         if(hp.getCurrentHp()!=hp.getMAX_HP()) {
             double hpY = shape.getBounds().getY() - y - 10;
             g2.setColor(new Color(70, 70, 70));
