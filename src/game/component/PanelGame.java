@@ -382,7 +382,7 @@ public class PanelGame extends JComponent {
     // Thêm kẻ thù vào game
     private void addEnemy() {
         Sound.soundZombie();
-        if (enemies.size() >= 1) {
+        if (enemies.size() >= 20) {
             return; // If there are already 20 enemies, do not add more
         }
         Random ran = new Random();
@@ -744,7 +744,7 @@ public class PanelGame extends JComponent {
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
                     // Cập nhật HP của kẻ thù dựa trên kích thước viên đạn, nếu HP = 0
-                    if(!enemy.updateHP(bullet.getDamage())) {
+                    if(!enemy.hpEnemey.updateHP(bullet.getDamage())) {
                         score++;
                         enemies.remove(enemy);
                         //Sound.soundZombie();
@@ -773,7 +773,7 @@ public class PanelGame extends JComponent {
             // Kiểm tra nếu có va chạm (vùng giao nhau không rỗng)
             if (!area.isEmpty()) {
                 // Lấy máu của enemy
-                double enemyHp = enemy.getHP();
+                double enemyHp = enemy.hpEnemey.getHP();
 
                 // Lấy thời gian hiện tại
                 long currentTime = System.currentTimeMillis();
@@ -781,7 +781,7 @@ public class PanelGame extends JComponent {
                 // Chỉ xử lý va chạm nếu đã qua 3 giây kể từ lần va chạm trước
                 if (currentTime - lastExplosionTime >= 3000) {
                     // Kiểm tra nếu enemy chết khi va chạm với player
-                    if (!enemy.updateHP(player.getHP())) {
+                    if (!enemy.hpEnemey.updateHP(player.hpPlayer.getHP())) {
                         enemies.remove(enemy);
                         Sound.soundZombie();
 
@@ -800,7 +800,7 @@ public class PanelGame extends JComponent {
                     }
 
                     // Kiểm tra nếu player chết khi va chạm với enemy
-                    if (!player.updateHP(enemyHp)) {
+                    if (!player.hpPlayer .updateHP(enemyHp)) {
                         player.setAlive(false);
                         Sound.soundZombie();
 
@@ -995,37 +995,43 @@ public class PanelGame extends JComponent {
         }
     }
 
-    //kiểm tra chạm item
+    // Kiểm tra chạm item
     private void checkItems() {
-        Iterator<Item> iterator = items.iterator();
-        // Lặp qua tất cả các items trên bản đồ
-        while (iterator.hasNext()) {
-            Item item = iterator.next();
-            if (!item.isCollected()) {
-                // Tạo vùng va chạm bằng cách lấy hình dạng của player
-                Area area = new Area(player.getShape());
-                // Tính phần giao của hình dạng player và item
-                area.intersect(new Area(item.getShape()));
-                // Nếu có va chạm (phần giao không rỗng)
-                if (!area.isEmpty() && item.getType()!=3) {
-                    // Đánh dấu item đã được thu thập
-                    item.collect();
-                    int randomGun = (int) (Math.random() * 4); // 0 to 100
-                    int randomBullet = (int) (Math.random() * 30);
-                    GunList.get(randomGun).addCurrentAmmo(randomBullet);
-                    // Xóa item khỏi danh sách
-                    iterator.remove();
-                }
-                else if (!area.isEmpty() && item.getType()==3){
-                    item.collect();
-                    player.updateHP(20);
-                    // Xóa item khỏi danh sách
-                    iterator.remove();
-                }
+        // Dùng Iterator để tránh ConcurrentModificationException
+        synchronized (items) { // Sử dụng đồng bộ nếu `items` được chia sẻ giữa các luồng
+            Iterator<Item> iterator = items.iterator();
 
+            // Lặp qua tất cả các items trên bản đồ
+            while (iterator.hasNext()) {
+                Item item = iterator.next();
+
+                if (!item.isCollected()) {
+                    // Tạo vùng va chạm bằng cách lấy hình dạng của player
+                    Area area = new Area(player.getShape());
+
+                    // Tính phần giao của hình dạng player và item
+                    area.intersect(new Area(item.getShape()));
+
+                    // Nếu có va chạm (phần giao không rỗng)
+                    if (!area.isEmpty()) {
+                        item.collect(); // Đánh dấu item đã được thu thập
+
+                        if (item.getType() != 3) { // Item không phải loại hồi máu
+                            int randomGun = (int) (Math.random() * GunList.size()); // Random súng từ danh sách
+                            int randomBullet = (int) (Math.random() * 30) + 1; // Random số đạn (1 - 30)
+                            GunList.get(randomGun).addCurrentAmmo(randomBullet);
+                        } else { // Nếu item là loại hồi máu
+                            player.hpPlayer.restoreHP(20); // Hồi máu cho người chơi
+                        }
+
+                        // Xóa item khỏi danh sách một cách an toàn
+                        iterator.remove();
+                    }
+                }
             }
         }
     }
+
 
     // Render hình ảnh đã vẽ lên màn hình
     private void render() {

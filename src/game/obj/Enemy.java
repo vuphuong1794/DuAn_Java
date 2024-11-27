@@ -7,7 +7,7 @@ import java.awt.geom.Area;
 import java.util.Random;
 import java.awt.geom.Path2D;
 
-public class Enemy extends HpRender  {
+public class Enemy {
     public static final double ENEMY_SIZE = 50;
     private double x, y;
     private static final float ENEMY_SPEED = 0.3f;
@@ -20,7 +20,7 @@ public class Enemy extends HpRender  {
     private double targetX, targetY;  // Vị trí mục tiêu mà enemy sẽ di chuyển đến
     private static final float ROTATION_SPEED = 2.0f; // Tốc độ xoay của enemy
     private static final int MIN_DISTANCE = 150; // Khoảng cách tối thiểu với player
-
+    public HpRender hpEnemey;
 
     private boolean collideLeft;
     private boolean collideRight;
@@ -28,9 +28,7 @@ public class Enemy extends HpRender  {
     private boolean collideDown;
     public Enemy()  {
 
-
-        // Them HP cho Enemy
-        super( new HP(20,20));
+        hpEnemey=new HpRender(20);
         Random random = new Random();
         int imageNumber = random.nextInt(NUM_IMAGES) + 1;
         String imagePath = "/game/image/Z" + imageNumber + ".png";
@@ -177,7 +175,7 @@ public class Enemy extends HpRender  {
         Shape shape = getShape();
 
         // Gan gia tri hp cho Hprender
-        hpRender(g2, shape,x, y);
+        hpEnemey.hpRender(g2, shape,x, y);
         g2.setTransform(oldTransform);
     }
 

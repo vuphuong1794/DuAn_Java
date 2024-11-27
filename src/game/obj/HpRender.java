@@ -6,10 +6,10 @@ import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
 public class HpRender {
-    protected final HP hp;
+    protected HP hp;
 
-    public HpRender(HP hp) {
-        this.hp = hp;
+    public HpRender(double hpInput) {
+        hp=new HP(hpInput,hpInput);
     }
 
     protected void hpRender(Graphics2D g2, Shape shape, double x,double y) {
@@ -27,6 +27,10 @@ public class HpRender {
     public boolean updateHP(double cutHP) {
         hp.setCurrentHp(hp.getCurrentHp() - cutHP);
         return hp.getCurrentHp() > 0;
+    }
+
+    public void restoreHP(double HP) {
+        hp.setCurrentHp(hp.getCurrentHp()+HP);
     }
 
     public double getHP() {

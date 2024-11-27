@@ -21,10 +21,7 @@ public class HP {
         this.MAX_HP = MAX_HP;
         this.currentHp = currentHp;
     }
-    
-    public HP() {
-    }
-    
+
     private double MAX_HP;
     private double currentHp;
      

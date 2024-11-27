@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player extends HpRender {
+public class Player {
 
     private static final int GAME_WIDTH = 1920;
     private static final int GAME_HEIGHT = 940;
@@ -34,9 +34,10 @@ public class Player extends HpRender {
 
     private boolean alive=true;
 
+    public HpRender hpPlayer;
     // Constructor: Khởi tạo đối tượng Player và tải hình ảnh từ thư mục resources
     public Player() {
-        super(new HP(50,50));
+        hpPlayer=new HpRender(50); //Máu mặc định
         this.image = loadImage("/game/image/PlayerShortGun.png");
         this.inventory = new ArrayList<>();
         this.currentGunIndex = 0; // No gun equipped initially
@@ -166,7 +167,7 @@ public class Player extends HpRender {
         }
         g2.scale(1, 1);
         // Render health bar or other overlays
-        hpRender(g2, getShape(),x, y);
+        hpPlayer.hpRender(g2, getShape(),x, y);
 
         // Restore the original transformation state
         g2.setTransform(oldTransform);
@@ -225,7 +226,7 @@ public class Player extends HpRender {
 
     public void reset() {
         alive = true;
-        resetHP();
+        hpPlayer.resetHP();
         angle = 0;
         speed = 0;
     }
