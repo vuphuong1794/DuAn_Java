@@ -464,6 +464,7 @@ public class PanelGame extends JComponent {
                          //System.out.println("mouse position is not null");
                          //System.out.println(mousePosition.x+"  "+mousePosition.y);
 
+
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
 
@@ -498,8 +499,7 @@ public class PanelGame extends JComponent {
                         enemy.updateMovement(
                                 player.getX(),
                                 player.getY(),
-                                player.getAngle(),
-                                player.getSpeed()
+                                map.isEnemyCollidingWithWall(enemy)
                         );
                         if (!enemy.check(width, height)) {
                             enemies.remove(i);
@@ -544,7 +544,7 @@ public class PanelGame extends JComponent {
                             }
                             case "rifle" -> {
                                 if (gunEquip.getCurrentAmmo()>0){
-                                bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),20,8));
                                 }
                             }
                             case "sniper" -> {
@@ -734,7 +734,6 @@ public class PanelGame extends JComponent {
         if (player.isAlive()) {
             player.draw(g2); // Vẽ player
             player.drawBorder(g2); // Vẽ player
-
             gunEquip.drawGun(g2,player.getX(),player.getY(), player.getAngle(), gunEquip.getName());
         }
 

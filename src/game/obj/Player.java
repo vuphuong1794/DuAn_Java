@@ -172,17 +172,14 @@ public class Player extends HpRender {
         g2.setTransform(oldTransform);
     }
     public Area getShape() {
-        int width = image.getWidth(null);
-        int height = image.getHeight(null);
-        Rectangle rectangle = new Rectangle(-(int)(PLAYER_SIZE/2), -(int)(PLAYER_SIZE/2), (int)PLAYER_SIZE, (int)PLAYER_SIZE  );
 
-//        // Tạo hitbox với kích thước phù hợp với sprite
-//        Rectangle rectangle = new Rectangle(
-//                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều ngang
-//                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều dọc
-//                (int)PLAYER_SIZE,      // Chiều rộng
-//                (int)PLAYER_SIZE       // Chiều cao
-//        );
+        // Tạo hitbox với kích thước phù hợp với sprite
+        Rectangle rectangle = new Rectangle(
+                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều ngang
+                -(int)(PLAYER_SIZE/2), // Căn giữa theo chiều dọc
+                (int)PLAYER_SIZE,      // Chiều rộng
+                (int)PLAYER_SIZE       // Chiều cao
+        );
 
         AffineTransform afx = new AffineTransform();
         // Dịch chuyển đến tâm của nhân vật

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.util.List;
 import java.util.Random;
 import java.awt.geom.Path2D;
 
@@ -20,14 +21,13 @@ public class Enemy extends HpRender  {
     private double targetX, targetY;  // Vị trí mục tiêu mà enemy sẽ di chuyển đến
     private static final float ROTATION_SPEED = 2.0f; // Tốc độ xoay của enemy
     private static final int MIN_DISTANCE = 150; // Khoảng cách tối thiểu với player
-
     public Enemy()  {
         // Them HP cho Enemy
         super( new HP(20,20));
         Random random = new Random();
         int imageNumber = random.nextInt(NUM_IMAGES) + 1;
         String imagePath = "/game/image/Z" + imageNumber + ".png";
-        this.image = new ImageIcon(getClass().getResource(imagePath)).getImage();
+        this.image = loadImage(imagePath);
         Path2D p = new Path2D.Double();
         p.moveTo(0, ENEMY_SIZE/2);
         p.lineTo(15, 10);
@@ -36,9 +36,18 @@ public class Enemy extends HpRender  {
         p.lineTo(ENEMY_SIZE-5, ENEMY_SIZE-13);
         p.lineTo(15, ENEMY_SIZE-10);
         enemyShape = new Area(p);
-    }
 
-    public void updateMovement(double playerX, double playerY, float playerAngle, float playerSpeed) {
+    }
+    // Phương thức tải hình ảnh và xử lý lỗi nếu có
+    private Image loadImage(String path) {
+        try {
+            return new ImageIcon(getClass().getResource(path)).getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public void updateMovement(double playerX, double playerY, String collider) {
         // Tính khoảng cách hiện tại đến player
         double distanceToPlayer = Math.sqrt(Math.pow(playerX - x, 2) + Math.pow(playerY - y, 2));
 
@@ -86,9 +95,40 @@ public class Enemy extends HpRender  {
             currentSpeed *= (distanceToPlayer / MIN_DISTANCE);
         }
 
-        // Di chuyển enemy
-        x += Math.cos(Math.toRadians(angle)) * currentSpeed;
-        y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+        //Check va chạm để di chuyển cho đúng
+        if (collider.contains("up")){
+            // Di chuyển enemy
+            x += Math.cos(Math.toRadians(angle)) * currentSpeed;
+            if (Math.sin(Math.toRadians(angle))>=0) {
+                y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+            }
+
+        }
+        else if (collider.contains("down")){
+            x += Math.cos(Math.toRadians(angle)) * currentSpeed;
+            if (Math.sin(Math.toRadians(angle))<=0) {
+                y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+            }
+
+        }
+        else if (collider.contains("left")){
+            if (Math.sin(Math.toRadians(angle))>=0) {
+                x += Math.sin(Math.toRadians(angle)) * currentSpeed;
+            }
+            y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+
+        }
+        else if (collider.contains("right")){
+            if (Math.sin(Math.toRadians(angle))<=0) {
+                x += Math.sin(Math.toRadians(angle)) * currentSpeed;
+            }
+            y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+
+        }
+        else {
+            x += Math.cos(Math.toRadians(angle)) * currentSpeed;
+            y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+        }
     }
 
     public void changeLocation(double x, double y) {
@@ -139,10 +179,6 @@ public class Enemy extends HpRender  {
 
     //===================================GETSHAPE CAN DUOC SUA LAI+++++++++++++++++++++++++++++++++++++++++++++
     public Area getShape() {
-        // Get the width and height of the image
-        int width = image.getWidth(null);
-        int height = image.getHeight(null);
-
         // Define the bounding area of the image centered at (0,0)
         Rectangle imageRect = new Rectangle(-(int)(ENEMY_SIZE/2), -(int)(ENEMY_SIZE/2), (int)ENEMY_SIZE, (int)ENEMY_SIZE);
 
