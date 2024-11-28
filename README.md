@@ -30,9 +30,17 @@
 ## 🎮 Cách chơi
 
 ```plaintext
+Keyboard:
 W,A,S,D - Di chuyển
-J - Bắn đạn thường
-K - Bắn đạn phóng lựu
+Chuột phải - Bắn đạn 
+1, 2, 3, 4 - Chuyển đổi súng
+
+Tay cầm PS5:
+Left JoyStick - Di chuyển nhân vật
+Right JoyStick - Xoay hướng nhân vật
+Cò R2 - Bắn đạn
+Các nút tròn, vuông, tam giác, X - Chuyển đổi súng
+
 ```
 
 ## 📥 Cài đặt
@@ -48,12 +56,14 @@ K - Bắn đạn phóng lựu
 - [x] v0.1 - Test
   - [x] Hệ thống bắn súng đơn giản
   - [x] AI zombie đơn giản
-  - [ ] Hệ thống nhặt đạn, vật phẩm
-  - [ ] Lưu điểm mà người chơi đạt được trong CSDL
+  - [x] Hệ thống nhặt đạn, vật phẩm
+  - [x] Lưu điểm mà người chơi đạt được trong CSDL
+  - [x] Khả năng chuyển linh hoạt qua lại giữa các thiết bị đầu vào
+  - [x] Zombie có tính năng riêng biệt 
 
 - [ ] v0.2 - Beta
-  - [ ] Hệ thống bắn súng nâng cao
-  - [ ] Zombie có tính năng riêng biệt
+  - [ ] Hệ thống shop / súng nâng cao
+  - [ ] Zombie có tính năng riêng biệt nâng cao
   - [ ] Chế độ Multiplayer
 
 - [ ] v1.0 - Phiên bản chính thức
@@ -77,7 +87,7 @@ Chúng tôi luôn chào đón sự đóng góp từ cộng đồng! Hãy làm th
 
 - 🤺 **Player Developer**: [Ngô Xuân Diệu](https://github.com/Yuno04)
 - 🧟 **Zombie Developer**: [Vũ Nguyễn Phương](https://github.com/vuphuong1794)
-- 🎨,🎮 **Leader, Art and Game Director**: [Mai Nguyễn Đăng Khoa](https://github.com/MaiKhoa0101)
+- 🎨,🎮 **Leader, Art**: [Mai Nguyễn Đăng Khoa](https://github.com/MaiKhoa0101)
 - 🖥️ **Game Features**: [Nguyễn Hồng Tồn](https://github.com/PolyEtilen1909)
 
 ---
