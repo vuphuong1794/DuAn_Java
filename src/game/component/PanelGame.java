@@ -759,7 +759,7 @@ public class PanelGame extends JComponent {
                                     shotTime = 1000;
                                 }
                                 case "grenade" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(),Sound.getVolume()));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 0, 8, gunEquip.getName().toString(),Sound.getVolume()));
                                     shotTime = 2000;
                                 }
 
@@ -791,6 +791,10 @@ public class PanelGame extends JComponent {
                 area.intersect(enemy.getShape());
                 // Nếu vùng giao nhau không rỗng, tức là viên đạn đã va chạm với zombie
                 if(!area.isEmpty()){
+
+                    if(bullet.type==4){
+                        loadImage("/game/image/explode.png");
+                    }
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
                     // Cập nhật HP của kẻ thù dựa trên kích thước viên đạn, nếu HP = 0

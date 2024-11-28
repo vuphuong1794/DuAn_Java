@@ -1,4 +1,5 @@
 package game.obj;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -36,10 +37,11 @@ public class Bullet {
             type=3;
             speed=15f;
         }
-        else {
+        else if (nameGun.equals("grenade")){
             damage=100f;
             type=4;
-            speed=2f;
+            speed=5f;
+
         }
     }
 
@@ -49,7 +51,7 @@ public class Bullet {
 
     }
     public boolean check(int width, int height){
-        if(x<=-damage || x>width || y<=-damage || y>height){
+        if(x<=0 || x>width || y<=0|| y>height){
             return false;
         }
         else {
@@ -86,4 +88,13 @@ public class Bullet {
         return y+damage/2;
     }
 
+    public Image loadImage(String path) {
+        try {
+            return new ImageIcon(getClass().getResource(path)).getImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Không tải được anhr");
+            return null; // Trả về null nếu xảy ra lỗi khi tải hình ảnh
+        }
+    }
 }
