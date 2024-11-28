@@ -25,7 +25,7 @@ public class sound {
         this.zombie = this.getClass().getClassLoader().getResource("game/obj/sound/zombie.wav");
         this.shotgun = this.getClass().getClassLoader().getResource("game/obj/sound/shotgun.wav");
         
-        // Tạo thanh trượt âm lượng
+        // Tạo thanh trượt âm lượngds
         createVolumeControl();
     }
 
@@ -91,7 +91,12 @@ public class sound {
 
             // Điều chỉnh âm lượng xuống còn 10% của âm lượng thực tế
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            float dB = 20f * (float) Math.log10(volume * 0.1f); // Giảm volume xuống 10%
+            float dB ;
+            if (volume > 0) {
+                dB = 20f * (float) Math.log10(volume * 0.1f);
+            } else {
+                dB = -80f; // Giá trị tối thiểu để làm im tiếng
+            }
             gainControl.setValue(dB);
 
             // Lắng nghe sự kiện kết thúc âm thanh để đóng clip

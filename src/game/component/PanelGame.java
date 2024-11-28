@@ -514,6 +514,7 @@ public class PanelGame extends JComponent {
     private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
         // Tính toán âm lượng dựa trên vị trí chuột
         float volume = Math.max(0, Math.min(1f, (float) (mouseX - sliderX) / sliderWidth));
+        System.out.println("number of volumn after change: "+volume);
         Sound.setVolume(volume); // Cập nhật âm lượng vào hệ thống
     }
 
@@ -721,22 +722,22 @@ public class PanelGame extends JComponent {
                     }
 
                     if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
-                        System.out.println("left click");
+                        //System.out.println("left click");
                             switch (gunEquip.getName()) {
                                 case "pistol" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8, gunEquip.getName().toString()));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8, gunEquip.getName().toString(), Sound.getVolume()));
                                     shotTime = 300;
                                 }
                                 case "rifle" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString()));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(),Sound.getVolume()));
                                     shotTime = 30;
                                 }
                                 case "sniper" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString()));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(),Sound.getVolume()));
                                     shotTime = 1000;
                                 }
                                 case "grenade" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString()));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(),Sound.getVolume()));
                                     shotTime = 2000;
                                 }
 
@@ -744,7 +745,7 @@ public class PanelGame extends JComponent {
 
                         try {
                             Thread.sleep(shotTime);
-                            System.out.println("Thread is sleep");// Sleep to prevent CPU overload
+                            //System.out.println("Thread is sleep");// Sleep to prevent CPU overload
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

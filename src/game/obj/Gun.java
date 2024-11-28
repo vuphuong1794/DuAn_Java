@@ -120,7 +120,7 @@ public class Gun {
     }
 
     // Method to shoot a bullet
-    public Bullet shoot(float x, float y, float angle, float offsetX, float offsetY, String nameGun) {
+    public Bullet shoot(float x, float y, float angle, float offsetX, float offsetY, String nameGun, float volumn) {
         if (isReloading) {
             System.out.println(name + " is reloading!");
             return null;
@@ -128,7 +128,8 @@ public class Gun {
 
         if (currentAmmo > 0) {
             currentAmmo--;
-            System.out.println("Bang! " + name + " fired. Ammo left: " + currentAmmo);
+            //System.out.println("Bang! " + name + " fired. Ammo left: " + currentAmmo);
+            Sound.setVolume(volumn);
             Sound.soundShoot();
             // Create a new bullet at the gun's position and angle
             Bullet bullet = new Bullet(x, y, angle,offsetX,offsetY,nameGun);
