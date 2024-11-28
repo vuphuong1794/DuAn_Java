@@ -78,7 +78,7 @@ public class Main extends JFrame {
         startTime = System.nanoTime();
         cardLayout.show(mainPanel, "Game");
 
-        // Start the game with the player object
+        // chaỵ panelgame với obj player
         SwingUtilities.invokeLater(() -> {
             panelGame.start(player);
         });

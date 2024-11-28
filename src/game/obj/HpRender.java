@@ -25,7 +25,12 @@ public class HpRender {
 
 
     public boolean updateHP(double cutHP) {
-        hp.setCurrentHp(hp.getCurrentHp() - cutHP);
+        if (cutHP>=hp.getMAX_HP()) {
+            hp.setCurrentHp(0);
+        }
+        else {
+            hp.setCurrentHp(hp.getCurrentHp() - cutHP);
+        }
         return hp.getCurrentHp() > 0;
     }
 
