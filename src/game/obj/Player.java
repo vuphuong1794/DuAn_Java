@@ -146,7 +146,7 @@ public class Player {
         // Draw the player image centered at (-width / 2, -height / 2)
         int width = image.getWidth(null);
         int height = image.getHeight(null);
-        System.out.println("Player position: " + -width / 2 +", "+ -height / 2);
+        //System.out.println("Player position: " + -width / 2 +", "+ -height / 2);
         g2.drawImage(image, -width / 2, -height / 2, null);
 
 

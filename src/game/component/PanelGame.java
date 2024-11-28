@@ -1,5 +1,9 @@
 package game.component;
 
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
+import net.java.games.input.Event;
+import net.java.games.input.EventQueue;
 
 import game.obj.*;
 import game.obj.item.Item;
@@ -72,6 +76,8 @@ public class PanelGame extends JComponent {
     private long lastExplosionTime = 0;
     private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
+
+    private boolean isController=false;
     public PanelGame(Player player, Main main) {
         // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -80,7 +86,7 @@ public class PanelGame extends JComponent {
                 mousePosition = e.getPoint();
             }
         });
-
+        isController=false;
         this.player = player;
         this.main = main;
     }
@@ -121,8 +127,7 @@ public class PanelGame extends JComponent {
 
         initObjectGame();
         initKeyboard();
-
-        //initGamepad();
+        initGamepad();
 
         initBullets();
         thread.start();
@@ -132,19 +137,21 @@ public class PanelGame extends JComponent {
         // Detect PS5 controller
         Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
-        while (true){
-            for (Controller controller : controllers) {
-                if (controller.getName().contains("DualSense") || controller.getName().contains("PS5 Controller")) {
-                    ps5Controller = controller;
-                    break;
-                }
-            }
-            if (ps5Controller != null) {
+        boolean ps5Detected = false;
+        for (Controller controller : controllers) {
+            System.out.println("Controller Name: " + controller.getName());
+            System.out.println("Controller Type: " + controller.getType());
+            // Kiểm tra tên của controller
+            if (controller.getName().contains("DualSense") || controller.getName().contains("Controller")) {
+                ps5Controller = controller;
+                ps5Detected = true;
                 break;
             }
         }
 
-        if (ps5Controller != null) {
+        if (ps5Detected) {
+            System.out.println("PS5 Controller detected successfully!");
+
             // Add a gamepad input thread
             new Thread(() -> {
                 while (start) {
@@ -158,67 +165,82 @@ public class PanelGame extends JComponent {
 
                         // Deadzone to prevent drift
                         float deadzone = 0.2f;
+///////////////////////////////Check if ps5Controller is pressed///////////////////////////////////////////////////////////
+                        EventQueue eventQueue = ps5Controller.getEventQueue();
+                        Event event = new Event();
 
-                        // Horizontal movement
-                        if (stickXValue > deadzone) {
-                            System.out.println("OMG. it work");
-                            key.setKey_right(true);
-                            key.setKey_left(false);
-                        } else if (stickXValue < -deadzone) {
-                            key.setKey_left(true);
-                            key.setKey_right(false);
-                        } else {
-                            key.setKey_left(false);
-                            key.setKey_right(false);
-                        }
+                        while (eventQueue.getNextEvent(event)) {
+                            String componentName = event.getComponent().getName();
+                            float value = event.getValue();
 
-                        // Vertical movement
-                        if (stickYValue > deadzone) {
-                            key.setKey_down(true);
-                            key.setKey_up(false);
-                        } else if (stickYValue < -deadzone) {
-                            key.setKey_up(true);
-                            key.setKey_down(false);
-                        } else {
-                            key.setKey_up(false);
-                            key.setKey_down(false);
+                            // Nếu có input từ tay cầm
+                            if (value> deadzone || value < -deadzone) {
+                                isController=true;
+                                System.out.println("Gamepad Input Detected: " + componentName + " Value: " + value);
+                            }
                         }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        if (isController) {
 
-                        // Button mappings
-                        Component crossButton = ps5Controller.getComponent(Component.Identifier.Button._0);
-                        Component circleButton = ps5Controller.getComponent(Component.Identifier.Button._1);
-                        Component squareButton = ps5Controller.getComponent(Component.Identifier.Button._2);
-                        Component triangleButton = ps5Controller.getComponent(Component.Identifier.Button._3);
-                        Component r1Button = ps5Controller.getComponent(Component.Identifier.Button._4);
+                            // Horizontal movement
+                            if (stickXValue > deadzone) {
+                                key.setKey_right(true);
+                                key.setKey_left(false);
+                            } else if (stickXValue < -deadzone) {
+                                key.setKey_left(true);
+                                key.setKey_right(false);
+                            } else {
+                                key.setKey_left(false);
+                                key.setKey_right(false);
+                            }
 
-                        // Shooting (R1 button)
-                        if (r1Button != null && r1Button.getPollData() > 0.5f) {
-                            key.setMouseLeftClick(true);
-                        }
-                        else {
-                            key.setMouseLeftClick(false);
-                        }
+                            // Vertical movement
+                            if (stickYValue > deadzone) {
+                                key.setKey_down(true);
+                                key.setKey_up(false);
+                            } else if (stickYValue < -deadzone) {
+                                key.setKey_up(true);
+                                key.setKey_down(false);
+                            } else {
+                                key.setKey_up(false);
+                                key.setKey_down(false);
+                            }
 
-                        // Gun selection
-                        if (crossButton != null && crossButton.getPollData() > 0.5f) {
-                            key.setKey_1(true);
-                        }
-                        if (circleButton != null && circleButton.getPollData() > 0.5f) {
-                            key.setKey_2(true);
-                        }
-                        if (squareButton != null && squareButton.getPollData() > 0.5f) {
-                            key.setKey_3(true);
-                        }
-                        if (triangleButton != null && triangleButton.getPollData() > 0.5f) {
-                            key.setKey_4(true);
-                        }
+                            // Button mappings
+                            Component crossButton = ps5Controller.getComponent(Component.Identifier.Button._0);
+                            Component circleButton = ps5Controller.getComponent(Component.Identifier.Button._1);
+                            Component squareButton = ps5Controller.getComponent(Component.Identifier.Button._2);
+                            Component triangleButton = ps5Controller.getComponent(Component.Identifier.Button._3);
+                            Component r1Button = ps5Controller.getComponent(Component.Identifier.Button._4);
 
-                        // Reset/Enter
-                        Component startButton = ps5Controller.getComponent(Component.Identifier.Button._9);
-                        if (startButton != null && startButton.getPollData() > 0.5f) {
-                            key.setKey_enter(true);
-                        } else {
-                            key.setKey_enter(false);
+                            // Shooting (R1 button)
+                            if (r1Button != null && r1Button.getPollData() > 0.5f) {
+                                key.setMouseLeftClick(true);
+                            } else {
+                                key.setMouseLeftClick(false);
+                            }
+
+                            // Gun selection
+                            if (crossButton != null && crossButton.getPollData() > 0.5f) {
+                                key.setKey_1(true);
+                            }
+                            if (circleButton != null && circleButton.getPollData() > 0.5f) {
+                                key.setKey_2(true);
+                            }
+                            if (squareButton != null && squareButton.getPollData() > 0.5f) {
+                                key.setKey_3(true);
+                            }
+                            if (triangleButton != null && triangleButton.getPollData() > 0.5f) {
+                                key.setKey_4(true);
+                            }
+
+                            // Reset/Enter
+                            Component startButton = ps5Controller.getComponent(Component.Identifier.Button._9);
+                            if (startButton != null && startButton.getPollData() > 0.5f) {
+                                key.setKey_enter(true);
+                            } else {
+                                key.setKey_enter(false);
+                            }
                         }
                     }
 
@@ -503,6 +525,7 @@ public class PanelGame extends JComponent {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                isController=false;
                 if (e.getButton() == MouseEvent.BUTTON1) { // Left mouse button
                     key.setMouseLeftClick(true);
                 }
@@ -554,6 +577,7 @@ public class PanelGame extends JComponent {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                isController=false;
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_A -> key.setKey_left(true);
                     case KeyEvent.VK_D -> key.setKey_right(true);
@@ -958,9 +982,6 @@ public class PanelGame extends JComponent {
                 savePlayerScore();
             }
 
-            // Convert time to minutes and seconds
-            long minutes = finalElapsedTime / 60;
-            long seconds = finalElapsedTime % 60;
 
             // Gradient background
             GradientPaint gradient = new GradientPaint(0, 0, new Color(0, 0, 0, 200), 0, height, new Color(50, 50, 50, 150));
@@ -984,7 +1005,12 @@ public class PanelGame extends JComponent {
             g2.setColor(Color.YELLOW);
             g2.drawString("Score: " + score, width / 2 - 260, height / 2 - 60);
             g2.setColor(Color.GREEN);
-            g2.drawString("Time Played: " + (finalElapsedTime / 60) + "m " + (finalElapsedTime % 60) + "s", width / 2 - 260, height / 2 );
+            try {
+                g2.drawString("Time Played: " + (finalElapsedTime / 60) + "m " + (finalElapsedTime % 60) + "s", width / 2 - 260, height / 2 );
+            }
+            catch (Exception exception){
+                System.out.println(exception.getMessage());
+            }
             g2.setColor(Color.CYAN);
             g2.drawString("Player: " + playerName, width / 2 - 260, height / 2 + 100);
 
