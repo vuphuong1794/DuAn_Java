@@ -196,6 +196,8 @@ public class PanelGame extends JComponent {
                             mousePosition = MouseInfo.getPointerInfo().getLocation();
                             int newX = (int) mousePosition.getX() + moveX;
                             int newY = (int) mousePosition.getY() + moveY;
+                            mousePosition.setLocation(newX, newY);
+
                             // Horizontal movement
                             if (stickXValue > deadzone) {
                                 key.setKey_right(true);
@@ -225,10 +227,10 @@ public class PanelGame extends JComponent {
                             Component circleButton = ps5Controller.getComponent(Component.Identifier.Button._1);
                             Component squareButton = ps5Controller.getComponent(Component.Identifier.Button._2);
                             Component triangleButton = ps5Controller.getComponent(Component.Identifier.Button._3);
-                            Component r1Button = ps5Controller.getComponent(Component.Identifier.Button._4);
+                            Component r2Trigger = ps5Controller.getComponent(Component.Identifier.Axis.Z);
 
                             // Shooting (R1 button)
-                            if (r1Button != null && r1Button.getPollData() > 0.5f) {
+                            if (r2Trigger != null && r2Trigger.getPollData() > 0.5f) {
                                 key.setMouseLeftClick(true);
                             } else {
                                 key.setMouseLeftClick(false);
