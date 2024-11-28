@@ -4,6 +4,7 @@ import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
+import java.awt.Robot;
 
 import game.obj.*;
 import game.obj.item.Item;
@@ -125,13 +126,15 @@ public class PanelGame extends JComponent {
 
         initObjectGame();
         initKeyboard();
-        initGamepad();
+        try{initGamepad();}
+        catch(Exception e){e.printStackTrace();}
 
         initBullets();
         thread.start();
     }
 
-    private void initGamepad() {
+    private void initGamepad() throws AWTException {
+        Robot robot = new Robot();
         // Detect PS5 controller
         Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
@@ -161,6 +164,20 @@ public class PanelGame extends JComponent {
                         float stickXValue = leftStickX.getPollData();
                         float stickYValue = leftStickY.getPollData();
 
+
+                        // Right stick configuration
+                        Component rightStickX = ps5Controller.getComponent(Component.Identifier.Axis.RX);
+                        Component rightStickY = ps5Controller.getComponent(Component.Identifier.Axis.RY);
+
+                        float rightStickXValue = rightStickX.getPollData();
+                        float rightStickYValue = rightStickY.getPollData();
+
+                        // Scale mouse movement
+                        float sensitivity = 10.0f; // Adjust for faster/slower movement
+                        int moveX = (int) (rightStickXValue * sensitivity);
+                        int moveY = (int) (rightStickYValue * sensitivity);
+
+
                         // Deadzone to prevent drift
                         float deadzone = 0.2f;
 ///////////////////////////////Check if ps5Controller is pressed///////////////////////////////////////////////////////////
@@ -179,7 +196,14 @@ public class PanelGame extends JComponent {
                         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
                         if (isController) {
+                            //RIGHT STICK
+                            // Mouse movement
+                            Point mousePosition = MouseInfo.getPointerInfo().getLocation();
+                            int newX = (int) mousePosition.getX() + (int) (rightStickXValue * sensitivity);
+                            int newY = (int) mousePosition.getY() + (int) (rightStickYValue * sensitivity);
+                            robot.mouseMove(newX, newY);
 
+                            //LEFT STICK
                             // Horizontal movement
                             if (stickXValue > deadzone) {
                                 key.setKey_right(true);
@@ -209,10 +233,10 @@ public class PanelGame extends JComponent {
                             Component circleButton = ps5Controller.getComponent(Component.Identifier.Button._1);
                             Component squareButton = ps5Controller.getComponent(Component.Identifier.Button._2);
                             Component triangleButton = ps5Controller.getComponent(Component.Identifier.Button._3);
-                            Component r1Button = ps5Controller.getComponent(Component.Identifier.Button._4);
+                            Component r2Trigger = ps5Controller.getComponent(Component.Identifier.Axis.Z);
 
                             // Shooting (R1 button)
-                            if (r1Button != null && r1Button.getPollData() > 0.5f) {
+                            if (r2Trigger != null && r2Trigger.getPollData() > 0.5f) {
                                 key.setMouseLeftClick(true);
                             } else {
                                 key.setMouseLeftClick(false);
