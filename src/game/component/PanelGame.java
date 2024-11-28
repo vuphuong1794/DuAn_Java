@@ -813,11 +813,7 @@ public class PanelGame extends JComponent {
                 boomEffects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color(255, 70, 70)));
                 boomEffects.add(new Effect(x, y, 10, 5, 150, 0.2f, new Color(255, 255, 255)));
 
-                if (!player.hpPlayer.updateHP(30)){
-                    player.setAlive(false);
-                };
-
-
+                player.hpPlayer.updateHP(30);
             }
         }
 
