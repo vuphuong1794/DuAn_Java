@@ -138,25 +138,28 @@ public class PanelGame extends JComponent {
         // Detect PS5 controller
         Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
-        boolean ps5Detected = false;
+
         for (Controller controller : controllers) {
             System.out.println("Controller Name: " + controller.getName());
             System.out.println("Controller Type: " + controller.getType());
             // Kiểm tra tên của controller
             if (controller.getName().contains("DualSense") || controller.getName().contains("Controller")) {
                 ps5Controller = controller;
-                ps5Detected = true;
+                isController = true;
                 break;
             }
         }
 
-        if (ps5Detected) {
+        if (isController) {
             System.out.println("PS5 Controller detected successfully!");
 
             // Add a gamepad input thread
             new Thread(() -> {
                 while (start) {
                     if (ps5Controller.poll()) {
+//                        for (Component component : ps5Controller.getComponents()) {
+//                            System.out.println("Component: " + component.getName() + " | Identifier: " + component.getIdentifier());
+//                        }
                         // Movement using left analog stick
                         Component leftStickX = ps5Controller.getComponent(Component.Identifier.Axis.X);
                         Component leftStickY = ps5Controller.getComponent(Component.Identifier.Axis.Y);
@@ -164,14 +167,13 @@ public class PanelGame extends JComponent {
                         float stickXValue = leftStickX.getPollData();
                         float stickYValue = leftStickY.getPollData();
 
-
                         // Right stick configuration
                         Component rightStickX = ps5Controller.getComponent(Component.Identifier.Axis.RX);
                         Component rightStickY = ps5Controller.getComponent(Component.Identifier.Axis.RY);
-
                         float rightStickXValue = rightStickX.getPollData();
                         float rightStickYValue = rightStickY.getPollData();
-
+                        System.out.println("RX Axis: " + rightStickX.getPollData());
+                        System.out.println("RY Axis: " + rightStickY.getPollData());
                         // Deadzone to prevent drift
                         float deadzone = 0.2f;
 
@@ -193,19 +195,25 @@ public class PanelGame extends JComponent {
                         if (isController) {
                             //RIGHT STICK
                             // Get the current mouse position
-                            Point mousePosition = MouseInfo.getPointerInfo().getLocation();
+                            if (rightStickXValue > deadzone ||
+                                    rightStickYValue > deadzone ||
+                                    rightStickXValue < -deadzone ||
+                                    rightStickYValue < -deadzone)
+                            {
+                                Point mousePosition = MouseInfo.getPointerInfo().getLocation();
 
-                            // Scale mouse movement
-                            float sensitivity = 10.0f; // Adjust for faster/slower movement
-                            int moveX = (int) (rightStickXValue * sensitivity);
-                            int moveY = (int) (rightStickYValue * sensitivity);
+                                // Scale mouse movement
+                                float sensitivity = 1.0f; // Adjust for faster/slower movement
+                                int moveX = (int) (rightStickXValue * sensitivity);
+                                int moveY = (int) (rightStickYValue * sensitivity);
 
-                            // Calculate new mouse position (absolute screen coordinates)
-                            int newX = (int) mousePosition.getX() + moveX;
-                            int newY = (int) mousePosition.getY() + moveY;
-
-                            // Move the mouse to the new position
-                            robot.mouseMove(newX, newY);
+                                // Calculate new mouse position (absolute screen coordinates)
+                                int newX = (int) mousePosition.getX() + moveX;
+                                int newY = (int) mousePosition.getY() + moveY;
+                                System.out.println("newX: " + newX + " newY: " + newY + " rightStickXvalue: " + rightStickXValue + " rightStickYvalue: " + rightStickYValue);
+                                // Move the mouse to the new position
+                                //robot.mouseMove(newX, newY);
+                            }
 
 
                             //LEFT STICK
@@ -238,10 +246,10 @@ public class PanelGame extends JComponent {
                             Component circleButton = ps5Controller.getComponent(Component.Identifier.Button._1);
                             Component squareButton = ps5Controller.getComponent(Component.Identifier.Button._2);
                             Component triangleButton = ps5Controller.getComponent(Component.Identifier.Button._3);
-                            Component r2Trigger = ps5Controller.getComponent(Component.Identifier.Axis.Z);
+                            Component RZAxis = ps5Controller.getComponent(Component.Identifier.Button._7);
 
                             // Shooting (R1 button)
-                            if (r2Trigger != null && r2Trigger.getPollData() > 0.5f) {
+                            if (RZAxis != null && RZAxis.getPollData() > 0.5f) {
                                 key.setMouseLeftClick(true);
                             } else {
                                 key.setMouseLeftClick(false);
@@ -262,7 +270,7 @@ public class PanelGame extends JComponent {
                             }
 
                             // Reset/Enter
-                            Component startButton = ps5Controller.getComponent(Component.Identifier.Button._9);
+                            Component startButton = ps5Controller.getComponent(Component.Identifier.Button._6);
                             if (startButton != null && startButton.getPollData() > 0.5f) {
                                 key.setKey_enter(true);
                             } else {
