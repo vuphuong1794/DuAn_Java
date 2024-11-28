@@ -27,6 +27,7 @@ public class Enemy {
     private boolean collideRight;
     private boolean collideUp;
     private boolean collideDown;
+
     public Enemy()  {
 
         Random random = new Random();
@@ -67,8 +68,6 @@ public class Enemy {
         setCollideFalse();
 
     }
-
-
 
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
     private Image loadImage(String path) {
@@ -218,19 +217,17 @@ public class Enemy {
     }
 
 
-    //===================================GETSHAPE CAN DUOC SUA LAI+++++++++++++++++++++++++++++++++++++++++++++
     public Area getShape() {
-        // Define the bounding area of the image centered at (0,0)
         Rectangle imageRect = new Rectangle(-(int)(ENEMY_SIZE/2), -(int)(ENEMY_SIZE/2), (int)ENEMY_SIZE, (int)ENEMY_SIZE);
 
         // Create a transformation for the enemy's position and angle
         AffineTransform afx = new AffineTransform();
         afx.translate(x, y ); // Move to enemy's center
-        //afx.rotate(Math.toRadians(angle), 0, 0);  // Rotate around center
 
         // Return the transformed shape of the image area
         return new Area(afx.createTransformedShape(imageRect));
     }
+
     public void drawBorder(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
         g2.setColor(Color.RED);
@@ -248,7 +245,7 @@ public class Enemy {
 
     public boolean check(int width, int height) {
         // Define a buffer to allow enemies to stay in the game if they are close to the edges
-        int buffer = 50; // Increase this buffer if needed for testing
+        int buffer = 50;
 
         // Nếu enemy chưa từng vào màn hình, luôn trả về true
         if (!hasEnteredScreen) {

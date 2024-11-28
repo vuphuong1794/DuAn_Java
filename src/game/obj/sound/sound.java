@@ -13,6 +13,7 @@ public class sound {
     private final URL hit;
     private final URL zombie;
     private final URL shotgun;
+    private final URL boom;
 
     // Biến điều chỉnh âm lượng
     private float volume = 0.5f;
@@ -24,6 +25,7 @@ public class sound {
         this.hit = this.getClass().getClassLoader().getResource("game/obj/sound/hit.wav");
         this.zombie = this.getClass().getClassLoader().getResource("game/obj/sound/zombie.wav");
         this.shotgun = this.getClass().getClassLoader().getResource("game/obj/sound/shotgun.wav");
+        this.boom = this.getClass().getClassLoader().getResource("game/obj/sound/boom.wav");
         
         // Tạo thanh trượt âm lượngds
         createVolumeControl();
@@ -80,6 +82,8 @@ public class sound {
     public void soundShotgun(){
         play(shotgun);
     }
+
+    public void soundBoom(){ play(boom); }
 
     // Phương thức chung để phát âm thanh
     private void play(URL url) {

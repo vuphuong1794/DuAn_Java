@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Random;
 
 
-import net.java.games.input.Controller;
-import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Component;
 public class PanelGame extends JComponent {
 
@@ -76,8 +74,8 @@ public class PanelGame extends JComponent {
     private long lastExplosionTime = 0;
     private static final int MAX_ITEMS = 5; // Số lượng item tối đa trên bản đồ
 
-
     private boolean isController=false;
+
     public PanelGame(Player player, Main main) {
         // Tạo trình để lắng nghe chuyển động, theo giỏ vị trí chuột
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -495,7 +493,7 @@ public class PanelGame extends JComponent {
                     System.out.println("items is created");
                     addRandomItem();
                 }
-                sleep(1000); // 5 giây tạo 1 item mới nếu chưa đạt max
+                sleep(1000); // 1 giây tạo 1 item mới nếu chưa đạt max
             }
         }).start();
     }
@@ -809,6 +807,36 @@ public class PanelGame extends JComponent {
     }
 
     private void checkPlayer(Enemy enemy) {
+        if (enemy.type == 2) {
+            // tinh khoảng cách
+            double distanceX = Math.abs(player.getX() - enemy.getX());
+            double distanceY = Math.abs(player.getY() - enemy.getY());
+            double distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+            double phamvi = 200.0;
+
+            //nếu đứng gần ng chơi thì kích hoạt
+            if (distance <= phamvi) {
+                enemies.remove(enemy);
+                Sound.soundBoom();
+
+                double x = enemy.getX() + Enemy.ENEMY_SIZE / 2;
+                double y = enemy.getY() + Enemy.ENEMY_SIZE / 2;
+
+                boomEffects.add(new Effect(x, y, 5, 5, 75, 0.05f, new Color(32, 178, 169)));
+                boomEffects.add(new Effect(x, y, 5, 5, 75, 0.1f, new Color(32, 178, 169)));
+                boomEffects.add(new Effect(x, y, 10, 10, 100, 0.3f, new Color(230, 207, 105)));
+                boomEffects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color(255, 70, 70)));
+                boomEffects.add(new Effect(x, y, 10, 5, 150, 0.2f, new Color(255, 255, 255)));
+
+                if (!player.hpPlayer.updateHP(30)){
+                    player.setAlive(false);
+                };
+
+
+            }
+        }
+
         if (enemy != null) {
             // Tạo vùng giao nhau giữa hình dạng của player và enemy
             Area area = new Area(player.getShape());
@@ -866,6 +894,7 @@ public class PanelGame extends JComponent {
             }
         }
     }
+
     // Vẽ nền game
     private void drawBackground() {
         // Tải hình ảnh bản đồ nếu chưa được tải

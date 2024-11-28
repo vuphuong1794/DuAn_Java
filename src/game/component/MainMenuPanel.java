@@ -102,10 +102,19 @@ public class MainMenuPanel extends JPanel {
 
     private void showInstructions() {
         JOptionPane.showMessageDialog(this,
-                "1. Sử dụng các phím W, A, S, D để di chuyển.\n" +
+                "Điều khiển bàn phím:\n" +
+                        "1. Sử dụng các phím W, A, S, D để di chuyển.\n" +
                         "2. Nhấn 'Chuột Trái' để bắn.\n" +
                         "3. Di chuyển tới vật phẩm rơi trên bản đồ để nhặt / sử dụng.\n" +
-                        "4. Tránh zombies và sống sót càng lâu càng tốt.",
+                        "4. Tránh zombies và sống sót càng lâu càng tốt.\n\n" +
+                        "Điều khiển tay cầm PlayStation 5:\n" +
+                        "1. Joystick trái: Di chuyển nhân vật.\n" +
+                        "2. Joystick phải: Xoay nhân vật.\n" +
+                        "3. Nút R2: Bắn.\n" +
+                        "4. Nút Vuông (Square): Chuyển súng 1.\n" +
+                        "5. Nút Tròn (Circle): Chuyển súng 2.\n" +
+                        "6. Nút Tam Giác (Triangle): Chuyển súng 3.\n" +
+                        "7. Nút X: Chuyển súng 4.",
                 "Hướng dẫn chơi",
                 JOptionPane.INFORMATION_MESSAGE);
     }
