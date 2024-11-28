@@ -652,9 +652,9 @@ public class PanelGame extends JComponent {
 
         // Main game loop thread
         new Thread(() -> {
+            long lastShotTime = 0; // Thêm biến để theo dõi thời gian bắn cuối cùng
             while (start) {
                 if (player.isAlive()) {
-                    //System.out.println("Player is alive");
                     float speed = 1f; // Movement speed
                     // Player movement
                     if (key.isKey_left()) {
@@ -664,7 +664,6 @@ public class PanelGame extends JComponent {
                         else {
                             System.out.println("left is prevent");
                         }
-
                     }
                     if (key.isKey_right()) {
                         if (!map.checkCollision(player).contains("right")) {
@@ -673,7 +672,6 @@ public class PanelGame extends JComponent {
                         else{
                             System.out.println("right is prevent");
                         }
-
                     }
                     if (key.isKey_up()) {
                         if (!map.checkCollision(player).contains("up")) {
@@ -682,7 +680,6 @@ public class PanelGame extends JComponent {
                         else {
                             System.out.println("up is prevent");
                         }
-
                     }
                     if (key.isKey_down()) {
                         if (!map.checkCollision(player).contains("down")) {
@@ -691,15 +688,10 @@ public class PanelGame extends JComponent {
                         else {
                             System.out.println("down is prevent");
                         }
-
                     }
 
                     // Rotation logic (calculate angle between player and mouse)
                     if (mousePosition != null) {
-                         //System.out.println("mouse position is not null");
-                         //System.out.println(mousePosition.x+"  "+mousePosition.y);
-
-
                         double dx = mousePosition.x - player.getX();
                         double dy = mousePosition.y - player.getY();
 
@@ -718,49 +710,39 @@ public class PanelGame extends JComponent {
                         System.out.println("mouse position is null");
                     }
 
-                    //player.update();
                     checkItems();
 
-                if (key.isKey_1() && GunList.size() > 0) {
-                    gunEquip = GunList.get(0);
-                } else if (key.isKey_2() && GunList.size() > 1) {
-                    gunEquip = GunList.get(1);
-                } else if (key.isKey_3() && GunList.size() > 2) {
-                    gunEquip = GunList.get(2);
-                } else if (key.isKey_4() && GunList.size() > 3) {
-                    gunEquip = GunList.get(3);
-                }
-
-                if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
-                    switch (gunEquip.getName()) {
-                        case "pistol" -> {
-                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8, gunEquip.getName().toString(), Sound.getVolume()));
-                            shotTime = 300;
-                        }
-                        case "rifle" -> {
-                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(), Sound.getVolume()));
-                            shotTime = 30;
-                        }
-                        case "sniper" -> {
-                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(), Sound.getVolume()));
-                            shotTime = 1000;
-                        }
-                        case "grenade" -> {
-                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 0, 8, gunEquip.getName().toString(), Sound.getVolume()));
-                            shotTime = 2000;
-                        }
+                    // Gun selection
+                    if (key.isKey_1() && GunList.size() > 0) {
+                        gunEquip = GunList.get(0);
+                    } else if (key.isKey_2() && GunList.size() > 1) {
+                        gunEquip = GunList.get(1);
+                    } else if (key.isKey_3() && GunList.size() > 2) {
+                        gunEquip = GunList.get(2);
+                    } else if (key.isKey_4() && GunList.size() > 3) {
+                        gunEquip = GunList.get(3);
                     }
 
-                    try {
-                        Thread.sleep(shotTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    // Shooting logic with time-based cooldown
+                    long currentTime = System.currentTimeMillis();
+                    if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
+                        // Kiểm tra thời gian cooldown
+                        int cooldownTime = 0;
+                        switch (gunEquip.getName()) {
+                            case "pistol" -> cooldownTime = 300;
+                            case "rifle" -> cooldownTime = 30;
+                            case "sniper" -> cooldownTime = 1000;
+                            case "grenade" -> cooldownTime = 2000;
+                        }
 
-                } else {
-                    shotTime = 10;
+                        // Chỉ bắn nếu đã qua thời gian cooldown
+                        if (currentTime - lastShotTime >= cooldownTime) {
+                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(),
+                                    20, 8, gunEquip.getName().toString(), Sound.getVolume()));
+                            lastShotTime = currentTime; // Cập nhật thời gian bắn cuối
+                        }
+                    }
                 }
-            }
                 else {
                     if (key.isKey_enter()) {
                         // Reset key states to prevent sticky keys
@@ -796,10 +778,10 @@ public class PanelGame extends JComponent {
                 }
 
                 sleep(5); // Sleep for 5ms to reduce CPU load
-
             }
         }).start();
     }
+
 
     private void checkBullets(Bullet bullet){
         // Duyệt qua danh sách zombie
@@ -838,6 +820,7 @@ public class PanelGame extends JComponent {
             }
         }
     }
+
 
     private void checkPlayer(Enemy enemy) {
         if (enemy.type == 2) {
