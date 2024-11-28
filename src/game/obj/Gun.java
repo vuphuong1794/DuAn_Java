@@ -140,6 +140,24 @@ public class Gun {
         }
     }
 
+    public void resetAmmo() {
+        // Reset to initial ammo count
+        switch(name) {
+            case "pistol":
+                currentAmmo = 100;
+                break;
+            case "rifle":
+                currentAmmo = 0;
+                break;
+            case "sniper":
+                currentAmmo = 0;
+                break;
+            case "grenade":
+                currentAmmo = 0;
+                break;
+        }
+    }
+
     // Method to reload the gun
     public void reload() {
         if (isReloading) {

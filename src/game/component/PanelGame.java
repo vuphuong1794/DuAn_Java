@@ -538,12 +538,23 @@ public class PanelGame extends JComponent {
         items.clear();
         enemies.clear();
         bullets.clear();
-        player.changeLocation(300, 300);
-        player.reset();
         ammoCount = 0;
         startTime = System.nanoTime();
         finalElapsedTime=null;
+        player.changeLocation(300, 300);
+        player.reset();
 
+        // Reset all guns to initial state
+        for (Gun gun : GunList) {
+            gun.resetAmmo(); // Add this method to your Gun class to reset ammo
+        }
+
+        // Reset to default gun
+        gunEquip = GunList.get(0);
+
+        ammoCount = 0;
+        startTime = System.nanoTime();
+        finalElapsedTime = null;
     }
 
     private void updateVolume(int mouseX, int sliderX, int sliderWidth) {
@@ -709,9 +720,57 @@ public class PanelGame extends JComponent {
 
                     //player.update();
                     checkItems();
+
+                if (key.isKey_1() && GunList.size() > 0) {
+                    gunEquip = GunList.get(0);
+                } else if (key.isKey_2() && GunList.size() > 1) {
+                    gunEquip = GunList.get(1);
+                } else if (key.isKey_3() && GunList.size() > 2) {
+                    gunEquip = GunList.get(2);
+                } else if (key.isKey_4() && GunList.size() > 3) {
+                    gunEquip = GunList.get(3);
                 }
+
+                if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
+                    switch (gunEquip.getName()) {
+                        case "pistol" -> {
+                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8, gunEquip.getName().toString(), Sound.getVolume()));
+                            shotTime = 300;
+                        }
+                        case "rifle" -> {
+                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(), Sound.getVolume()));
+                            shotTime = 30;
+                        }
+                        case "sniper" -> {
+                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(), Sound.getVolume()));
+                            shotTime = 1000;
+                        }
+                        case "grenade" -> {
+                            bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 0, 8, gunEquip.getName().toString(), Sound.getVolume()));
+                            shotTime = 2000;
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(shotTime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    shotTime = 10;
+                }
+            }
                 else {
                     if (key.isKey_enter()) {
+                        // Reset key states to prevent sticky keys
+                        key.setKey_1(false);
+                        key.setKey_2(false);
+                        key.setKey_3(false);
+                        key.setKey_4(false);
+                        key.setMouseLeftClick(false);
+
+                        // Reset game
                         resetGame();
                     }
                 }
@@ -737,58 +796,7 @@ public class PanelGame extends JComponent {
                 }
 
                 sleep(5); // Sleep for 5ms to reduce CPU load
-            }
-        }).start();
 
-        // Shooting logic thread
-        new Thread(() -> {
-            while (start) {
-                if (player.isAlive()) {
-                    if (key.isKey_1() && GunList.size() > 0) {
-                        gunEquip = GunList.get(0); // Equip the first gun
-                    } else if (key.isKey_2() && GunList.size() > 1) {
-                        gunEquip = GunList.get(1); // Equip the second gun
-                    } else if (key.isKey_3() && GunList.size() > 2) {
-                        gunEquip = GunList.get(2); // Equip the third gun
-                    } else if (key.isKey_4() && GunList.size() > 3) {
-                        gunEquip = GunList.get(3); // Equip the third gun
-                    } else {
-                        gunEquip = GunList.get(0); // Equip the first gun
-                    }
-
-                    if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
-                        //System.out.println("left click");
-                            switch (gunEquip.getName()) {
-                                case "pistol" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8, gunEquip.getName().toString(), Sound.getVolume()));
-                                    shotTime = 300;
-                                }
-                                case "rifle" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(),Sound.getVolume()));
-                                    shotTime = 30;
-                                }
-                                case "sniper" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString(),Sound.getVolume()));
-                                    shotTime = 1000;
-                                }
-                                case "grenade" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 0, 8, gunEquip.getName().toString(),Sound.getVolume()));
-                                    shotTime = 2000;
-                                }
-
-                        }
-
-                        try {
-                            Thread.sleep(shotTime);
-                            //System.out.println("Thread is sleep");// Sleep to prevent CPU overload
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    else {
-                        shotTime=10;
-                    }
-                }
             }
         }).start();
     }

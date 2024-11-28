@@ -57,7 +57,6 @@ public class Main extends JFrame {
         add(mainPanel);
         cardLayout.show(mainPanel, "Menu");
 
-        // Optional: Handle window opening events (preload resources)
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
