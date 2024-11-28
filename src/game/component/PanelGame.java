@@ -4,6 +4,7 @@ import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
 import net.java.games.input.EventQueue;
+import java.awt.Robot;
 
 import game.obj.*;
 import game.obj.item.Item;
@@ -125,13 +126,15 @@ public class PanelGame extends JComponent {
 
         initObjectGame();
         initKeyboard();
-        initGamepad();
+        try{initGamepad();}
+        catch(Exception e){e.printStackTrace();}
 
         initBullets();
         thread.start();
     }
 
-    private void initGamepad() {
+    private void initGamepad() throws AWTException {
+        Robot robot = new Robot();
         // Detect PS5 controller
         Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
 
@@ -193,11 +196,14 @@ public class PanelGame extends JComponent {
                         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
                         if (isController) {
-                            mousePosition = MouseInfo.getPointerInfo().getLocation();
-                            int newX = (int) mousePosition.getX() + moveX;
-                            int newY = (int) mousePosition.getY() + moveY;
-                            mousePosition.setLocation(newX, newY);
+                            //RIGHT STICK
+                            // Mouse movement
+                            Point mousePosition = MouseInfo.getPointerInfo().getLocation();
+                            int newX = (int) mousePosition.getX() + (int) (rightStickXValue * sensitivity);
+                            int newY = (int) mousePosition.getY() + (int) (rightStickYValue * sensitivity);
+                            robot.mouseMove(newX, newY);
 
+                            //LEFT STICK
                             // Horizontal movement
                             if (stickXValue > deadzone) {
                                 key.setKey_right(true);
