@@ -8,11 +8,11 @@ import java.util.Random;
 import java.awt.geom.Path2D;
 
 public class Enemy {
-    public static final double ENEMY_SIZE = 50;
+    public static double ENEMY_SIZE = 50;
     private double x, y;
-    private static final float ENEMY_SPEED = 0.3f;
+    private float ENEMY_SPEED = 0.3f;
     private float angle = 0;
-    private static final int NUM_IMAGES = 7;
+    private static final int NUM_IMAGES = 11;
     private final Image image;
     private final Area enemyShape;
     private boolean hasEnteredScreen = false;
@@ -21,6 +21,7 @@ public class Enemy {
     private static final float ROTATION_SPEED = 2.0f; // Tốc độ xoay của enemy
     private static final int MIN_DISTANCE = 150; // Khoảng cách tối thiểu với player
     public HpRender hpEnemey;
+    public int type;
 
     private boolean collideLeft;
     private boolean collideRight;
@@ -28,11 +29,32 @@ public class Enemy {
     private boolean collideDown;
     public Enemy()  {
 
-        hpEnemey=new HpRender(20);
         Random random = new Random();
         int imageNumber = random.nextInt(NUM_IMAGES) + 1;
         String imagePath = "/game/image/Z" + imageNumber + ".png";
         this.image = loadImage(imagePath);
+
+        if(imageNumber==6){
+            type = 2;
+            ENEMY_SPEED=0.3f;
+            hpEnemey=new HpRender(35);
+        }
+        else if(imageNumber==7){
+            type = 3;
+            ENEMY_SPEED=0.35f;
+            hpEnemey=new HpRender(50);
+        }
+        else if (imageNumber>=8 && imageNumber<=11){
+            type = 4;
+            ENEMY_SPEED=0.8f;
+            hpEnemey=new HpRender(15);
+        }
+        else{
+            type = 1;
+            ENEMY_SPEED=0.3f;
+            hpEnemey=new HpRender(20);
+        }
+
         Path2D p = new Path2D.Double();
         p.moveTo(0, ENEMY_SIZE/2);
         p.lineTo(15, 10);
@@ -45,6 +67,9 @@ public class Enemy {
         setCollideFalse();
 
     }
+
+
+
     // Phương thức tải hình ảnh và xử lý lỗi nếu có
     private Image loadImage(String path) {
         try {

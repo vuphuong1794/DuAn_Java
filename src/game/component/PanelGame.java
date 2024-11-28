@@ -35,7 +35,7 @@ public class PanelGame extends JComponent {
     private boolean start = true;
     private Key key;
     private Image imagemap;
-    private float shotTime;
+    private long shotTime;
 
     // Game FPS
     private final int FPS = 60;
@@ -647,7 +647,7 @@ public class PanelGame extends JComponent {
                         System.out.println("mouse position is null");
                     }
 
-                    player.update();
+                    //player.update();
                     checkItems();
                 }
                 else {
@@ -697,35 +697,36 @@ public class PanelGame extends JComponent {
                     }
 
                     if (key.isMouseLeftClick() && (mousePosition.x > 280 || mousePosition.x < 135 || mousePosition.y > 105 || mousePosition.y < 85)) {
-                        long currentTime = System.currentTimeMillis();
-                        if (shotTime == 0) {
+                        System.out.println("left click");
                             switch (gunEquip.getName()) {
                                 case "pistol" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 40, 8, gunEquip.getName().toString()));
+                                    shotTime = 300;
                                 }
                                 case "rifle" -> {
-                                    if (gunEquip.getCurrentAmmo() > 0) {
-                                        bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8));
-                                    }
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString()));
+                                    shotTime = 30;
                                 }
                                 case "sniper" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8));
-
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString()));
+                                    shotTime = 1000;
                                 }
                                 case "grenade" -> {
-                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8));
+                                    bullets.add(gunEquip.shoot(player.getX(), player.getY(), player.getAngle(), 20, 8, gunEquip.getName().toString()));
+                                    shotTime = 2000;
                                 }
-                            }
+
                         }
-                        shotTime++;
-                        if (shotTime == 15) {
-                            shotTime = 0;
+
+                        try {
+                            Thread.sleep(shotTime);
+                            System.out.println("Thread is sleep");// Sleep to prevent CPU overload
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
-                    try {
-                        Thread.sleep(10); // Sleep to prevent CPU overload
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    else {
+                        shotTime=10;
                     }
                 }
             }

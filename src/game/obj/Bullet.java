@@ -14,12 +14,33 @@ public class Bullet {
     private float speed=3f;
     private float offsetX;
     private float offsetY;
-    public Bullet (double x, double y, float angle, float offsetX, float offsetY) {
+    public int type;
+    public Bullet (double x, double y, float angle, float offsetX, float offsetY, String nameGun) {
         this.x=x;
         this.y=y;
         this.angle=angle;
         this.offsetX=offsetX;
         this.offsetY=offsetY;
+        if(nameGun.equals("pistol")){
+            damage=6f;
+            type=1;
+            speed=5f;
+        }
+        else if (nameGun.equals("rifle")){
+            damage=4f;
+            type=2;
+            speed=8f;
+        }
+        else if (nameGun.equals("sniper")){
+            damage=20f;
+            type=3;
+            speed=15f;
+        }
+        else {
+            damage=100f;
+            type=4;
+            speed=2f;
+        }
     }
 
     public void update(){
