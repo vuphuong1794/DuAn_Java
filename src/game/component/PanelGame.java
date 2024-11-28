@@ -163,6 +163,20 @@ public class PanelGame extends JComponent {
                         float stickXValue = leftStickX.getPollData();
                         float stickYValue = leftStickY.getPollData();
 
+
+                        // Right stick configuration
+                        Component rightStickX = ps5Controller.getComponent(Component.Identifier.Axis.RX);
+                        Component rightStickY = ps5Controller.getComponent(Component.Identifier.Axis.RY);
+
+                        float rightStickXValue = rightStickX.getPollData();
+                        float rightStickYValue = rightStickY.getPollData();
+
+                        // Scale mouse movement
+                        float sensitivity = 10.0f; // Adjust for faster/slower movement
+                        int moveX = (int) (rightStickXValue * sensitivity);
+                        int moveY = (int) (rightStickYValue * sensitivity);
+
+
                         // Deadzone to prevent drift
                         float deadzone = 0.2f;
 ///////////////////////////////Check if ps5Controller is pressed///////////////////////////////////////////////////////////
@@ -181,7 +195,9 @@ public class PanelGame extends JComponent {
                         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
                         if (isController) {
-
+                            mousePosition = MouseInfo.getPointerInfo().getLocation();
+                            int newX = (int) mousePosition.getX() + moveX;
+                            int newY = (int) mousePosition.getY() + moveY;
                             // Horizontal movement
                             if (stickXValue > deadzone) {
                                 key.setKey_right(true);
