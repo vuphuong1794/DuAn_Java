@@ -152,7 +152,8 @@ public class Player {
 
         // Restore the original transformation state
         g2.setTransform(oldTransform);
-        drawBorder(g2); // Vẽ player
+        //drawBorder(g2); // Vẽ player
+        drawHealth(g2);
     }
     public void drawBorder(Graphics2D g2) {
         AffineTransform oldTransform = g2.getTransform();
@@ -172,6 +173,19 @@ public class Player {
         hpPlayer.hpRender(g2, getShape(),0, (int)(PLAYER_SIZE / 2));
         // Restore the original transformation state
         g2.setTransform(oldTransform);
+    }
+
+    void drawHealth(Graphics2D g2){
+        AffineTransform oldTransform = g2.getTransform();
+        // Draw a red rectangle around the player's hitbox
+        g2.setColor(Color.RED);
+        g2.scale(1, 1);
+
+        // Restore the original transformation state
+        // Render health bar or other overlays
+        hpPlayer.hpRender(g2, getShape(),0, (int)(PLAYER_SIZE / 2));
+        g2.setTransform(oldTransform);
+
     }
     public Area getShape() {
 

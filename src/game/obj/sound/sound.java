@@ -97,7 +97,7 @@ public class sound {
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             float dB ;
             if (volume > 0) {
-                dB = 20f * (float) Math.log10(volume * 0.1f);
+                dB = 20f * (float) Math.log10(volume * 0.3f);
             } else {
                 dB = -80f; // Giá trị tối thiểu để làm im tiếng
             }

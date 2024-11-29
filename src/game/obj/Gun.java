@@ -101,7 +101,7 @@ public class Gun {
         }
         else if (name.equals("grenade")) {
             g2.rotate(Math.toRadians(angle - 90)); // Rotate gun based on player's angle
-            g2.translate(-70, 40);
+            g2.translate(-70, 35);
         }
 
         double scaleFactor = Gun_size / 40.0; // Scale relative to reference size (10.0)

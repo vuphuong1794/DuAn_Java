@@ -1,5 +1,6 @@
 package game.component;
 
+
 import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 import net.java.games.input.Event;
@@ -31,6 +32,7 @@ public class PanelGame extends JComponent {
 
     private Controller ps5Controller;
 
+    private List<Explosion> explosions = new ArrayList<>();
     private Graphics2D g2;
     private BufferedImage image;
     private int width, height;
@@ -106,10 +108,15 @@ public class PanelGame extends JComponent {
         // Cấu hình render cho đồ họa mượt mà hơn
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        final long[] lastTime = {System.currentTimeMillis()};
 
         // Khởi động luồng chính của game
         thread = new Thread(() -> {
             while (start) {
+                long currentTime = System.currentTimeMillis();
+                int deltaTime = (int) (currentTime - lastTime[0]); // Time elapsed since last frame
+                lastTime[0] = currentTime;
+                updateExplosions(deltaTime);
                 long startTime = System.nanoTime();
                 drawBackground();
                 drawGame();
@@ -172,8 +179,8 @@ public class PanelGame extends JComponent {
                         Component rightStickY = ps5Controller.getComponent(Component.Identifier.Axis.RY);
                         float rightStickXValue = rightStickX.getPollData();
                         float rightStickYValue = rightStickY.getPollData();
-                        System.out.println("RX Axis: " + rightStickX.getPollData());
-                        System.out.println("RY Axis: " + rightStickY.getPollData());
+                        //System.out.println("RX Axis: " + rightStickX.getPollData());
+                        //System.out.println("RY Axis: " + rightStickY.getPollData());
                         // Deadzone to prevent drift
                         float deadzone = 0.2f;
 
@@ -188,7 +195,7 @@ public class PanelGame extends JComponent {
                             // Nếu có input từ tay cầm
                             if (value> deadzone || value < -deadzone) {
                                 isController=true;
-                                System.out.println("Gamepad Input Detected: " + componentName + " Value: " + value);
+                                //System.out.println("Gamepad Input Detected: " + componentName + " Value: " + value);
                             }
                         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,7 +217,7 @@ public class PanelGame extends JComponent {
                                 // Calculate new mouse position (absolute screen coordinates)
                                 int newX = (int) mousePosition.getX() + moveX;
                                 int newY = (int) mousePosition.getY() + moveY;
-                                System.out.println("newX: " + newX + " newY: " + newY + " rightStickXvalue: " + rightStickXValue + " rightStickYvalue: " + rightStickYValue);
+                                //System.out.println("newX: " + newX + " newY: " + newY + " rightStickXvalue: " + rightStickXValue + " rightStickYvalue: " + rightStickYValue);
                                 // Move the mouse to the new position
                                 //robot.mouseMove(newX, newY);
                             }
@@ -352,6 +359,26 @@ public class PanelGame extends JComponent {
             //System.out.println("test loi");
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void addExplosion(double x, double y, Image image, int duration) {
+        explosions.add(new Explosion(x, y, image, duration));
+    }
+    private void updateExplosions(int deltaTime) {
+        Iterator<Explosion> iterator = explosions.iterator();
+        while (iterator.hasNext()) {
+            Explosion explosion = iterator.next();
+            explosion.update(deltaTime);
+            if (explosion.isExpired()) {
+                iterator.remove();
+            }
+        }
+    }
+
+    private void renderExplosions(Graphics2D g2, Bullet bullet) {
+        for (Explosion explosion : explosions) {
+            explosion.render(g2,bullet);
         }
     }
 
@@ -730,7 +757,7 @@ public class PanelGame extends JComponent {
                         int cooldownTime = 0;
                         switch (gunEquip.getName()) {
                             case "pistol" -> cooldownTime = 300;
-                            case "rifle" -> cooldownTime = 30;
+                            case "rifle" -> cooldownTime = 150;
                             case "sniper" -> cooldownTime = 1000;
                             case "grenade" -> cooldownTime = 2000;
                         }
@@ -796,7 +823,8 @@ public class PanelGame extends JComponent {
                 if(!area.isEmpty()){
 
                     if(bullet.type==4){
-                        loadImage("/game/image/explode.png");
+                        addExplosion(bullet.getX(), bullet.getY(), loadImage("/game/image/explode.png"), 3000);
+                        renderExplosions(g2,bullet);
                     }
 
                     boomEffects.add(new Effect(bullet.getCenterX(), bullet.getCenterY(),3, 5, 60, 0.5f, new Color(230, 207, 105)));
@@ -822,6 +850,23 @@ public class PanelGame extends JComponent {
     }
 
 
+
+    public void Explodesion(double doubleX, double doubleY, Image image){
+        // Tải hình ảnh bản đồ nếu chưa được tải
+        Image imageExplode = image;
+        int timeCount=0;
+        // Vẽ hình ảnh bản đồ lên nền
+        while (timeCount<3000) {
+            if (imageExplode != null) {
+                g2.drawImage(imageExplode, (int) doubleX, (int) doubleY, width * 3, height * 3, null); // Vẽ hình ảnh với kích thước của panel
+            } else {
+                g2.setColor(new Color(30, 30, 30)); // Màu nền xám đậm nếu không tải được hình ảnh
+                g2.fillRect(0, 0, width, height); // Vẽ hình chữ nhật với kích thước của panel
+            }
+            timeCount+=1;
+        }
+    }
+
     private void checkPlayer(Enemy enemy) {
         if (enemy.type == 2) {
             // tinh khoảng cách
@@ -845,7 +890,7 @@ public class PanelGame extends JComponent {
                 boomEffects.add(new Effect(x, y, 10, 5, 100, 0.5f, new Color(255, 70, 70)));
                 boomEffects.add(new Effect(x, y, 10, 5, 150, 0.2f, new Color(255, 255, 255)));
 
-                player.hpPlayer.updateHP(30);
+                player.hpPlayer.updateHP(20);
             }
         }
 
@@ -993,7 +1038,7 @@ public class PanelGame extends JComponent {
             Enemy enemy = enemies.get(i);
             if (enemy != null) {
                 enemy.draw(g2); // Vẽ từng kẻ thù
-//                enemy.drawBorder(g2); // Vẽ từng kẻ thù
+                //enemy.drawBorder(g2); // Vẽ từng kẻ thù
 
             }
         }
@@ -1015,6 +1060,8 @@ public class PanelGame extends JComponent {
                 item.draw(g2);
             }
         }
+
+
         }
         catch (Exception exception){
             System.out.println(exception.getMessage());

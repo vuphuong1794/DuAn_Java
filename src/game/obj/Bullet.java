@@ -16,7 +16,9 @@ public class Bullet {
     private float offsetX;
     private float offsetY;
     public int type;
+    public Image image;
     public Bullet (double x, double y, float angle, float offsetX, float offsetY, String nameGun) {
+        image=loadImage("/game/image/bullet.png");
         this.x=x;
         this.y=y;
         this.angle=angle;
@@ -25,22 +27,22 @@ public class Bullet {
         if(nameGun.equals("pistol")){
             damage=6f;
             type=1;
-            speed=5f;
+            speed=3f;
         }
         else if (nameGun.equals("rifle")){
             damage=4f;
             type=2;
-            speed=8f;
+            speed=5f;
         }
         else if (nameGun.equals("sniper")){
             damage=20f;
             type=3;
-            speed=15f;
+            speed=8f;
         }
         else if (nameGun.equals("grenade")){
-            damage=100f;
+            damage=20f;
             type=4;
-            speed=5f;
+            speed=1f;
 
         }
     }
@@ -60,11 +62,14 @@ public class Bullet {
     }
     public void draw(Graphics2D g2){
         AffineTransform oldTransform = g2.getTransform();
-        g2.setColor(color);
+       // g2.setColor(color);
         g2.translate(x,y);
         g2.rotate(Math.toRadians(angle)); // Rotate gun based on player's angle
         g2.translate(offsetX, offsetY);
-        g2.fill(shape);
+        g2.scale(0.1f,0.1f);
+        //g2.fill(shape);
+        g2.drawImage(image,20,20,null);
+
         g2.setTransform(oldTransform);
     }
 

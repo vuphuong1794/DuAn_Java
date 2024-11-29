@@ -89,20 +89,24 @@ public class Enemy {
         double dy = playerY - y;
         double angleToPlayer = Math.toDegrees(Math.atan2(dy, dx));
 
-        // Chuẩn hóa góc về khoảng 0-360
-        if (angleToPlayer < 0) {
-            angleToPlayer += 360;
-        }
+        // Lưu trữ vị trí hiện tại trước khi di chuyển
+        double prevX = x;
+        double prevY = y;
+
+        // Di chuyển theo hướng
+        x += Math.cos(Math.toRadians(angle)) * ENEMY_SPEED;
+        y += Math.sin(Math.toRadians(angle)) * ENEMY_SPEED;
 
         // Tính góc xoay ngắn nhất
-        double angleDifference = angleToPlayer - angle;
+        //vd: với góc của player là 10, zombie là 350 thay vì phải quay 360 + 10 thì chỉ cần quay -20 độ
+        double angleDifference = angleToPlayer - angle; //10 - 350 = -340
         if (angleDifference > 180) {
             angleDifference -= 360;
-        } else if (angleDifference < -180) {
-            angleDifference += 360;
+        } else if (angleDifference < -180) { //-340 < 180
+            angleDifference += 360; //-340 + 360 = 20 => chỉ cần xoay 20 độ
         }
 
-        // Xoay enemy
+        // Xoay enemy mượt
         if (Math.abs(angleDifference) > ROTATION_SPEED) {
             if (angleDifference > 0) {
                 angle += ROTATION_SPEED;
@@ -129,42 +133,32 @@ public class Enemy {
         }
 
         //Check va chạm để di chuyển cho đúng
-        if (collider.contains("up")||collider.contains("down")||collider.contains("left")||collider.contains("right")) {
-            if (collider.contains("up")) {
-                collideUp = true;
-                // Di chuyển enemy
-                if (Math.sin(Math.toRadians(angle)) > 0) {
-                    y += Math.sin(Math.toRadians(angle)) * currentSpeed;
-                }
-            }
-            else if (collider.contains("down")) {
-                collideDown = true;
-                if (Math.sin(Math.toRadians(angle)) < 0) {
-                    y += Math.sin(Math.toRadians(angle)) * currentSpeed;
-                }
-            }
-            else  {
-                y += Math.sin(Math.toRadians(angle)) * currentSpeed;
+        // Kiểm tra va chạm chi tiết
+        if (collider.contains("left") || collider.contains("right") ||
+                collider.contains("up") || collider.contains("down")) {
+            // Nếu va chạm, quay lại vị trí cũ
+            x = prevX;
+            y = prevY;
+
+            // Thay đổi hướng để tránh va chạm
+            if (collider.contains("left")) {
+                // Va chạm bên trái, quay sang phải
+                angle = (angle + 90) % 360;
+            } else if (collider.contains("right")) {
+                // Va chạm bên phải, quay sang trái
+                angle = (angle - 90 + 360) % 360;
             }
 
-            if (collider.contains("left")) {
-                collideLeft = true;
-                if (Math.sin(Math.toRadians(angle)) > 0) {
-                    x += Math.sin(Math.toRadians(angle)) * currentSpeed;
-                }
+            if (collider.contains("up")) {
+                // Va chạm phía trên, quay xuống dưới
+                angle = (angle + 90) % 360;
+            } else if (collider.contains("down")) {
+                // Va chạm phía dưới, quay lên trên
+                angle = (angle - 90 + 360) % 360;
             }
-            else if (collider.contains("right")) {
-                collideRight = true;
-                if (Math.sin(Math.toRadians(angle)) < 0) {
-                    x += Math.sin(Math.toRadians(angle)) * currentSpeed;
-                }
-            }
-            else  {
-                x += Math.sin(Math.toRadians(angle)) * currentSpeed;
-            }
-        }
-        else {
+
             setCollideFalse();
+            // Di chuyển trong hướng mới
             x += Math.cos(Math.toRadians(angle)) * currentSpeed;
             y += Math.sin(Math.toRadians(angle)) * currentSpeed;
         }
@@ -201,7 +195,7 @@ public class Enemy {
         // Gan gia tri hp cho Hprender
         hpEnemey.hpRender(g2, shape,x, y+10);
         g2.setTransform(oldTransform);
-        drawBorder(g2);
+        //drawBorder(g2);
     }
 
     public double getX() {
